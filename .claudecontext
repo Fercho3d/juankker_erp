@@ -1,0 +1,15 @@
+# Laravel Project Context
+
+## Include
+- app/**/*.php
+- routes/**/*.php
+- config/**/*.php
+- database/migrations/**/*.php
+- resources/views/**/*.blade.php
+- resources/js/**/*.{js,vue}
+
+## Exclude
+- vendor/**
+- node_modules/**
+- storage/**
+- public/build/**
