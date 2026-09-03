@@ -22,11 +22,19 @@ class User extends Authenticatable
         'email',
         'password',
         'organization_id',
+        'is_superadmin',
+        'last_login_at',
+        'login_count',
     ];
 
     public function organization()
     {
         return $this->belongsTo(Organization::class);
+    }
+
+    public function isSuperadmin(): bool
+    {
+        return (bool) $this->is_superadmin;
     }
 
     /**
@@ -46,6 +54,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'is_superadmin' => 'boolean',
         'password' => 'hashed',
     ];
 }

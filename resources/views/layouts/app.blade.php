@@ -14,7 +14,10 @@
 
 <body>
     <nav class="navbar">
-        <a href="{{ url('/') }}" class="navbar-brand">ERP System</a>
+        <a href="{{ url('/') }}" class="navbar-brand" style="display:inline-flex;align-items:center;gap:8px;">
+            <span style="width:26px;height:26px;background:var(--primary-color);border-radius:7px;display:inline-block;"></span>
+            <span>Juankker <span style="color:var(--text-main);">ERP</span></span>
+        </a>
         <div class="navbar-nav">
             @guest
                 <a href="{{ route('login') }}" class="nav-link">Login</a>
@@ -32,12 +35,19 @@
                 <span class="nav-link">|</span>
                 <a href="{{ route('atributos-producto.index') }}" class="nav-link">Atributos</a>
                 <span class="nav-link">|</span>
-                <a href="{{ route('inventario.index') }}" class="nav-link">Inventario</a>
+                <a href="{{ route('inventario.index') }}" class="nav-link">Inventario @include('partials.pro-badge')</a>
                 <span class="nav-link">|</span>
-                <a href="{{ route('pos.index') }}" class="nav-link fw-bold text-primary">Punto de Venta</a>
+                <a href="{{ route('pos.index') }}" class="nav-link fw-bold text-primary">Punto de Venta @include('partials.pro-badge')</a>
                 <span class="nav-link">|</span>
-                <a href="{{ route('sales.index') }}" class="nav-link">Historial Ventas</a>
+                <a href="{{ route('sales.index') }}" class="nav-link">Historial Ventas @include('partials.pro-badge')</a>
                 <span class="nav-link">|</span>
+                @if(Auth::user()->isSuperadmin())
+                    <a href="{{ route('superadmin.dashboard') }}" class="nav-link" style="color:#1e3a8a;font-weight:700;">⚙ Superadmin</a>
+                    <span class="nav-link">|</span>
+                @else
+                    <a href="{{ route('subscription.index') }}" class="nav-link" title="Mi suscripción">Plan</a>
+                    <span class="nav-link">|</span>
+                @endif
                 <a href="{{ route('profile.edit') }}" class="nav-link" title="Mi Perfil">{{ Auth::user()->name }}</a>
                 <span class="nav-link">|</span>
                 <span class="nav-link">{{ Auth::user()->organization->name ?? 'No Org' }}</span>
@@ -49,6 +59,8 @@
             @endguest
         </div>
     </nav>
+
+    @include('partials.trial-banner')
 
     <main>
         @yield('content')

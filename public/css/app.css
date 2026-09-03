@@ -1,6 +1,6 @@
 :root {
-    --primary-color: #4f46e5;
-    --primary-hover: #4338ca;
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
     --background: #f3f4f6;
     --surface: #ffffff;
     --text-main: #111827;
@@ -289,7 +289,7 @@ body {
 .feature-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border-color: rgba(79, 70, 229, 0.2);
+    border-color: rgba(37, 99, 235, 0.2);
     /* Slight tint of primary on hover */
 }
 
@@ -318,7 +318,7 @@ body {
 .feature-icon {
     width: 56px;
     height: 56px;
-    background-color: #f5f3ff;
+    background-color: #eff6ff;
     /* Very light primary tint */
     border-radius: 16px;
     color: var(--primary-color);
@@ -405,7 +405,7 @@ body {
     width: 44px;
     height: 44px;
     min-width: 44px;
-    background-color: #eef2ff;
+    background-color: #eff6ff;
     border-radius: 12px;
     color: var(--primary-color);
     display: flex;
@@ -597,7 +597,7 @@ body {
 .search-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
 .filter-select {
@@ -790,7 +790,7 @@ body {
 }
 
 .btn-icon-edit:hover {
-    background-color: #eef2ff;
+    background-color: #eff6ff;
 }
 
 .btn-icon-delete {

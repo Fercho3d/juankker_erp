@@ -23,14 +23,36 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductAttributeController;
 use App\Http\Controllers\ProductAttributeValueController;
+use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\PricingController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\BetaRequestController;
+use App\Http\Controllers\SuperadminController;
 
 Route::get('/', [WelcomeController::class, 'index']);
+
+// Página pública de planes y solicitud de beta.
+Route::get('/precios', [PricingController::class, 'index'])->name('pricing');
+Route::post('/beta', [BetaRequestController::class, 'store'])->name('beta.store');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/register/verify', [AuthController::class, 'showVerifyForm'])->name('register.verify');
+    Route::post('/register/verify', [AuthController::class, 'verifyOtp']);
+    Route::post('/register/resend', [AuthController::class, 'resendOtp'])->name('register.resend');
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
+
+    // Recuperación de contraseña.
+    Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequest'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
+
+    // Invitaciones beta.
+    Route::get('/invitacion/{token}', [AuthController::class, 'showInvitation'])->name('invitation.show');
+    Route::post('/invitacion/{token}', [AuthController::class, 'acceptInvitation'])->name('invitation.accept');
 });
 
 Route::middleware('auth')->group(function () {
@@ -39,6 +61,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Suscripción del tenant.
+    Route::get('/suscripcion', [SubscriptionController::class, 'index'])->name('subscription.index');
+    Route::get('/suscripcion/upgrade/{plan}', [SubscriptionController::class, 'upgrade'])->name('subscription.upgrade');
+    Route::post('/suscripcion/confirmar/{plan}', [SubscriptionController::class, 'confirm'])->name('subscription.confirm');
+    Route::post('/suscripcion/cancelar', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
 
     // Clients & Suppliers
     Route::resource('clientes', ClientController::class)->except(['show'])->parameters(['clientes' => 'cliente']);
@@ -62,7 +90,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('valores/{valor}', [ProductAttributeValueController::class, 'destroy'])->name('valores.destroy');
     });
 
-    // POS Routes
+    // POS Routes (Premium)
+    Route::middleware('premium')->group(function () {
     Route::get('/pos', [App\Http\Controllers\POSController::class, 'index'])->name('pos.index');
     Route::prefix('pos')->name('pos.')->group(function () {
         Route::get('search', [App\Http\Controllers\POSController::class, 'search'])->name('search');
@@ -82,4 +111,35 @@ Route::middleware('auth')->group(function () {
 
     // Inventory
     Route::resource('inventario', App\Http\Controllers\InventoryController::class)->only(['index', 'update']);
+    }); // fin grupo premium (POS, ventas, inventario)
+});
+
+/* ==================== SUPERADMIN ==================== */
+Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::get('/', [SuperadminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/organizaciones', [SuperadminController::class, 'index'])->name('index');
+    Route::get('/uso', [SuperadminController::class, 'uso'])->name('uso');
+    Route::get('/org/{organization}', [SuperadminController::class, 'show'])->name('show');
+    Route::put('/org/{organization}/suscripcion', [SuperadminController::class, 'updateSubscription'])->name('subscription.update');
+    Route::post('/org/{organization}/trial', [SuperadminController::class, 'activateTrial'])->name('subscription.trial');
+    Route::post('/impersonate/{user}', [SuperadminController::class, 'impersonate'])->name('impersonate');
+    Route::post('/stop-impersonating', [SuperadminController::class, 'stopImpersonating'])->name('stop-impersonating');
+
+    // Planes
+    Route::get('/planes', [SuperadminController::class, 'planes'])->name('planes');
+    Route::post('/planes', [SuperadminController::class, 'storePlan'])->name('planes.store');
+    Route::put('/planes/{plan}', [SuperadminController::class, 'updatePlan'])->name('planes.update');
+    Route::delete('/planes/{plan}', [SuperadminController::class, 'destroyPlan'])->name('planes.destroy');
+    Route::put('/settings', [SuperadminController::class, 'updateSettings'])->name('settings.update');
+
+    // Invitaciones
+    Route::get('/invitaciones', [SuperadminController::class, 'invitations'])->name('invitations');
+    Route::post('/invitaciones', [SuperadminController::class, 'storeInvitation'])->name('invitations.store');
+    Route::post('/invitaciones/{invitation}/reenviar', [SuperadminController::class, 'resendInvitation'])->name('invitations.resend');
+    Route::delete('/invitaciones/{invitation}', [SuperadminController::class, 'destroyInvitation'])->name('invitations.destroy');
+
+    // Solicitudes beta
+    Route::get('/beta', [SuperadminController::class, 'betaRequests'])->name('beta');
+    Route::post('/beta/{betaRequest}/invitar', [SuperadminController::class, 'inviteBeta'])->name('beta.invite');
+    Route::post('/beta/{betaRequest}/descartar', [SuperadminController::class, 'dismissBeta'])->name('beta.dismiss');
 });
