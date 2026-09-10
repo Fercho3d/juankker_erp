@@ -28,6 +28,9 @@ use App\Http\Controllers\PricingController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\BetaRequestController;
 use App\Http\Controllers\SuperadminController;
+use App\Http\Controllers\CrmController;
+use App\Http\Controllers\LeadController;
+use App\Http\Controllers\CrmActivityController;
 
 Route::get('/', [WelcomeController::class, 'index']);
 
@@ -67,6 +70,27 @@ Route::middleware('auth')->group(function () {
     Route::get('/suscripcion/upgrade/{plan}', [SubscriptionController::class, 'upgrade'])->name('subscription.upgrade');
     Route::post('/suscripcion/confirmar/{plan}', [SubscriptionController::class, 'confirm'])->name('subscription.confirm');
     Route::post('/suscripcion/cancelar', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+
+    // CRM (Premium)
+    Route::middleware('premium:crm')->prefix('crm')->name('crm.')->group(function () {
+        Route::get('/', [CrmController::class, 'pendientes'])->name('pendientes');
+        Route::get('tablero', [CrmController::class, 'tablero'])->name('tablero');
+        Route::post('leads/{lead}/mover', [CrmController::class, 'mover'])->name('leads.mover');
+
+        Route::get('importar', [LeadController::class, 'importarForm'])->name('leads.importar.form');
+        Route::post('importar', [LeadController::class, 'importar'])->name('leads.importar');
+
+        Route::get('leads/nuevo', [LeadController::class, 'create'])->name('leads.create');
+        Route::post('leads', [LeadController::class, 'store'])->name('leads.store');
+        Route::get('leads/{lead}', [LeadController::class, 'show'])->whereNumber('lead')->name('leads.show');
+        Route::get('leads/{lead}/editar', [LeadController::class, 'edit'])->whereNumber('lead')->name('leads.edit');
+        Route::put('leads/{lead}', [LeadController::class, 'update'])->whereNumber('lead')->name('leads.update');
+        Route::delete('leads/{lead}', [LeadController::class, 'destroy'])->whereNumber('lead')->name('leads.destroy');
+        Route::post('leads/{lead}/convertir', [LeadController::class, 'convertir'])->whereNumber('lead')->name('leads.convertir');
+
+        Route::post('leads/{lead}/actividades', [CrmActivityController::class, 'store'])->whereNumber('lead')->name('actividades.store');
+        Route::post('actividades/{actividad}/completar', [CrmActivityController::class, 'completar'])->name('actividades.completar');
+    });
 
     // Clients & Suppliers
     Route::resource('clientes', ClientController::class)->except(['show'])->parameters(['clientes' => 'cliente']);

@@ -23,6 +23,8 @@
                 <a href="{{ route('login') }}" class="nav-link">Login</a>
                 <a href="{{ route('register') }}" class="btn-nav">Get Started</a>
             @else
+                <a href="{{ route('crm.pendientes') }}" class="nav-link fw-bold" style="color:#4f46e5;font-weight:700;">CRM @include('partials.pro-badge')</a>
+                <span class="nav-link">|</span>
                 <a href="{{ route('clientes.index') }}" class="nav-link">Clientes</a>
                 <span class="nav-link">|</span>
                 <a href="{{ route('proveedores.index') }}" class="nav-link">Proveedores</a>
