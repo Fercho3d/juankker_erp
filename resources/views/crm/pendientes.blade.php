@@ -60,9 +60,12 @@
                     </span>
                     <span class="shrink-0 hidden sm:inline text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">{{ $lead->stage->nombre }}</span>
                 </a>
+                {{-- El hueco del teléfono se aparta aunque no haya, para que las columnas no bailen --}}
                 @if ($tel = $lead->telefonoDigitos())
                     <a href="tel:+52{{ $tel }}"
-                       class="shrink-0 mr-3 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-md no-underline tabular-nums">{{ $lead->telefono }}</a>
+                       class="shrink-0 mr-3 sm:w-28 text-center text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-md no-underline tabular-nums">{{ $lead->telefono }}</a>
+                @else
+                    <span class="shrink-0 mr-3 hidden sm:block sm:w-28" aria-hidden="true"></span>
                 @endif
                 </div>
             @endforeach
@@ -108,12 +111,15 @@
                     </div>
                     <span class="shrink-0 hidden sm:inline text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">{{ $lead->stage->nombre }}</span>
                     @if ($lead->diasSinContacto() !== null)
-                        <span class="shrink-0 hidden sm:inline text-xs text-gray-400 tabular-nums w-24 text-right">{{ $lead->diasSinContacto() }} días sin contacto</span>
+                        <span class="shrink-0 hidden sm:inline text-xs text-gray-400 tabular-nums w-32 text-right whitespace-nowrap">{{ $lead->diasSinContacto() }} días sin contacto</span>
                     @endif
                 </a>
+                {{-- El hueco del teléfono se aparta aunque no haya, para que las columnas no bailen --}}
                 @if ($tel = $lead->telefonoDigitos())
                     <a href="tel:+52{{ $tel }}"
-                       class="shrink-0 mr-3 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-md no-underline tabular-nums">{{ $lead->telefono }}</a>
+                       class="shrink-0 mr-3 sm:w-28 text-center text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-md no-underline tabular-nums">{{ $lead->telefono }}</a>
+                @else
+                    <span class="shrink-0 mr-3 hidden sm:block sm:w-28" aria-hidden="true"></span>
                 @endif
                 </div>
             @endforeach

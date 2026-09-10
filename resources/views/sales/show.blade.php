@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @push('styles')
+    {{-- Los íconos ri-* nunca se cargaban: se veían recuadros vacíos --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {

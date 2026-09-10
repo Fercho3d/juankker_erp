@@ -1,0 +1,562 @@
+/* =========================================================================
+   Cascarón de la app: menú lateral, barra superior, menú de usuario y
+   selectores de tema e idioma.
+
+   Estilos propios y no Tailwind: tres vistas no cargan Tailwind y el
+   cascarón tiene que verse igual en todas. Claro y oscuro salen de las
+   mismas variables; la clase `dark` del <html> la pone el servidor o
+   partials/theme-script antes del primer pintado.
+   ========================================================================= */
+
+:root {
+    --sh-bg: #f5f6f8;
+    --sh-panel: #ffffff;
+    --sh-raised: #f1f3f7;
+    --sh-line: #e6e8ec;
+    --sh-ink: #0f172a;
+    --sh-ink-soft: #334155;
+    --sh-ink-muted: #64748b;
+    --sh-ink-faint: #94a3b8;
+    --sh-accent: #4f46e5;
+    --sh-accent-ink: #4338ca;
+    --sh-accent-soft: rgba(79, 70, 229, .09);
+    --sh-danger: #e11d48;
+    --sh-shadow: 0 12px 32px -12px rgba(15, 23, 42, .28);
+    --sh-sidebar: 16rem;
+    --sh-sidebar-mini: 4.5rem;
+    --sh-header: 3.75rem;
+}
+
+html.dark {
+    --sh-bg: #0b0f17;
+    --sh-panel: #111722;
+    --sh-raised: #1a2130;
+    --sh-line: #232b3a;
+    --sh-ink: #e7eaf0;
+    --sh-ink-soft: #c9d0db;
+    --sh-ink-muted: #8f9aac;
+    --sh-ink-faint: #667085;
+    --sh-accent: #818cf8;
+    --sh-accent-ink: #a5b4fc;
+    --sh-accent-soft: rgba(129, 140, 248, .13);
+    --sh-danger: #fb7185;
+    --sh-shadow: 0 16px 36px -12px rgba(0, 0, 0, .75);
+}
+
+.shell-body {
+    background: var(--sh-bg);
+    color: var(--sh-ink);
+}
+
+.shell-sidebar, .shell-sidebar *,
+.shell-header, .shell-header *,
+.shell-guestbar, .shell-guestbar *,
+.shell-trial, .shell-trial * {
+    box-sizing: border-box;
+}
+
+.shell-icon { display: block; width: 1.15rem; height: 1.15rem; flex-shrink: 0; }
+
+/* --- Menú lateral: cajón en móvil, fijo desde 1024px ------------------- */
+
+.shell-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 50;
+    width: var(--sh-sidebar);
+    display: flex;
+    flex-direction: column;
+    background: var(--sh-panel);
+    border-right: 1px solid var(--sh-line);
+    transform: translateX(-100%);
+    transition: transform .22s ease, width .22s ease;
+}
+
+.shell-body.menu-abierto { overflow: hidden; }
+.shell-body.menu-abierto .shell-sidebar { transform: none; box-shadow: var(--sh-shadow); }
+
+.shell-brand {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    height: var(--sh-header);
+    padding: 0 .75rem 0 1.1rem;
+    border-bottom: 1px solid var(--sh-line);
+    flex-shrink: 0;
+}
+
+.shell-brand-link {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    min-width: 0;
+    flex: 1;
+    color: var(--sh-ink);
+    text-decoration: none;
+}
+
+.shell-logo {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border-radius: .6rem;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    box-shadow: 0 6px 14px -6px rgba(99, 102, 241, .7);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.shell-brand-name {
+    font-size: 1.02rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+}
+
+.shell-brand-name span { color: var(--sh-ink-faint); font-weight: 600; }
+
+.shell-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding: .9rem .65rem;
+    overflow-y: auto;
+}
+
+.shell-nav-label {
+    margin: 0 0 .35rem;
+    padding: 0 .7rem;
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--sh-ink-faint);
+}
+
+.shell-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    width: 100%;
+    margin: 1px 0;
+    padding: .55rem .7rem;
+    border: 0;
+    border-radius: .6rem;
+    background: none;
+    color: var(--sh-ink-muted);
+    font-family: inherit;
+    font-size: .875rem;
+    font-weight: 500;
+    line-height: 1.25;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+
+.shell-link:hover { background: var(--sh-raised); color: var(--sh-ink); }
+
+.shell-link.is-active {
+    background: var(--sh-accent-soft);
+    color: var(--sh-accent-ink);
+    font-weight: 600;
+}
+
+.shell-link.is-active::before {
+    content: '';
+    position: absolute;
+    top: .45rem;
+    bottom: .45rem;
+    left: -.65rem;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--sh-accent);
+}
+
+.shell-link-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.shell-sidebar-foot {
+    display: none; /* sólo trae "Contraer menú", que es de escritorio */
+    flex-shrink: 0;
+    padding: .65rem;
+    border-top: 1px solid var(--sh-line);
+}
+
+.pro-badge {
+    display: inline-block;
+    flex-shrink: 0;
+    padding: .22rem .38rem;
+    border-radius: .35rem;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: .6rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+html.dark .pro-badge { background: rgba(245, 158, 11, .16); color: #fcd34d; }
+
+.shell-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(2, 6, 23, .55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+}
+
+.shell-body.menu-abierto .shell-backdrop { opacity: 1; pointer-events: auto; }
+
+/* --- Columna principal y barra superior -------------------------------- */
+
+.shell-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 100vh;
+    transition: padding-left .22s ease;
+}
+
+.shell-header,
+.shell-guestbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    height: var(--sh-header);
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--sh-line);
+    background: var(--sh-panel);
+    background: color-mix(in srgb, var(--sh-panel) 86%, transparent);
+    -webkit-backdrop-filter: saturate(1.4) blur(10px);
+    backdrop-filter: saturate(1.4) blur(10px);
+}
+
+.shell-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    color: var(--sh-ink-soft);
+    font-size: .95rem;
+    font-weight: 600;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.shell-icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    padding: 0;
+    border: 0;
+    border-radius: .55rem;
+    background: none;
+    color: var(--sh-ink-muted);
+    cursor: pointer;
+}
+
+.shell-icon-btn:hover { background: var(--sh-raised); color: var(--sh-ink); }
+.shell-icon-btn .shell-icon { width: 1.25rem; height: 1.25rem; }
+
+.shell-toggles { display: none; align-items: center; gap: .5rem; }
+
+.shell-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--sh-line);
+    border-radius: 999px;
+    background: var(--sh-panel);
+}
+
+.shell-pill-btn {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--sh-ink-faint);
+    font-family: inherit;
+    font-size: .68rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+
+.shell-pill-btn:hover { color: var(--sh-ink-soft); }
+
+.shell-pill-btn[aria-checked="true"] {
+    background: var(--sh-raised);
+    color: var(--sh-accent-ink);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .14);
+}
+
+.shell-pill-icon { display: block; width: 1rem; height: 1rem; }
+
+/* --- Menú de usuario ---------------------------------------------------- */
+
+.shell-user { position: relative; flex-shrink: 0; }
+
+.shell-user-btn {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .3rem .45rem;
+    border: 0;
+    border-radius: .65rem;
+    background: none;
+    color: var(--sh-ink-soft);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.shell-user-btn:hover { background: var(--sh-raised); }
+
+.shell-avatar {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.shell-user-name { display: none; flex-direction: column; max-width: 11rem; line-height: 1.15; }
+
+.shell-user-name span,
+.shell-user-name small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.shell-user-name span { color: var(--sh-ink); font-size: .85rem; font-weight: 600; }
+.shell-user-name small { color: var(--sh-ink-faint); font-size: .72rem; }
+
+.shell-caret { display: none; width: 1rem; height: 1rem; color: var(--sh-ink-faint); }
+
+.shell-menu {
+    position: absolute;
+    top: calc(100% + .5rem);
+    right: 0;
+    z-index: 60;
+    width: 15rem;
+    padding: .4rem;
+    border: 1px solid var(--sh-line);
+    border-radius: .85rem;
+    background: var(--sh-panel);
+    box-shadow: var(--sh-shadow);
+}
+
+.shell-menu[hidden] { display: none; }
+
+.shell-menu-head {
+    margin-bottom: .3rem;
+    padding: .5rem .65rem .6rem;
+    border-bottom: 1px solid var(--sh-line);
+}
+
+.shell-menu-head p,
+.shell-menu-head small {
+    display: block;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.shell-menu-head p { color: var(--sh-ink); font-size: .85rem; font-weight: 600; }
+.shell-menu-head small { color: var(--sh-ink-faint); font-size: .75rem; }
+
+.shell-menu-prefs {
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+    margin-bottom: .3rem;
+    padding: .45rem .65rem .6rem;
+    border-bottom: 1px solid var(--sh-line);
+}
+
+.shell-menu-prefs > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    color: var(--sh-ink-muted);
+    font-size: .82rem;
+}
+
+.shell-menu form { margin: 0; }
+
+.shell-menu-item {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    width: 100%;
+    padding: .5rem .65rem;
+    border: 0;
+    border-radius: .55rem;
+    background: none;
+    color: var(--sh-ink-soft);
+    font-family: inherit;
+    font-size: .85rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.shell-menu-item:hover { background: var(--sh-raised); color: var(--sh-ink); }
+.shell-menu-item .shell-icon { width: 1rem; height: 1rem; }
+.shell-menu-item.is-danger { color: var(--sh-danger); }
+
+/* --- Banner de prueba, contenido y barra de visitantes ------------------ */
+
+.shell-trial {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: .3rem .9rem;
+    padding: .5rem 1rem;
+    background: linear-gradient(90deg, #312e81, #4338ca);
+    color: #e0e7ff;
+    font-size: .82rem;
+    text-align: center;
+}
+
+.shell-trial a { color: #fff; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+.shell-content { flex: 1; min-width: 0; }
+
+.shell-guestbar { justify-content: space-between; }
+.shell-guestbar .shell-brand-link { flex: 0 1 auto; }
+.shell-guestbar-end { display: flex; align-items: center; gap: .75rem; }
+.shell-toggles.is-guest { display: flex; }
+
+.shell-guest-link {
+    color: var(--sh-ink-muted);
+    font-size: .875rem;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.shell-guest-link:hover { color: var(--sh-ink); }
+
+.shell-guest-cta {
+    padding: .5rem .9rem;
+    border-radius: .6rem;
+    background: #4f46e5;
+    color: #fff;
+    font-size: .85rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.shell-guest-cta:hover { background: #4338ca; }
+
+/* --- Foco visible con teclado ------------------------------------------- */
+
+.shell-link:focus-visible,
+.shell-icon-btn:focus-visible,
+.shell-pill-btn:focus-visible,
+.shell-user-btn:focus-visible,
+.shell-menu-item:focus-visible,
+.shell-brand-link:focus-visible,
+.shell-guest-link:focus-visible,
+.shell-guest-cta:focus-visible {
+    outline: 2px solid var(--sh-accent);
+    outline-offset: 2px;
+}
+
+/* --- Tamaños ------------------------------------------------------------ */
+
+.shell-only-desktop { display: none !important; }
+
+@media (max-width: 479px) {
+    .shell-guestbar .shell-brand-name,
+    .shell-guestbar .shell-guest-link { display: none; }
+}
+
+@media (min-width: 640px) {
+    .shell-header, .shell-guestbar { padding: 0 1.5rem; }
+    .shell-toggles { display: flex; }
+    .shell-caret { display: block; }
+    .shell-menu-prefs { display: none; }
+}
+
+@media (min-width: 768px) {
+    .shell-user-name { display: flex; }
+}
+
+@media (min-width: 1024px) {
+    .shell-sidebar { transform: none; }
+    .shell-main { padding-left: var(--sh-sidebar); }
+    .shell-backdrop, .shell-only-mobile { display: none !important; }
+    .shell-only-desktop { display: flex !important; }
+    .shell-sidebar-foot { display: block; }
+    .shell-body.menu-abierto { overflow: visible; }
+
+    /* Menú contraído: sólo íconos (la etiqueta queda en el title) */
+    html.menu-mini .shell-sidebar { width: var(--sh-sidebar-mini); }
+    html.menu-mini .shell-main { padding-left: var(--sh-sidebar-mini); }
+    html.menu-mini .shell-brand { justify-content: center; padding: 0; }
+    html.menu-mini .shell-brand-link { flex: 0 0 auto; }
+    html.menu-mini .shell-brand-name,
+    html.menu-mini .shell-link-text,
+    html.menu-mini .shell-sidebar .pro-badge { display: none; }
+    html.menu-mini .shell-nav-label {
+        height: 1px;
+        margin: 0 .6rem .55rem;
+        padding: 0;
+        overflow: hidden;
+        background: var(--sh-line);
+        color: transparent;
+    }
+    html.menu-mini .shell-link { justify-content: center; padding: .6rem; }
+    html.menu-mini .shell-link.is-active::before { left: -.65rem; }
+    html.menu-mini .shell-collapse-btn .shell-icon { transform: scaleX(-1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shell-sidebar, .shell-main, .shell-backdrop { transition: none; }
+}
+
+@media print {
+    .shell-sidebar, .shell-header, .shell-backdrop, .shell-trial, .shell-guestbar { display: none !important; }
+    .shell-main { padding-left: 0 !important; }
+}

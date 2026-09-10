@@ -31,8 +31,13 @@ use App\Http\Controllers\SuperadminController;
 use App\Http\Controllers\CrmController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\CrmActivityController;
+use App\Http\Controllers\PreferenceController;
 
 Route::get('/', [WelcomeController::class, 'index']);
+
+// Tema e idioma: abiertos también a visitantes, que los guardan en cookie.
+Route::put('/preferencias/tema', [PreferenceController::class, 'theme'])->name('preferences.theme');
+Route::put('/preferencias/idioma', [PreferenceController::class, 'locale'])->name('preferences.locale');
 
 // Página pública de planes y solicitud de beta.
 Route::get('/precios', [PricingController::class, 'index'])->name('pricing');

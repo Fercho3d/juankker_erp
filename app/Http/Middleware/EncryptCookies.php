@@ -12,6 +12,7 @@ class EncryptCookies extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        // La escribe el navegador en claro con el tema ya resuelto (ver Theme).
+        \App\Support\Theme::RESOLVED_COOKIE,
     ];
 }

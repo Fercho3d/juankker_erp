@@ -1,0 +1,169 @@
+/* =========================================================================
+   Modo oscuro para las vistas existentes.
+
+   Las vistas usan colores de Tailwind escritos a mano (bg-white,
+   text-gray-900…). En lugar de sembrar `dark:` en miles de clases, esta hoja
+   reasigna la paleta cuando el <html> lleva la clase `dark`. El selector
+   `html.dark .bg-white` pesa más que el `.bg-white` que genera el Tailwind
+   del CDN, así que gana sin !important y sin importar el orden de carga.
+
+   La lista sale de las clases que de verdad aparecen en resources/views; si
+   una vista nueva usa otro tono y se ve mal en oscuro, se agrega aquí.
+   ========================================================================= */
+
+html.dark {
+    --d-surface: #131a26;
+    --d-surface-2: #161e2b;
+    --d-surface-3: #1b2433;
+    --d-surface-4: #263042;
+    --d-t1: #e7eaf0;
+    --d-t2: #cfd5df;
+    --d-t3: #aab3c1;
+    --d-t4: #8d97a8;
+    --d-t5: #6f7a8c;
+    --d-t6: #5a6577;
+    --d-b1: #1f2837;
+    --d-b2: #263042;
+    --d-b3: #334155;
+    --d-b4: #475569;
+
+    /* Variables de public/css/app.css */
+    --background: #0b0f17;
+    --surface: #131a26;
+    --text-main: #e7eaf0;
+    --text-muted: #8d97a8;
+    --border: #263042;
+    --shadow: 0 4px 10px -2px rgba(0, 0, 0, .5);
+}
+
+html.dark ::placeholder { color: var(--d-t5); opacity: 1; }
+
+/* --- Fondos neutros ------------------------------------------------------ */
+
+html.dark .bg-white { background-color: var(--d-surface); }
+html.dark .bg-gray-50, html.dark .bg-slate-50 { background-color: var(--d-surface-2); }
+html.dark .bg-slate-50\/50 { background-color: rgba(22, 30, 43, .6); }
+html.dark .bg-gray-100, html.dark .bg-slate-100 { background-color: var(--d-surface-3); }
+html.dark .bg-gray-200, html.dark .bg-slate-200 { background-color: var(--d-surface-4); }
+/* Botones oscuros: si se quedaran en gray-900 desaparecerían contra el fondo */
+html.dark .bg-gray-900 { background-color: #2c3749; }
+
+html.dark .hover\:bg-gray-50:hover, html.dark .hover\:bg-slate-50:hover { background-color: var(--d-surface-3); }
+html.dark .hover\:bg-slate-100:hover { background-color: #222c3d; }
+html.dark .hover\:bg-gray-800:hover { background-color: #3a465a; }
+
+/* --- Fondos con tinte: pasteles → velos translúcidos --------------------- */
+
+html.dark .bg-indigo-50 { background-color: rgba(99, 102, 241, .14); }
+html.dark .bg-blue-50 { background-color: rgba(59, 130, 246, .14); }
+html.dark .bg-violet-50 { background-color: rgba(139, 92, 246, .14); }
+html.dark .bg-emerald-50 { background-color: rgba(16, 185, 129, .13); }
+html.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, .2); }
+html.dark .bg-rose-50 { background-color: rgba(244, 63, 94, .13); }
+html.dark .bg-red-50 { background-color: rgba(239, 68, 68, .13); }
+html.dark .bg-red-100 { background-color: rgba(239, 68, 68, .2); }
+html.dark .bg-amber-50 { background-color: rgba(245, 158, 11, .13); }
+html.dark .bg-amber-100 { background-color: rgba(245, 158, 11, .2); }
+
+html.dark .hover\:bg-indigo-50:hover, html.dark .group:hover .group-hover\:bg-indigo-50 { background-color: rgba(99, 102, 241, .18); }
+html.dark .hover\:bg-indigo-100:hover { background-color: rgba(99, 102, 241, .26); }
+html.dark .hover\:bg-red-50:hover { background-color: rgba(239, 68, 68, .16); }
+html.dark .hover\:bg-emerald-100:hover { background-color: rgba(16, 185, 129, .24); }
+html.dark .hover\:bg-amber-50\/50:hover { background-color: rgba(245, 158, 11, .08); }
+
+/* --- Texto neutro -------------------------------------------------------- */
+
+html.dark .text-gray-900, html.dark .text-slate-900,
+html.dark .text-gray-800, html.dark .text-slate-800 { color: var(--d-t1); }
+html.dark .text-gray-700, html.dark .text-slate-700 { color: var(--d-t2); }
+html.dark .text-gray-600, html.dark .text-slate-600 { color: var(--d-t3); }
+html.dark .text-gray-500, html.dark .text-slate-500 { color: var(--d-t4); }
+html.dark .text-gray-400, html.dark .text-slate-400 { color: var(--d-t5); }
+html.dark .text-slate-300 { color: var(--d-t6); }
+
+html.dark .hover\:text-gray-900:hover, html.dark .hover\:text-slate-800:hover { color: var(--d-t1); }
+html.dark .hover\:text-gray-700:hover { color: var(--d-t2); }
+html.dark .hover\:text-gray-600:hover { color: var(--d-t3); }
+
+/* --- Texto de color: un tono más claro para que contraste --------------- */
+
+html.dark .text-indigo-500, html.dark .text-indigo-600 { color: #818cf8; }
+html.dark .text-indigo-700, html.dark .text-indigo-800, html.dark .text-indigo-900 { color: #a5b4fc; }
+html.dark .hover\:text-indigo-600:hover, html.dark .hover\:text-indigo-700:hover,
+html.dark .hover\:text-indigo-800:hover, html.dark .group:hover .group-hover\:text-indigo-300 { color: #c7d2fe; }
+html.dark .text-blue-600 { color: #60a5fa; }
+html.dark .text-blue-700, html.dark .text-blue-800 { color: #93c5fd; }
+html.dark .text-violet-800 { color: #c4b5fd; }
+html.dark .text-emerald-500, html.dark .text-emerald-600 { color: #34d399; }
+html.dark .text-emerald-700, html.dark .text-emerald-800 { color: #6ee7b7; }
+html.dark .text-rose-500, html.dark .text-rose-600 { color: #fb7185; }
+html.dark .text-rose-700, html.dark .text-rose-800 { color: #fda4af; }
+html.dark .text-red-500, html.dark .text-red-600 { color: #f87171; }
+html.dark .text-red-700, html.dark .text-red-800, html.dark .hover\:text-red-700:hover { color: #fca5a5; }
+html.dark .text-amber-600 { color: #fbbf24; }
+html.dark .text-amber-700, html.dark .text-amber-800, html.dark .hover\:text-amber-800:hover { color: #fcd34d; }
+
+/* --- Bordes y divisores -------------------------------------------------- */
+
+html.dark .border-gray-100, html.dark .border-slate-100 { border-color: var(--d-b1); }
+html.dark .border-gray-200, html.dark .border-slate-200 { border-color: var(--d-b2); }
+html.dark .border-gray-300, html.dark .border-slate-300 { border-color: var(--d-b3); }
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--d-b1); }
+html.dark .hover\:border-gray-300:hover, html.dark .hover\:border-gray-400:hover,
+html.dark .hover\:border-slate-300:hover { border-color: var(--d-b4); }
+
+html.dark .border-indigo-100 { border-color: rgba(99, 102, 241, .3); }
+html.dark .border-emerald-100, html.dark .border-emerald-200 { border-color: rgba(16, 185, 129, .3); }
+html.dark .border-red-200 { border-color: rgba(239, 68, 68, .35); }
+html.dark .border-rose-200 { border-color: rgba(244, 63, 94, .35); }
+html.dark .border-amber-200 { border-color: rgba(245, 158, 11, .35); }
+
+/* --- Componentes de public/css/app.css con color fijo ------------------- */
+
+html.dark .navbar { box-shadow: none; }
+html.dark .form-control { background-color: var(--d-surface-2); color: var(--d-t1); border-color: var(--d-b2); }
+html.dark .form-control:focus { background-color: var(--d-surface-2); color: var(--d-t1); }
+html.dark .search-input, html.dark .filter-select { background-color: var(--d-surface-2); color: var(--d-t1); }
+html.dark .feature-card { border-color: var(--d-b2); }
+html.dark .feature-icon, html.dark .settings-card-icon, html.dark .btn-icon-edit:hover { background-color: rgba(59, 130, 246, .15); }
+html.dark .settings-card-icon.icon-danger, html.dark .btn-icon-delete:hover { background-color: rgba(239, 68, 68, .15); color: #f87171; }
+html.dark .btn-icon-delete { color: #f87171; }
+html.dark .alert-success { background-color: rgba(16, 185, 129, .13); color: #6ee7b7; border-color: rgba(16, 185, 129, .3); }
+html.dark .alert-success svg { color: #34d399; }
+html.dark .settings-card-danger { border-color: rgba(239, 68, 68, .35); }
+html.dark .data-table thead, html.dark .data-table tbody tr:hover { background-color: var(--d-surface-2); }
+html.dark .rfc-code, html.dark .badge-muted, html.dark .table-footer nav a:hover { background-color: var(--d-surface-3); color: var(--d-t3); }
+html.dark .table-footer nav span[aria-disabled] { color: var(--d-t6); }
+html.dark .badge-success { background-color: rgba(16, 185, 129, .15); color: #6ee7b7; }
+html.dark .badge-info { background-color: rgba(59, 130, 246, .15); color: #93c5fd; }
+html.dark .badge-purple { background-color: rgba(139, 92, 246, .15); color: #c4b5fd; }
+html.dark .badge-warning { background-color: rgba(245, 158, 11, .15); color: #fcd34d; }
+html.dark .invalid-feedback { color: #f87171; }
+
+/* Paginación de Laravel (vendor/pagination/tailwind) */
+html.dark nav[role="navigation"] span[aria-current] > span,
+html.dark nav[role="navigation"] a,
+html.dark nav[role="navigation"] span[aria-disabled] > span {
+    background-color: var(--d-surface);
+    border-color: var(--d-b2);
+    color: var(--d-t3);
+}
+
+/* Campos sin clase de fondo: el navegador les pone su gris de fábrica
+   (#3b3b3b), que no es de la paleta. Con :where() el peso es cero, así que
+   cualquier clase que sí traiga su fondo sigue ganando. */
+:where(html.dark) :where(
+    input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="submit"], [type="button"], [type="reset"]),
+    select,
+    textarea
+) {
+    background-color: var(--d-surface-2);
+}
+
+/* Botones de método de pago del punto de venta (variantes peer-checked) */
+html.dark .peer\/cash:checked ~ .peer-checked\/cash\:bg-emerald-50 { background-color: rgba(16, 185, 129, .13); }
+html.dark .peer\/cash:checked ~ .peer-checked\/cash\:text-emerald-700 { color: #6ee7b7; }
+html.dark .peer\/card:checked ~ .peer-checked\/card\:bg-blue-50 { background-color: rgba(59, 130, 246, .14); }
+html.dark .peer\/card:checked ~ .peer-checked\/card\:text-blue-700 { color: #93c5fd; }
+html.dark .peer\/transfer:checked ~ .peer-checked\/transfer\:bg-indigo-50 { background-color: rgba(99, 102, 241, .14); }
+html.dark .peer\/transfer:checked ~ .peer-checked\/transfer\:text-indigo-700 { color: #a5b4fc; }

@@ -25,6 +25,8 @@ class User extends Authenticatable
         'is_superadmin',
         'last_login_at',
         'login_count',
+        'theme',
+        'locale',
     ];
 
     public function organization()
@@ -57,5 +59,7 @@ class User extends Authenticatable
         'last_login_at' => 'datetime',
         'is_superadmin' => 'boolean',
         'password' => 'hashed',
+        'theme' => \App\Support\Theme::class,
+        'locale' => \App\Support\Locale::class,
     ];
 }
