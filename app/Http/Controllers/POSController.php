@@ -12,13 +12,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class POSController extends Controller
 {
     public function index()
     {
-        $categories = Category::whereNull('parent_id')->with('children')->get();
-        return view('pos.index', compact('categories'));
+        // Todo filtrado por organización: antes salían las categorías y los
+        // clientes de todas las empresas.
+        $orgId = Auth::user()->organization_id;
+        $categories = Category::where('organization_id', $orgId)->whereNull('parent_id')
+            ->with(['children' => fn ($q) => $q->where('organization_id', $orgId)])->get();
+        $clients = Client::where('organization_id', $orgId)->where('activo', true)->orderBy('razon_social')->get();
+
+        return view('pos.index', compact('categories', 'clients'));
     }
 
     // API: Search products
@@ -27,6 +34,7 @@ class POSController extends Controller
         $term = $request->query('q');
 
         $variants = ProductVariant::search($term)
+            ->whereHas('product', fn ($q) => $q->where('organization_id', Auth::user()->organization_id))
             ->where('activo', true)
             ->with(['product', 'attributeValues'])
             ->limit(20)
@@ -190,7 +198,9 @@ class POSController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => __('Error al procesar la venta: :error', ['error' => $e->getMessage()])], 500);
+            Log::error('Falló el cobro en el punto de venta', ['sale_id' => $sale->id, 'error' => $e->getMessage()]);
+
+            return response()->json(['error' => __('No se pudo procesar la venta. Inténtalo de nuevo.')], 500);
         }
     }
 

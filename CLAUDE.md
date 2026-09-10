@@ -23,7 +23,17 @@
 
 ERP SaaS multi-tenant en Laravel 10. Todo dato de negocio cuelga de
 `organization_id`; el scope de tenant se aplica en cada consulta, no por
-middleware global. Los planes (`plans.modules`) definen qué módulos ve cada
+middleware global.
+
+**Aislamiento entre empresas:** como el filtro es manual, cada consulta tiene
+que acordarse sola. Reglas: todo `find`/listado filtra por `organization_id`
+(las variantes también la tienen, se llena sola desde su producto); toda regla
+`exists`/`unique` va con `->where('organization_id', …)`; nunca se consultan
+modelos desde una vista; y el error crudo de una excepción va al log, no a la
+pantalla. `tests/Feature/AislamientoEntreEmpresasTest.php` ataca desde otra
+empresa cada ruta con parámetro, los listados y los IDs de los formularios. Si
+agregas una ruta con un parámetro nuevo, la prueba falla hasta que le des un
+blanco en `prepararBlancos()`: es a propósito. Los planes (`plans.modules`) definen qué módulos ve cada
 organización, y las rutas se protegen con `premium:<modulo>`.
 
 ### Módulo CRM

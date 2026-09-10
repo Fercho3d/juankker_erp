@@ -109,8 +109,8 @@
                         <select id="client-select"
                             class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-slate-700">
                             <option value="">{{ __('Cliente General (Público)') }}</option>
-                            @foreach(\App\Models\Client::all() as $client)
-                                <option value="{{ $client->id }}">{{ $client->nombre_completo }}</option>
+                            @foreach($clients as $client)
+                                <option value="{{ $client->id }}">{{ $client->razon_social }}</option>
                             @endforeach
                         </select>
                     </div>

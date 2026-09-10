@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -122,7 +123,7 @@ class ProductController extends Controller
                         $attributeValueIds = is_array($variantData['attribute_value_ids'])
                             ? $variantData['attribute_value_ids']
                             : explode(',', $variantData['attribute_value_ids']);
-                        $variant->attributeValues()->attach($attributeValueIds);
+                        $variant->attributeValues()->attach($this->valoresPropios($attributeValueIds));
                     }
                 }
             }
@@ -132,7 +133,9 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withErrors(['error' => __('Error al crear el producto: :error', ['error' => $e->getMessage()])])->withInput();
+            Log::error('No se pudo crear el producto', ['error' => $e->getMessage()]);
+
+            return back()->withErrors(['error' => __('No se pudo guardar el producto. Revisa los datos e inténtalo de nuevo.')])->withInput();
         }
     }
 
@@ -226,7 +229,7 @@ class ProductController extends Controller
                                 $attributeValueIds = is_array($variantData['attribute_value_ids'])
                                     ? $variantData['attribute_value_ids']
                                     : explode(',', $variantData['attribute_value_ids']);
-                                $variant->attributeValues()->sync($attributeValueIds);
+                                $variant->attributeValues()->sync($this->valoresPropios($attributeValueIds));
                             }
 
                             $existingVariantIds[] = $variant->id;
@@ -247,7 +250,7 @@ class ProductController extends Controller
                             $attributeValueIds = is_array($variantData['attribute_value_ids'])
                                 ? $variantData['attribute_value_ids']
                                 : explode(',', $variantData['attribute_value_ids']);
-                            $variant->attributeValues()->attach($attributeValueIds);
+                            $variant->attributeValues()->attach($this->valoresPropios($attributeValueIds));
                         }
 
                         $existingVariantIds[] = $variant->id;
@@ -263,7 +266,9 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withErrors(['error' => __('Error al actualizar el producto: :error', ['error' => $e->getMessage()])])->withInput();
+            Log::error('No se pudo actualizar el producto', ['product_id' => $producto->id, 'error' => $e->getMessage()]);
+
+            return back()->withErrors(['error' => __('No se pudo guardar el producto. Revisa los datos e inténtalo de nuevo.')])->withInput();
         }
     }
 
@@ -274,6 +279,17 @@ class ProductController extends Controller
         $producto->delete();
 
         return redirect()->route('productos.index')->with('status', 'product-deleted');
+    }
+
+    /**
+     * Sólo valores de atributo de la propia organización. Los ajenos sólo pueden
+     * llegar alterando la petición: se descartan en silencio.
+     */
+    private function valoresPropios(array $ids): array
+    {
+        return \App\Models\ProductAttributeValue::whereIn('id', $ids)
+            ->whereHas('attribute', fn ($q) => $q->where('organization_id', Auth::user()->organization_id))
+            ->pluck('id')->all();
     }
 
     private function authorizeProduct(Product $product)
@@ -320,6 +336,12 @@ class ProductController extends Controller
             'precio_mayoreo' => 'nullable|numeric|min:0',
             'stock_minimo' => 'nullable|integer|min:0',
             'codigo_sat' => 'nullable|string|max:10',
+            // Único por organización (antes era global y delataba a otras empresas)
+            'codigo_barras' => [
+                'nullable', 'string', 'max:100',
+                Rule::unique('product_variants', 'codigo_barras')->where('organization_id', $organizationId)
+                    ->ignore($ignoreId ? \App\Models\ProductVariant::where('product_id', $ignoreId)->value('id') : null),
+            ],
             'permite_decimales' => 'boolean',
             'activo' => 'boolean',
         ];
@@ -334,7 +356,11 @@ class ProductController extends Controller
                     'string',
                     'max:100',
                     'distinct',
-                    Rule::unique('product_variants', 'sku')->ignore($variant['id'] ?? null),
+                    Rule::unique('product_variants', 'sku')->where('organization_id', $organizationId)->ignore($variant['id'] ?? null),
+                ];
+                $rules["variants.{$key}.codigo_barras"] = [
+                    'nullable', 'string', 'max:100', 'distinct',
+                    Rule::unique('product_variants', 'codigo_barras')->where('organization_id', $organizationId)->ignore($variant['id'] ?? null),
                 ];
                 $rules["variants.{$key}.precio_venta"] = 'required|numeric|min:0';
                 $rules["variants.{$key}.stock_actual"] = 'nullable|integer|min:0';

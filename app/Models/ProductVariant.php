@@ -6,6 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductVariant extends Model
 {
+    /** La empresa sale siempre de su producto: ningún alta tiene que acordarse de ponerla. */
+    protected static function booted(): void
+    {
+        static::creating(function (self $variante) {
+            $variante->organization_id ??= $variante->product?->organization_id;
+        });
+    }
+
     protected $fillable = [
         'product_id',
         'sku',
