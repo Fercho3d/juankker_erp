@@ -16,6 +16,7 @@ class CrmSmokeTest extends TestCase
         $rutas = [
             '/crm',
             '/crm/tablero',
+            '/crm/tablero?sector=Comercio+al+por+menor&tamano=11&contacto=telefono&search=refacc',
             '/crm/leads/nuevo',
             '/crm/importar',
             "/crm/leads/{$lead->id}",

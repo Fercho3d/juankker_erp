@@ -47,8 +47,9 @@
     @if ($leads->count())
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-8">
             @foreach ($leads as $lead)
+                <div class="flex items-center hover:bg-gray-50 transition {{ !$loop->last ? 'border-b border-gray-100' : '' }}">
                 <a href="{{ route('crm.leads.show', $lead) }}"
-                   class="flex items-center gap-4 px-4 py-3.5 no-underline hover:bg-gray-50 transition {{ !$loop->last ? 'border-b border-gray-100' : '' }}">
+                   class="flex items-center gap-4 flex-1 min-w-0 px-4 py-3.5 no-underline">
                     <span class="shrink-0 w-2 h-2 rounded-full {{ $lead->estaVencido() ? 'bg-rose-500' : 'bg-amber-400' }}"></span>
                     <div class="min-w-0 flex-1">
                         <span class="block text-sm font-semibold text-gray-900 truncate">{{ $lead->empresa ?: $lead->nombre }}</span>
@@ -58,10 +59,12 @@
                         {{ $lead->estaVencido() ? 'Venció '.$lead->proxima_accion_at->format('d/m') : 'Hoy' }}
                     </span>
                     <span class="shrink-0 hidden sm:inline text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">{{ $lead->stage->nombre }}</span>
-                    @if ($lead->telefono)
-                        <span class="shrink-0 hidden md:inline text-xs text-gray-400 tabular-nums">{{ $lead->telefono }}</span>
-                    @endif
                 </a>
+                @if ($tel = $lead->telefonoDigitos())
+                    <a href="tel:+52{{ $tel }}"
+                       class="shrink-0 mr-3 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-md no-underline tabular-nums">{{ $lead->telefono }}</a>
+                @endif
+                </div>
             @endforeach
         </div>
     @else
@@ -93,22 +96,34 @@
 
     {{-- Sin próxima acción: la fuga silenciosa del embudo --}}
     @if ($sinSeguimiento->count())
-        <h2 class="text-base font-bold text-gray-900 mb-1">Sin próxima acción <span class="text-gray-400 font-medium">({{ $sinSeguimiento->count() }})</span></h2>
+        <h2 class="text-base font-bold text-gray-900 mb-1">Sin próxima acción <span class="text-gray-400 font-medium">({{ number_format($totalSinSeguimiento) }})</span></h2>
         <p class="text-sm text-gray-500 mb-3">Estos prospectos están abiertos pero nadie va a hacer nada con ellos. Aquí es por donde se fuga el embudo.</p>
         <div class="bg-white rounded-xl border border-amber-200 overflow-hidden">
             @foreach ($sinSeguimiento as $lead)
+                <div class="flex items-center hover:bg-amber-50/50 transition {{ !$loop->last ? 'border-b border-gray-100' : '' }}">
                 <a href="{{ route('crm.leads.show', $lead) }}"
-                   class="flex items-center gap-4 px-4 py-3 no-underline hover:bg-amber-50/50 transition {{ !$loop->last ? 'border-b border-gray-100' : '' }}">
+                   class="flex items-center gap-4 flex-1 min-w-0 px-4 py-3 no-underline">
                     <div class="min-w-0 flex-1">
                         <span class="block text-sm font-semibold text-gray-900 truncate">{{ $lead->empresa ?: $lead->nombre }}</span>
                     </div>
-                    <span class="shrink-0 text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">{{ $lead->stage->nombre }}</span>
+                    <span class="shrink-0 hidden sm:inline text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">{{ $lead->stage->nombre }}</span>
                     @if ($lead->diasSinContacto() !== null)
-                        <span class="shrink-0 text-xs text-gray-400 tabular-nums w-24 text-right">{{ $lead->diasSinContacto() }} días sin contacto</span>
+                        <span class="shrink-0 hidden sm:inline text-xs text-gray-400 tabular-nums w-24 text-right">{{ $lead->diasSinContacto() }} días sin contacto</span>
                     @endif
                 </a>
+                @if ($tel = $lead->telefonoDigitos())
+                    <a href="tel:+52{{ $tel }}"
+                       class="shrink-0 mr-3 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-md no-underline tabular-nums">{{ $lead->telefono }}</a>
+                @endif
+                </div>
             @endforeach
         </div>
+        @if ($totalSinSeguimiento > $sinSeguimiento->count())
+            <p class="text-sm text-gray-500 mt-3">
+                Van los {{ $sinSeguimiento->count() }} más grandes de {{ number_format($totalSinSeguimiento) }}.
+                <a href="{{ route('crm.tablero') }}" class="font-semibold text-indigo-600 no-underline hover:underline">Filtrar en el tablero →</a>
+            </p>
+        @endif
     @endif
 </div>
 @endsection

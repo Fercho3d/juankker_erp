@@ -50,10 +50,41 @@
         </div>
     </div>
 
-    <form method="GET" class="mb-5">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar prospecto, empresa, teléfono…"
-               class="w-full max-w-md px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15">
+    {{-- Filtros: los selectores se aplican al cambiar; la búsqueda, con Enter --}}
+    <form method="GET" class="flex flex-wrap items-center gap-2.5 mb-2">
+        <input type="text" name="search" value="{{ $filtros['search'] ?? '' }}" placeholder="Buscar empresa, giro, teléfono…"
+               class="w-full sm:w-64 px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15">
+        <select name="sector" onchange="this.form.submit()" class="px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15">
+            <option value="">Todos los sectores</option>
+            @foreach ($opciones['sectores'] as $valor => $n)
+                <option value="{{ $valor }}" @selected(($filtros['sector'] ?? '') === $valor)>{{ $valor }} ({{ number_format($n) }})</option>
+            @endforeach
+        </select>
+        <select name="tamano" onchange="this.form.submit()" class="px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15">
+            <option value="">Cualquier tamaño</option>
+            @foreach (\App\Models\Lead::TAMANOS as $min => $etiqueta)
+                <option value="{{ $min }}" @selected((int) ($filtros['tamano'] ?? 0) === $min)>{{ $etiqueta }}</option>
+            @endforeach
+        </select>
+        <select name="municipio" onchange="this.form.submit()" class="px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15">
+            <option value="">Todos los municipios</option>
+            @foreach ($opciones['municipios'] as $valor => $n)
+                <option value="{{ $valor }}" @selected(($filtros['municipio'] ?? '') === $valor)>{{ $valor }} ({{ number_format($n) }})</option>
+            @endforeach
+        </select>
+        <select name="contacto" onchange="this.form.submit()" class="px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15">
+            <option value="">Con o sin contacto</option>
+            <option value="telefono" @selected(($filtros['contacto'] ?? '') === 'telefono')>Con teléfono</option>
+            <option value="email" @selected(($filtros['contacto'] ?? '') === 'email')>Con correo</option>
+        </select>
+        @if ($filtros)
+            <a href="{{ route('crm.tablero') }}" class="px-3 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-900 no-underline">Limpiar filtros</a>
+        @endif
     </form>
+    <p class="text-xs text-gray-500 mb-5">
+        {{ number_format($leadsPorEtapa->sum(fn ($g) => $g->count())) }} prospectos{{ $filtros ? ' con estos filtros' : '' }}.
+        Los más grandes van primero; cada columna muestra hasta {{ $tope }}.
+    </p>
 
     {{-- Tablero --}}
     <div class="flex gap-4 overflow-x-auto pb-4 items-start">
@@ -78,7 +109,7 @@
                 </div>
 
                 <div class="p-2.5 flex flex-col gap-2 overflow-y-auto">
-                    @forelse ($items as $lead)
+                    @forelse ($items->take($tope) as $lead)
                         <a href="{{ route('crm.leads.show', $lead) }}"
                            draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '{{ $lead->id }}')"
                            class="block bg-white rounded-lg border border-gray-200 p-3 no-underline hover:border-indigo-300 hover:shadow-sm transition cursor-grab active:cursor-grabbing">
@@ -90,6 +121,14 @@
                             </div>
                             @if ($lead->empresa && $lead->nombre !== $lead->empresa)
                                 <span class="block text-xs text-gray-500 mt-0.5">{{ $lead->nombre }}</span>
+                            @endif
+                            @if ($lead->telefono)
+                                <span class="block text-xs text-gray-700 tabular-nums mt-1">{{ $lead->telefono }}</span>
+                            @endif
+                            @if ($lead->sector || $lead->personal_min || $lead->municipio)
+                                <span class="block text-[11px] text-gray-500 mt-1 truncate">
+                                    {{ collect([$lead->sector, $lead->personal_min ? $lead->personal_min.'+ pers.' : null, $lead->municipio])->filter()->implode(' · ') }}
+                                </span>
                             @endif
 
                             <div class="flex items-center gap-2 mt-2.5 flex-wrap">
@@ -113,6 +152,9 @@
                     @empty
                         <p class="text-xs text-gray-400 text-center py-6 m-0">Vacío</p>
                     @endforelse
+                    @if ($items->count() > $tope)
+                        <p class="text-[11px] text-gray-500 text-center py-2 m-0">y {{ number_format($items->count() - $tope) }} más — afina los filtros</p>
+                    @endif
                 </div>
             </div>
         @endforeach

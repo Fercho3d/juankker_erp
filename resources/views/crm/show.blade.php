@@ -139,8 +139,13 @@
             <div class="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
                 <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Contacto</span>
                 @if ($lead->telefono)
-                    <a href="https://wa.me/52{{ preg_replace('/\D/', '', $lead->telefono) }}" target="_blank" rel="noopener"
-                       class="text-sm text-gray-900 no-underline hover:text-indigo-600 tabular-nums">{{ $lead->telefono }} <span class="text-xs text-emerald-600 font-semibold">WhatsApp</span></a>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <span class="text-sm text-gray-900 tabular-nums">{{ $lead->telefono }}</span>
+                        @if ($tel = $lead->telefonoDigitos())
+                            <a href="tel:+52{{ $tel }}" class="text-xs font-semibold text-indigo-600 no-underline hover:underline">Llamar</a>
+                            <a href="https://wa.me/52{{ $tel }}" target="_blank" rel="noopener" class="text-xs font-semibold text-emerald-600 no-underline hover:underline">WhatsApp</a>
+                        @endif
+                    </div>
                 @endif
                 @if ($lead->email)
                     <a href="mailto:{{ $lead->email }}" class="text-sm text-gray-900 no-underline hover:text-indigo-600 break-all">{{ $lead->email }}</a>

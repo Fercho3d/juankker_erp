@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 
 class CrmController extends Controller
 {
+    /** Más tarjetas que esto por columna ya no se trabajan: se afinan los filtros. */
+    private const TOPE_POR_LISTA = 50;
+
     /**
      * Pendientes de hoy: la primera pantalla que se abre en la mañana.
      */
@@ -30,17 +33,15 @@ class CrmController extends Controller
             ->orderBy('proxima_accion_at')
             ->get();
 
-        $sinSeguimiento = Lead::deOrganizacion($orgId)
-            ->abiertos()
-            ->whereNull('proxima_accion_at')
-            ->with('stage')
-            ->orderBy('updated_at')
-            ->get();
+        $sinSeguimiento = Lead::deOrganizacion($orgId)->abiertos()->whereNull('proxima_accion_at');
 
         return view('crm.pendientes', [
             'actividades' => $actividades,
             'leads' => $leads,
-            'sinSeguimiento' => $sinSeguimiento,
+            'sinSeguimiento' => (clone $sinSeguimiento)->with('stage')
+                ->orderByDesc('personal_min')->orderBy('updated_at')
+                ->limit(self::TOPE_POR_LISTA)->get(),
+            'totalSinSeguimiento' => $sinSeguimiento->count(),
             'resumen' => self::resumen($orgId),
         ]);
     }
@@ -51,20 +52,38 @@ class CrmController extends Controller
     public function tablero(Request $request)
     {
         $orgId = Auth::user()->organization_id;
-        $etapas = CrmStage::paraOrganizacion($orgId);
+        $filtros = array_filter($request->only(['search', 'sector', 'tamano', 'municipio', 'contacto']));
 
         $leads = Lead::deOrganizacion($orgId)
-            ->search($request->input('search'))
+            ->filtrar($filtros)
             ->orderBy('orden')
             ->orderByDesc('valor_estimado')
+            ->orderByDesc('personal_min')
             ->get()
             ->groupBy('stage_id');
 
         return view('crm.tablero', [
-            'etapas' => $etapas,
+            'etapas' => CrmStage::paraOrganizacion($orgId),
             'leadsPorEtapa' => $leads,
+            'filtros' => $filtros,
+            'opciones' => $this->opcionesDeFiltro($orgId),
+            'tope' => self::TOPE_POR_LISTA,
             'resumen' => self::resumen($orgId),
         ]);
+    }
+
+    /**
+     * Valores que existen de verdad en el embudo, con cuántos leads tiene cada uno.
+     *
+     * @return array<string, \Illuminate\Support\Collection<string, int>>
+     */
+    private function opcionesDeFiltro(int $orgId): array
+    {
+        $conteo = fn (string $campo) => Lead::deOrganizacion($orgId)->whereNotNull($campo)
+            ->selectRaw("{$campo} as valor, count(*) as n")->groupBy($campo)
+            ->orderByDesc('n')->pluck('n', 'valor');
+
+        return ['sectores' => $conteo('sector'), 'municipios' => $conteo('municipio')];
     }
 
     /**

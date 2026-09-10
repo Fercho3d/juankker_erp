@@ -12,7 +12,8 @@ class Lead extends Model
     protected $fillable = [
         'organization_id', 'stage_id', 'owner_id', 'client_id',
         'nombre', 'empresa', 'email', 'telefono',
-        'origen', 'valor_estimado', 'valor_mensual', 'probabilidad',
+        'origen', 'giro', 'sector', 'personal_min', 'municipio',
+        'valor_estimado', 'valor_mensual', 'probabilidad',
         'proxima_accion', 'proxima_accion_at', 'ultimo_contacto_at',
         'cerrado_at', 'motivo_perdida', 'notas', 'orden',
     ];
@@ -21,6 +22,7 @@ class Lead extends Model
         'valor_estimado' => 'decimal:2',
         'valor_mensual' => 'decimal:2',
         'probabilidad' => 'integer',
+        'personal_min' => 'integer',
         'proxima_accion_at' => 'datetime',
         'ultimo_contacto_at' => 'datetime',
         'cerrado_at' => 'datetime',
@@ -33,6 +35,24 @@ class Lead extends Model
         'redes' => 'Redes sociales',
         'cliente_actual' => 'Cliente actual',
         'otro' => 'Otro',
+    ];
+
+    /** Cortes del DENUE: el estrato "11 a 30 personas" se guarda como 11. */
+    public const TAMANOS = [
+        6 => '6+ personas',
+        11 => '11+ personas',
+        31 => '31+ personas',
+        51 => '51+ personas',
+        101 => '101+ personas',
+        251 => '251+ personas',
+    ];
+
+    /** Sector SCIAN (dos primeros dígitos) => nombre con el que se filtra. */
+    public const SECTORES_SCIAN = [
+        '23' => 'Construcción', '31' => 'Manufactura', '32' => 'Manufactura', '33' => 'Manufactura',
+        '43' => 'Comercio al por mayor', '46' => 'Comercio al por menor',
+        '48' => 'Transporte', '49' => 'Transporte',
+        '72' => 'Restaurantes y hoteles', '81' => 'Talleres y reparación',
     ];
 
     public function stage()
@@ -81,7 +101,8 @@ class Lead extends Model
                 $q->where('nombre', 'like', "%{$term}%")
                     ->orWhere('empresa', 'like', "%{$term}%")
                     ->orWhere('email', 'like', "%{$term}%")
-                    ->orWhere('telefono', 'like', "%{$term}%");
+                    ->orWhere('telefono', 'like', "%{$term}%")
+                    ->orWhere('giro', 'like', "%{$term}%");
             });
         }
 
@@ -91,6 +112,22 @@ class Lead extends Model
     /**
      * Leads cuya próxima acción ya venció o vence hoy.
      */
+    /**
+     * Filtros del embudo: sector, tamaño mínimo, municipio y canal de contacto.
+     *
+     * @param  array<string, mixed>  $f
+     */
+    public function scopeFiltrar($query, array $f)
+    {
+        return $query
+            ->search($f['search'] ?? null)
+            ->when($f['sector'] ?? null, fn ($q, $v) => $q->where('sector', $v))
+            ->when($f['tamano'] ?? null, fn ($q, $v) => $q->where('personal_min', '>=', (int) $v))
+            ->when($f['municipio'] ?? null, fn ($q, $v) => $q->where('municipio', $v))
+            ->when(($f['contacto'] ?? null) === 'telefono', fn ($q) => $q->whereNotNull('telefono'))
+            ->when(($f['contacto'] ?? null) === 'email', fn ($q) => $q->whereNotNull('email'));
+    }
+
     public function scopePendientes($query)
     {
         return $query->abiertos()
@@ -117,5 +154,32 @@ class Lead extends Model
         return $this->proxima_accion_at !== null
             && $this->proxima_accion_at->isPast()
             && ! $this->proxima_accion_at->isToday();
+    }
+
+    public static function sectorDe(?string $scian, ?string $giro = null): ?string
+    {
+        if ($scian && isset(self::SECTORES_SCIAN[substr($scian, 0, 2)])) {
+            return self::SECTORES_SCIAN[substr($scian, 0, 2)];
+        }
+
+        foreach (['Comercio al por menor', 'Comercio al por mayor'] as $prefijo) {
+            if ($giro && str_starts_with($giro, $prefijo)) {
+                return $prefijo;
+            }
+        }
+
+        return $giro && preg_match('/^(Fabricación|Elaboración)/u', $giro) ? 'Manufactura'
+            : ($giro && str_starts_with($giro, 'Reparación') ? 'Talleres y reparación' : null);
+    }
+
+    /**
+     * Los diez dígitos nacionales, listos para tel: y wa.me. Tolera lo que se
+     * capture a mano: espacios, guiones o el +52 por delante.
+     */
+    public function telefonoDigitos(): ?string
+    {
+        $digitos = preg_replace('/\D/', '', (string) $this->telefono);
+
+        return strlen($digitos) >= 10 ? substr($digitos, -10) : null;
     }
 }

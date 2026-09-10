@@ -151,6 +151,7 @@ class DenueProspectar extends Command
         return [
             'empresa' => trim((string) ($r['Nombre'] ?? $r['Razon_social'] ?? '')),
             'giro' => $limpiar($r['Clase_actividad'] ?? null),
+            'scian' => substr((string) ($r['CLEE'] ?? ''), 5, 6) ?: null,
             'personal' => $limpiar($r['Estrato'] ?? null) ?? 'n/d',
             'min_personal' => (int) preg_replace('/\D.*/', '', (string) ($r['Estrato'] ?? '0')),
             'telefono' => $limpiar($r['Telefono'] ?? null),
@@ -265,6 +266,10 @@ class DenueProspectar extends Command
                 'telefono' => $n['telefono'],
                 'email' => $n['email'],
                 'origen' => 'prospeccion',
+                'giro' => $n['giro'] ? mb_substr($n['giro'], 0, 255) : null,
+                'sector' => Lead::sectorDe($n['scian'], $n['giro']),
+                'personal_min' => $n['min_personal'] ?: null,
+                'municipio' => $n['municipio'] ? mb_substr($n['municipio'], 0, 120) : null,
                 'probabilidad' => 10,
                 'notas' => implode("\n", array_filter([
                     $n['giro'] ? "Giro: {$n['giro']}" : null,

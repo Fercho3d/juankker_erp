@@ -42,6 +42,7 @@ class DenueImportarCsv extends Command
         'calle' => ['nom_vial', 'calle'],
         'numero' => ['numero_ext', 'num_exterior'],
         'cp' => ['codpos', 'cp', 'codigo_postal'],
+        'scian' => ['codigo_act', 'scian', 'codigo_actividad'],
     ];
 
     public function handle(): int
@@ -156,6 +157,7 @@ class DenueImportarCsv extends Command
             $filas->push([
                 'empresa' => $empresa,
                 'giro' => $tomar('giro'),
+                'scian' => $tomar('scian') ?: null,
                 'personal' => $personal ?: 'n/d',
                 'min_personal' => (int) preg_replace('/\D.*/', '', $personal),
                 'telefono' => $tomar('telefono') ?: null,
@@ -248,6 +250,10 @@ class DenueImportarCsv extends Command
                 'telefono' => $n['telefono'],
                 'email' => $n['email'],
                 'origen' => 'prospeccion',
+                'giro' => $n['giro'] ? mb_substr($n['giro'], 0, 255) : null,
+                'sector' => Lead::sectorDe($n['scian'], $n['giro']),
+                'personal_min' => $n['min_personal'] ?: null,
+                'municipio' => $n['municipio'] ? mb_substr($n['municipio'], 0, 120) : null,
                 'probabilidad' => 10,
                 'notas' => implode("\n", array_filter([
                     $n['giro'] ? "Giro: {$n['giro']}" : null,
