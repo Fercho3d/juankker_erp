@@ -22,8 +22,8 @@
     <div class="container mx-auto px-4 py-6 max-w-7xl h-screen flex flex-col">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="text-2xl font-bold text-slate-800">Punto de Venta</h1>
-                <p class="text-slate-500">Realiza ventas de forma rápida y eficiente</p>
+                <h1 class="text-2xl font-bold text-slate-800">{{ __('Punto de Venta') }}</h1>
+                <p class="text-slate-500">{{ __('Realiza ventas de forma rápida y eficiente') }}</p>
             </div>
             <div class="flex items-center gap-3">
                 <span
@@ -46,12 +46,12 @@
                                 class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
                             <input type="text" id="product-search"
                                 class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white text-slate-900 placeholder-slate-400 outline-none"
-                                placeholder="Buscar producto..." autofocus>
+                                placeholder="{{ __('Buscar producto...') }}" autofocus>
                         </div>
                         <button
                             class="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors font-medium bg-white"
                             onclick="filterCategory('all')">
-                            <i class="ri-apps-line"></i> Todos
+                            <i class="ri-apps-line"></i> {{ __('Todos') }}
                         </button>
                     </div>
 
@@ -78,8 +78,8 @@
                                     </svg>
                                 </div>
                             </div>
-                            <h5 class="text-lg font-medium text-slate-900">Listo para vender</h5>
-                            <p class="text-slate-500">Utilice el buscador o seleccione una categoría.</p>
+                            <h5 class="text-lg font-medium text-slate-900">{{ __('Listo para vender') }}</h5>
+                            <p class="text-slate-500">{{ __('Utilice el buscador o seleccione una categoría.') }}</p>
                         </div>
                     </div>
                 </div>
@@ -95,20 +95,20 @@
                         </div>
                         <div class="flex-grow">
                             <div class="flex justify-between items-center">
-                                <h2 class="text-base font-semibold text-slate-800">Carrito</h2>
+                                <h2 class="text-base font-semibold text-slate-800">{{ __('Carrito') }}</h2>
                                 <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold"
-                                    id="cart-count">0 items</span>
+                                    id="cart-count">{{ __('0 items') }}</span>
                             </div>
-                            <p class="text-xs text-slate-500">Productos seleccionados</p>
+                            <p class="text-xs text-slate-500">{{ __('Productos seleccionados') }}</p>
                         </div>
                     </div>
 
                     <!-- Client Selector -->
                     <div class="mb-0">
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cliente</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">{{ __('Cliente') }}</label>
                         <select id="client-select"
                             class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white text-slate-700">
-                            <option value="">Cliente General (Público)</option>
+                            <option value="">{{ __('Cliente General (Público)') }}</option>
                             @foreach(\App\Models\Client::all() as $client)
                                 <option value="{{ $client->id }}">{{ $client->nombre_completo }}</option>
                             @endforeach
@@ -132,7 +132,7 @@
 
                     <!-- Payment Method -->
                     <div class="md:col-span-4">
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Método de Pago</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">{{ __('Método de Pago') }}</label>
                         <div class="flex gap-2">
                             <input type="radio" class="peer/cash hidden" name="payment_method" id="pay-cash"
                                 value="efectivo" checked onchange="toggleCashInput()">
@@ -140,7 +140,7 @@
                                 class="flex-1 border-2 border-slate-200 p-2.5 rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-all hover:bg-slate-50 hover:border-slate-300 peer-checked/cash:border-emerald-500 peer-checked/cash:bg-emerald-50 peer-checked/cash:text-emerald-700"
                                 for="pay-cash">
                                 <i class="ri-money-dollar-circle-line text-xl"></i>
-                                <span class="text-xs font-bold">Efectivo</span>
+                                <span class="text-xs font-bold">{{ __('Efectivo') }}</span>
                             </label>
 
                             <input type="radio" class="peer/card hidden" name="payment_method" id="pay-card" value="tarjeta"
@@ -149,7 +149,7 @@
                                 class="flex-1 border-2 border-slate-200 p-2.5 rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-all hover:bg-slate-50 hover:border-slate-300 peer-checked/card:border-blue-500 peer-checked/card:bg-blue-50 peer-checked/card:text-blue-700"
                                 for="pay-card">
                                 <i class="ri-bank-card-line text-xl"></i>
-                                <span class="text-xs font-bold">Tarjeta</span>
+                                <span class="text-xs font-bold">{{ __('Tarjeta') }}</span>
                             </label>
 
                             <input type="radio" class="peer/transfer hidden" name="payment_method" id="pay-transfer"
@@ -158,7 +158,7 @@
                                 class="flex-1 border-2 border-slate-200 p-2.5 rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-all hover:bg-slate-50 hover:border-slate-300 peer-checked/transfer:border-indigo-500 peer-checked/transfer:bg-indigo-50 peer-checked/transfer:text-indigo-700"
                                 for="pay-transfer">
                                 <i class="ri-qr-code-line text-xl"></i>
-                                <span class="text-xs font-bold">Transf.</span>
+                                <span class="text-xs font-bold">{{ __('Transf.') }}</span>
                             </label>
                         </div>
                     </div>
@@ -166,7 +166,7 @@
                     <!-- Amount Received & Change -->
                     <div class="md:col-span-8 flex gap-4 transition-all duration-300" id="cash-input-container">
                         <div class="w-1/2">
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Recibido</label>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">{{ __('Recibido') }}</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
                                 <input type="number" id="amount-received"
@@ -175,7 +175,7 @@
                             </div>
                         </div>
                         <div class="w-1/2" id="change-container">
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Cambio</label>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">{{ __('Cambio') }}</label>
                             <div class="bg-emerald-50 border border-emerald-100 p-2.5 rounded-xl text-center">
                                 <span class="block font-extrabold text-emerald-600 text-xl" id="change-amount">$0.00</span>
                             </div>
@@ -190,15 +190,15 @@
                     <!-- Totals Display -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-slate-500 text-sm">
-                            <span>Subtotal</span>
+                            <span>{{ __('Subtotal') }}</span>
                             <span class="font-medium text-slate-700" id="cart-subtotal">$0.00</span>
                         </div>
                         <div class="flex justify-between text-slate-500 text-sm">
-                            <span>IVA (16%)</span>
+                            <span>{{ __('IVA (16%)') }}</span>
                             <span class="font-medium text-slate-700" id="cart-tax">$0.00</span>
                         </div>
                         <div class="flex justify-between items-end mt-2 pt-2 border-t border-dashed border-slate-200">
-                            <span class="text-sm font-bold text-slate-800 uppercase tracking-wide">Total a Pagar</span>
+                            <span class="text-sm font-bold text-slate-800 uppercase tracking-wide">{{ __('Total a Pagar') }}</span>
                             <span class="text-3xl font-black text-indigo-600 leading-none" id="cart-total">$0.00</span>
                         </div>
                     </div>
@@ -213,7 +213,7 @@
                         <button
                             class="col-span-2 py-2.5 rounded-xl text-white font-bold shadow-lg shadow-indigo-200 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 transform active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             onclick="processCheckout()" id="btn-pay" disabled>
-                            <span>Confirmar Venta</span>
+                            <span>{{ __('Confirmar Venta') }}</span>
                             <i class="ri-arrow-right-line"></i>
                         </button>
                     </div>
@@ -227,7 +227,26 @@
     @push('scripts')
 
         <script>
-            // Include existing JS logic here
+            // Textos de la interfaz en el idioma de quien vende (ver lang/en.json).
+            const T = {{ \Illuminate\Support\Js::from([
+                'carritoVacio' => __('Carrito vacío'),
+                'producto' => __('Producto'),
+                'sinResultados' => __('No se encontraron productos'),
+                'stock' => __('Stock: :n'),
+                'agotado' => __('Agotado'),
+                'errorBuscar' => __('Error al buscar productos'),
+                'errorAgregar' => __('Error al agregar producto'),
+                'stockInsuficiente' => __('Stock insuficiente'),
+                'confirmarQuitar' => __('¿Eliminar producto del carrito?'),
+                'confirmarCancelar' => __('¿Está seguro de cancelar la venta actual?'),
+                'listo' => __('Listo para vender'),
+                'listoAyuda' => __('Utilice el buscador o seleccione una categoría.'),
+                'montoMenor' => __('El monto recibido es menor al total.'),
+                'confirmarVenta' => __('¿Confirmar venta por :total?'),
+                'errorVenta' => __('Error al procesar la venta'),
+                'errorRed' => __('Error de red al procesar la venta'),
+            ]) }};
+
             let currentCart = null;
             let searchTimeout = null;
 
@@ -309,7 +328,7 @@
                     cartContainer.innerHTML = `
                                                 <div class="h-full flex flex-col items-center justify-center text-slate-400 opacity-50">
                                                     <i class="ri-shopping-cart-line text-4xl mb-2"></i>
-                                                    <p>Carrito vacío</p>
+                                                    <p>${T.carritoVacio}</p>
                                                 </div>`;
 
                     cartCount.innerText = '0 items';
@@ -334,7 +353,7 @@
 
                 let html = '';
                 currentCart.items.forEach(item => {
-                    const variantName = item.producto_nombre_snapshot || (item.variant ? item.variant.product.nombre : 'Producto');
+                    const variantName = item.producto_nombre_snapshot || (item.variant ? item.variant.product.nombre : T.producto);
                     html += `
                                                 <div class="cart-item bg-white mb-2 border border-slate-200 rounded-lg shadow-sm">
                                                     <div class="p-3">
@@ -374,7 +393,7 @@
                         grid.innerHTML = `
                                                     <div class="col-span-full text-center text-slate-400 py-12">
                                                         <i class="ri-ghost-line text-4xl mb-2"></i>
-                                                        <p>No se encontraron productos</p>
+                                                        <p>${T.sinResultados}</p>
                                                     </div>`;
                         return;
                     }
@@ -382,7 +401,7 @@
                     let html = '';
                     products.forEach(p => {
                         const stockClass = p.stock > 0 ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' : 'bg-slate-50 text-slate-600 ring-slate-500/10';
-                        const stockText = p.stock > 0 ? `Stock: ${p.stock}` : 'Agotado';
+                        const stockText = p.stock > 0 ? T.stock.replace(':n', p.stock) : T.agotado;
                         const opacity = p.stock > 0 ? '' : 'opacity-50 grayscale';
 
                         html += `
@@ -407,7 +426,7 @@
                     grid.innerHTML = html;
                 } catch (error) {
                     console.error('Search error:', error);
-                    grid.innerHTML = '<div class="col-span-full text-center text-red-500"><p>Error al buscar productos</p></div>';
+                    grid.innerHTML = `<div class="col-span-full text-center text-red-500"><p>${T.errorBuscar}</p></div>`;
                 }
             }
 
@@ -424,7 +443,7 @@
 
                     if (!response.ok) {
                         const data = await response.json();
-                        alert(data.error || 'Error al agregar producto');
+                        alert(data.error || T.errorAgregar);
                         return;
                     }
 
@@ -450,7 +469,7 @@
 
                     if (!response.ok) {
                         const data = await response.json();
-                        alert(data.error || 'Stock insuficiente');
+                        alert(data.error || T.stockInsuficiente);
                         return;
                     }
 
@@ -462,7 +481,7 @@
             }
 
             async function removeItem(itemId) {
-                if (!confirm('¿Eliminar producto del carrito?')) return;
+                if (!confirm(T.confirmarQuitar)) return;
 
                 try {
                     const response = await fetch(`{{ url('pos/cart/remove') }}/${itemId}`, {
@@ -494,7 +513,7 @@
             }
 
             async function cancelSale() {
-                if (!confirm('¿Está seguro de cancelar la venta actual?')) return;
+                if (!confirm(T.confirmarCancelar)) return;
 
                 try {
                     const response = await fetch('{{ route("pos.cancel") }}', {
@@ -515,8 +534,8 @@
                                                             </svg>
                                                         </div>
                                                     </div>
-                                                    <h5 class="text-lg font-medium text-slate-900">Listo para vender</h5>
-                                                    <p class="text-slate-500">Utilice el buscador o seleccione una categoría.</p>
+                                                    <h5 class="text-lg font-medium text-slate-900">${T.listo}</h5>
+                                                    <p class="text-slate-500">${T.listoAyuda}</p>
                                                 </div>
                                             `;
                 } catch (error) {
@@ -538,12 +557,12 @@
                 const amountReceived = parseFloat(document.getElementById('amount-received').value) || 0;
 
                 if (paymentMethod === 'efectivo' && amountReceived < currentCart.total) {
-                    alert('El monto recibido es menor al total.');
+                    alert(T.montoMenor);
                     document.getElementById('amount-received').focus();
                     return;
                 }
 
-                if (!confirm('¿Confirmar venta por ' + formatCurrency(currentCart.total) + '?')) {
+                if (!confirm(T.confirmarVenta.replace(':total', formatCurrency(currentCart.total)))) {
                     return;
                 }
 
@@ -565,11 +584,11 @@
                     if (data.success) {
                         window.location.href = data.redirect;
                     } else {
-                        alert(data.error || 'Error al procesar la venta');
+                        alert(data.error || T.errorVenta);
                     }
                 } catch (error) {
                     console.error('Checkout error:', error);
-                    alert('Error de red al procesar la venta');
+                    alert(T.errorRed);
                 }
             }
         </script>

@@ -8,14 +8,14 @@
 <div class="max-w-7xl mx-auto px-6 py-8">
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Valores: {{ $attribute->nombre }}</h1>
-            <p class="text-sm text-gray-500 mt-0.5">Gestiona los valores disponibles para este atributo</p>
+            <h1 class="text-2xl font-bold text-gray-900">{{ __('Valores: :nombre', ['nombre' => $attribute->nombre]) }}</h1>
+            <p class="text-sm text-gray-500 mt-0.5">{{ __('Gestiona los valores disponibles para este atributo') }}</p>
         </div>
         <a href="{{ route('atributos-producto.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="m15 18-6-6 6-6"/>
             </svg>
-            Volver a Atributos
+            {{ __('Volver a Atributos') }}
         </a>
     </div>
 
@@ -24,7 +24,7 @@
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M5 13l4 4L19 7"/>
             </svg>
-            Valor creado exitosamente
+            {{ __('Valor creado exitosamente') }}
         </div>
     @endif
 
@@ -33,7 +33,7 @@
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M5 13l4 4L19 7"/>
             </svg>
-            Valor actualizado exitosamente
+            {{ __('Valor actualizado exitosamente') }}
         </div>
     @endif
 
@@ -42,7 +42,7 @@
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M5 13l4 4L19 7"/>
             </svg>
-            Valor eliminado exitosamente
+            {{ __('Valor eliminado exitosamente') }}
         </div>
     @endif
 
@@ -54,8 +54,8 @@
                 </svg>
             </div>
             <div>
-                <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Agregar Nuevo Valor</h2>
-                <p class="text-sm text-gray-500">Crea un valor para {{ $attribute->nombre }}</p>
+                <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Agregar Nuevo Valor') }}</h2>
+                <p class="text-sm text-gray-500">{{ __('Crea un valor para :nombre', ['nombre' => $attribute->nombre]) }}</p>
             </div>
         </div>
 
@@ -64,14 +64,14 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="mb-4">
-                    <label for="valor" class="block text-sm font-medium text-gray-900 mb-2">Valor *</label>
+                    <label for="valor" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Valor') }} *</label>
                     <input
                         type="text"
                         id="valor"
                         name="valor"
                         class="w-full px-3 py-3 border {{ $errors->has('valor') ? 'border-red-400' : 'border-gray-200' }} rounded-xl text-sm transition-colors box-border focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
                         value="{{ old('valor') }}"
-                        placeholder="Ej: XL, Rojo, 2kg"
+                        placeholder="{{ __('Ej: XL, Rojo, 2kg') }}"
                         required
                     >
                     @error('valor')
@@ -81,14 +81,14 @@
 
                 @if($attribute->tipo === 'color')
                     <div class="mb-4">
-                        <label for="codigo_color" class="block text-sm font-medium text-gray-900 mb-2">Código Color (Hex)</label>
+                        <label for="codigo_color" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Código Color (Hex)') }}</label>
                         <input
                             type="text"
                             id="codigo_color"
                             name="codigo_color"
                             class="w-full px-3 py-3 border {{ $errors->has('codigo_color') ? 'border-red-400' : 'border-gray-200' }} rounded-xl text-sm transition-colors box-border focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
                             value="{{ old('codigo_color') }}"
-                            placeholder="#FF0000"
+                            placeholder="{{ __('#FF0000') }}"
                             pattern="#[0-9A-Fa-f]{6}"
                             maxlength="7"
                         >
@@ -99,7 +99,7 @@
                 @endif
 
                 <div class="mb-4">
-                    <label for="orden" class="block text-sm font-medium text-gray-900 mb-2">Orden</label>
+                    <label for="orden" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Orden') }}</label>
                     <input
                         type="number"
                         id="orden"
@@ -115,7 +115,7 @@
             </div>
 
             <div class="flex justify-end">
-                <button type="submit" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors cursor-pointer border-none">Agregar Valor</button>
+                <button type="submit" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors cursor-pointer border-none">{{ __('Agregar Valor') }}</button>
             </div>
         </form>
     </div>
@@ -125,13 +125,13 @@
             <table class="w-full text-sm border-collapse">
                 <thead class="bg-gray-50 border-b-2 border-gray-200">
                     <tr>
-                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Valor</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('Valor') }}</th>
                         @if($attribute->tipo === 'color')
-                            <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Color</th>
+                            <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('Color') }}</th>
                         @endif
-                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Orden</th>
-                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Estado</th>
-                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Acciones</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('Orden') }}</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('Estado') }}</th>
+                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('Acciones') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -148,16 +148,16 @@
                                             <span>{{ $value->codigo_color }}</span>
                                         </div>
                                     @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap bg-gray-100 text-gray-500">Sin color</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap bg-gray-100 text-gray-500">{{ __('Sin color') }}</span>
                                     @endif
                                 </td>
                             @endif
                             <td class="px-4 py-3.5 text-gray-900 align-middle">{{ $value->orden }}</td>
                             <td class="px-4 py-3.5 text-gray-900 align-middle">
                                 @if($value->activo)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap bg-emerald-50 text-emerald-800">Activo</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap bg-emerald-50 text-emerald-800">{{ __('Activo') }}</span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap bg-gray-100 text-gray-500">Inactivo</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap bg-gray-100 text-gray-500">{{ __('Inactivo') }}</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3.5 text-gray-900 align-middle">
@@ -166,7 +166,7 @@
                                           onsubmit="return confirm('¿Estás seguro de eliminar este valor?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer border-none bg-transparent" title="Eliminar">
+                                        <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer border-none bg-transparent" title="{{ __('Eliminar') }}">
                                             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                                             </svg>
@@ -183,8 +183,8 @@
                 <svg class="mx-auto mb-4 opacity-40" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path d="M3 12h18M3 6h18M3 18h18"/>
                 </svg>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">No hay valores</h3>
-                <p class="text-sm">Agrega valores para este atributo (ej: XS, S, M, L, XL).</p>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ __('No hay valores') }}</h3>
+                <p class="text-sm">{{ __('Agrega valores para este atributo (ej: XS, S, M, L, XL).') }}</p>
             </div>
         @endif
     </div>

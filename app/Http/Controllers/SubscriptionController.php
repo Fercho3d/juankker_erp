@@ -52,7 +52,7 @@ class SubscriptionController extends Controller
         }
 
         return redirect()->route('subscription.index')
-            ->with('status', "Plan {$plan->name} activado correctamente.");
+            ->with('status', __('Plan :plan activado correctamente.', ['plan' => __($plan->name)]));
     }
 
     public function cancel(Request $request)
@@ -61,6 +61,6 @@ class SubscriptionController extends Controller
         $org->update(['subscription_status' => 'cancelled']);
         AuditLog::record('suscripcion_cancelada', $org);
 
-        return back()->with('status', 'Tu suscripción se canceló. Seguirá activa hasta el fin del periodo.');
+        return back()->with('status', __('Tu suscripción se canceló. Seguirá activa hasta el fin del periodo.'));
     }
 }

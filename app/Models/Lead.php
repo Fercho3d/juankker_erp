@@ -172,7 +172,7 @@ class Lead extends Model
     /** "11 a 30", o null si el lead no viene del DENUE. */
     public function rangoPersonal(): ?string
     {
-        return self::TAMANOS[$this->personal_min] ?? null;
+        return isset(self::TAMANOS[$this->personal_min]) ? __(self::TAMANOS[$this->personal_min]) : null;
     }
 
     public static function sectorDe(?string $scian, ?string $giro = null): ?string

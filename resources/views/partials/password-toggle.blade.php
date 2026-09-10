@@ -5,7 +5,7 @@
 --}}
 <button type="button" tabindex="-1"
         onclick="alternarPassword(this)"
-        aria-label="Mostrar contraseña"
+        aria-label="{{ __('Mostrar contraseña') }}"
         class="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 bg-transparent border-0 cursor-pointer leading-none">
     <svg class="ojo-abierto" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
@@ -25,7 +25,7 @@
 
                 const oculto = campo.type === 'password';
                 campo.type = oculto ? 'text' : 'password';
-                boton.setAttribute('aria-label', oculto ? 'Ocultar contraseña' : 'Mostrar contraseña');
+                boton.setAttribute('aria-label', oculto ? {{ \Illuminate\Support\Js::from(__('Ocultar contraseña')) }} : {{ \Illuminate\Support\Js::from(__('Mostrar contraseña')) }});
                 boton.querySelector('.ojo-abierto').classList.toggle('hidden', oculto);
                 boton.querySelector('.ojo-cerrado').classList.toggle('hidden', !oculto);
             }

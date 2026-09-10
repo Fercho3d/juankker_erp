@@ -65,7 +65,7 @@ class POSController extends Controller
 
         // Check stock
         if ($variant->stock_actual < $request->quantity) {
-            return response()->json(['error' => 'Stock insuficiente'], 422);
+            return response()->json(['error' => __('Stock insuficiente')], 422);
         }
 
         // Check if item exists in cart
@@ -103,7 +103,7 @@ class POSController extends Controller
 
         // Check stock
         if ($variant->stock_actual < $request->quantity) {
-            return response()->json(['error' => 'Stock insuficiente'], 422);
+            return response()->json(['error' => __('Stock insuficiente')], 422);
         }
 
         $item->cantidad = $request->quantity;
@@ -162,13 +162,13 @@ class POSController extends Controller
         $sale = $this->getCurrentSale();
 
         if ($sale->items()->count() === 0) {
-            return response()->json(['error' => 'El carrito está vacío'], 422);
+            return response()->json(['error' => __('El carrito está vacío')], 422);
         }
 
         // Verify stock one last time
         foreach ($sale->items as $item) {
             if ($item->variant->stock_actual < $item->cantidad) {
-                return response()->json(['error' => "Stock insuficiente para {$item->producto_nombre_snapshot}"], 422);
+                return response()->json(['error' => __('Stock insuficiente para :producto', ['producto' => $item->producto_nombre_snapshot])], 422);
             }
         }
 
@@ -186,7 +186,7 @@ class POSController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Error al procesar la venta: ' . $e->getMessage()], 500);
+            return response()->json(['error' => __('Error al procesar la venta: :error', ['error' => $e->getMessage()])], 500);
         }
     }
 

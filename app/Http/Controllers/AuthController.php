@@ -47,7 +47,7 @@ class AuthController extends Controller
         $this->sendOtp($request, $data['email']);
 
         return redirect()->route('register.verify')
-            ->with('status', 'Te enviamos un código de verificación a tu correo.');
+            ->with('status', __('Te enviamos un código de verificación a tu correo.'));
     }
 
     public function showVerifyForm(Request $request)
@@ -71,17 +71,17 @@ class AuthController extends Controller
         }
 
         if (now()->timestamp > $otp['expires']) {
-            throw ValidationException::withMessages(['code' => 'El código expiró. Solicita uno nuevo.']);
+            throw ValidationException::withMessages(['code' => __('El código expiró. Solicita uno nuevo.')]);
         }
 
         if (($otp['attempts'] ?? 0) >= 5) {
-            throw ValidationException::withMessages(['code' => 'Demasiados intentos. Solicita un código nuevo.']);
+            throw ValidationException::withMessages(['code' => __('Demasiados intentos. Solicita un código nuevo.')]);
         }
 
         if (! hash_equals($otp['code'], trim($request->code))) {
             $otp['attempts'] = ($otp['attempts'] ?? 0) + 1;
             $request->session()->put('otp', $otp);
-            throw ValidationException::withMessages(['code' => 'Código incorrecto.']);
+            throw ValidationException::withMessages(['code' => __('Código incorrecto.')]);
         }
 
         $user = $this->createAccount($pending);
@@ -90,7 +90,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect('/')->with('status', '¡Tu prueba gratuita de 30 días está activa!');
+        return redirect('/')->with('status', __('¡Tu prueba gratuita de 30 días está activa!'));
     }
 
     public function resendOtp(Request $request)
@@ -103,7 +103,7 @@ class AuthController extends Controller
 
         $this->sendOtp($request, $pending['email']);
 
-        return back()->with('status', 'Te enviamos un nuevo código.');
+        return back()->with('status', __('Te enviamos un nuevo código.'));
     }
 
     private function sendOtp(Request $request, string $email): void
@@ -210,7 +210,7 @@ class AuthController extends Controller
 
         if ($invitation->isAccepted() || $invitation->isExpired()) {
             return redirect()->route('register')
-                ->withErrors(['email' => 'Esta invitación ya no es válida.']);
+                ->withErrors(['email' => __('Esta invitación ya no es válida.')]);
         }
 
         return view('auth.invitation', compact('invitation'));
@@ -240,6 +240,6 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect('/')->with('status', '¡Bienvenido! Tu prueba de 30 días está activa.');
+        return redirect('/')->with('status', __('¡Bienvenido! Tu prueba de 30 días está activa.'));
     }
 }

@@ -8,14 +8,14 @@
 <div class="max-w-[900px] mx-auto px-6 py-8">
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ $brand->exists ? 'Editar' : 'Nueva' }} Marca</h1>
-            <p class="text-sm text-gray-500 mt-0.5">{{ $brand->exists ? 'Actualiza los datos de la marca' : 'Crea una nueva marca de productos' }}</p>
+            <h1 class="text-2xl font-bold text-gray-900">{{ $brand->exists ? __('Editar marca') : __('Nueva marca') }}</h1>
+            <p class="text-sm text-gray-500 mt-0.5">{{ $brand->exists ? __('Actualiza los datos de la marca') : __('Crea una nueva marca de productos') }}</p>
         </div>
         <a href="{{ route('marcas.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="m15 18-6-6 6-6"/>
             </svg>
-            Volver
+            {{ __('Volver') }}
         </a>
     </div>
 
@@ -33,13 +33,13 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Información de la Marca</h2>
-                    <p class="text-sm text-gray-500">Datos básicos de la marca</p>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Información de la Marca') }}</h2>
+                    <p class="text-sm text-gray-500">{{ __('Datos básicos de la marca') }}</p>
                 </div>
             </div>
 
             <div class="mb-4">
-                <label for="nombre" class="block text-sm font-medium text-gray-900 mb-2">Nombre *</label>
+                <label for="nombre" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Nombre') }} *</label>
                 <input
                     type="text"
                     id="nombre"
@@ -54,7 +54,7 @@
             </div>
 
             <div class="mb-4">
-                <label for="descripcion" class="block text-sm font-medium text-gray-900 mb-2">Descripción</label>
+                <label for="descripcion" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Descripción') }}</label>
                 <textarea
                     id="descripcion"
                     name="descripcion"
@@ -75,8 +75,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Estado</h2>
-                    <p class="text-sm text-gray-500">Configuración de activación</p>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Estado') }}</h2>
+                    <p class="text-sm text-gray-500">{{ __('Configuración de activación') }}</p>
                 </div>
             </div>
 
@@ -89,16 +89,16 @@
                         class="w-[18px] h-[18px] accent-indigo-600 cursor-pointer"
                         {{ old('activo', $brand->activo ?? true) ? 'checked' : '' }}
                     >
-                    Marca activa
+                    {{ __('Marca activa') }}
                 </label>
-                <p class="text-xs text-gray-400 mt-1">Las marcas inactivas no estarán disponibles para nuevos productos</p>
+                <p class="text-xs text-gray-400 mt-1">{{ __('Las marcas inactivas no estarán disponibles para nuevos productos') }}</p>
             </div>
         </div>
 
         <div class="flex items-center gap-4 justify-end mt-8">
-            <a href="{{ route('marcas.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">Cancelar</a>
+            <a href="{{ route('marcas.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">{{ __('Cancelar') }}</a>
             <button type="submit" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors cursor-pointer border-none">
-                {{ $brand->exists ? 'Actualizar' : 'Crear' }} Marca
+                {{ $brand->exists ? __('Actualizar marca') : __('Crear marca') }}
             </button>
         </div>
     </form>

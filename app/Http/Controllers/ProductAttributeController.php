@@ -68,7 +68,7 @@ class ProductAttributeController extends Controller
     private function authorizeAttribute(ProductAttribute $attribute)
     {
         if ($attribute->organization_id !== Auth::user()->organization_id) {
-            abort(403, 'No autorizado');
+            abort(403, __('No autorizado'));
         }
     }
 

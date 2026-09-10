@@ -8,8 +8,8 @@
     <div class="max-w-7xl mx-auto px-6 py-8">
         <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">Inventario</h1>
-                <p class="text-sm text-gray-500 mt-0.5">Gestiona el stock de tus productos</p>
+                <h1 class="text-2xl font-bold text-gray-900">{{ __('Inventario') }}</h1>
+                <p class="text-sm text-gray-500 mt-0.5">{{ __('Gestiona el stock de tus productos') }}</p>
             </div>
 
             <form method="GET" action="{{ route('inventario.index') }}" class="flex items-center gap-3">
@@ -21,13 +21,13 @@
                     </svg>
                     <input type="text" name="search"
                         class="w-full pl-11 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition"
-                        placeholder="Buscar por nombre, SKU o código..." value="{{ request('search') }}">
+                        placeholder="{{ __('Buscar por nombre, SKU o código...') }}" value="{{ request('search') }}">
                 </div>
                 <button type="submit"
-                    class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors cursor-pointer">Buscar</button>
+                    class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors cursor-pointer">{{ __('Buscar') }}</button>
                 @if(request('search'))
                     <a href="{{ route('inventario.index') }}"
-                        class="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">Limpiar</a>
+                        class="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">{{ __('Limpiar') }}</a>
                 @endif
             </form>
         </div>
@@ -49,22 +49,22 @@
                         <tr>
                             <th
                                 class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">
-                                Imagen</th>
+                                {{ __('Imagen') }}</th>
                             <th
                                 class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">
-                                Producto</th>
+                                {{ __('Producto') }}</th>
                             <th
                                 class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">
-                                SKU / Barras</th>
+                                {{ __('SKU / Barras') }}</th>
                             <th
                                 class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">
-                                Precio Venta</th>
+                                {{ __('Precio Venta') }}</th>
                             <th
                                 class="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">
-                                Stock Actual</th>
+                                {{ __('Stock Actual') }}</th>
                             <th
                                 class="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">
-                                Acciones</th>
+                                {{ __('Acciones') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -98,11 +98,11 @@
                                 <td class="px-4 py-3.5 text-gray-500 align-middle">
                                     @if($variant->sku)
                                         <div class="flex items-center gap-1.5"><span
-                                                class="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">SKU</span>
+                                                class="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">{{ __('SKU') }}</span>
                                     {{ $variant->sku }}</div> @endif
                                     @if($variant->codigo_barras)
                                         <div class="flex items-center gap-1.5 mt-1"><span
-                                                class="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">EAN</span>
+                                                class="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">{{ __('EAN') }}</span>
                                     {{ $variant->codigo_barras }}</div> @endif
                                 </td>
                                 <td class="px-4 py-3.5 text-gray-900 align-middle font-medium">
@@ -122,7 +122,7 @@
                                             viewBox="0 0 24 24">
                                             <path d="M12 4v16m8-8H4" />
                                         </svg>
-                                        Ajustar
+                                        {{ __('Ajustar') }}
                                     </button>
 
                                     <!-- Styles for Modal (using Bootstrap classes as base but enhancing content) -->
@@ -135,13 +135,13 @@
                                                     @method('PUT')
                                                     <div
                                                         class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                                                        <h5 class="text-lg font-semibold text-gray-900">Ajustar Stock</h5>
+                                                        <h5 class="text-lg font-semibold text-gray-900">{{ __('Ajustar Stock') }}</h5>
                                                         <button type="button" class="btn-close opacity-50 hover:opacity-100"
-                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                                                     </div>
                                                     <div class="p-6">
                                                         <div class="text-start mb-6">
-                                                            <div class="text-sm text-gray-500 mb-1">Stock Actual</div>
+                                                            <div class="text-sm text-gray-500 mb-1">{{ __('Stock Actual') }}</div>
                                                             <div
                                                                 class="text-4xl font-bold {{ $variant->stock_actual > 0 ? 'text-emerald-600' : 'text-red-600' }}">
                                                                 {{ $variant->stock_actual }}
@@ -153,27 +153,26 @@
                                                         <div class="space-y-4 text-start">
                                                             <div>
                                                                 <label
-                                                                    class="block text-sm font-medium text-gray-700 mb-1.5">Operación</label>
+                                                                    class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('Operación') }}</label>
                                                                 <select class="form-control" name="operation" required>
-                                                                    <option value="add">Agregar (+)</option>
-                                                                    <option value="subtract">Restar (-)</option>
-                                                                    <option value="set">Definir Nuevo Total (=)</option>
+                                                                    <option value="add">{{ __('Agregar (+)') }}</option>
+                                                                    <option value="subtract">{{ __('Restar (-)') }}</option>
+                                                                    <option value="set">{{ __('Definir Nuevo Total (=)') }}</option>
                                                                 </select>
                                                             </div>
 
                                                             <div>
                                                                 <label
-                                                                    class="block text-sm font-medium text-gray-700 mb-1.5">Cantidad</label>
+                                                                    class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('Cantidad') }}</label>
                                                                 <input type="number" class="form-control" name="quantity"
                                                                     min="1" required>
                                                             </div>
 
                                                             <div>
                                                                 <label
-                                                                    class="block text-sm font-medium text-gray-700 mb-1.5">Notas
-                                                                    (Opcional)</label>
+                                                                    class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('Notas (Opcional)') }}</label>
                                                                 <input type="text" class="form-control" name="notes"
-                                                                    placeholder="Razón del ajuste...">
+                                                                    placeholder="{{ __('Razón del ajuste...') }}">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -181,10 +180,9 @@
                                                         class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
                                                         <button type="button"
                                                             class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                                                            data-bs-dismiss="modal">Cancelar</button>
+                                                            data-bs-dismiss="modal">{{ __('Cancelar') }}</button>
                                                         <button type="submit"
-                                                            class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">Guardar
-                                                            Ajuste</button>
+                                                            class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">{{ __('Guardar Ajuste') }}</button>
                                                     </div>
                                                 </form>
                                             </div>
@@ -200,8 +198,8 @@
                                         <rect x="2" y="7" width="20" height="14" rx="2" />
                                         <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" />
                                     </svg>
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-1">No hay productos</h3>
-                                    <p class="text-sm">Intenta ajustar los filtros de búsqueda.</p>
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ __('No hay productos') }}</h3>
+                                    <p class="text-sm">{{ __('Intenta ajustar los filtros de búsqueda.') }}</p>
                                 </td>
                             </tr>
                         @endforelse

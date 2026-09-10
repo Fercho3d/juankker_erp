@@ -8,14 +8,14 @@
 <div class="max-w-[900px] mx-auto px-6 py-8">
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ $category->exists ? 'Editar' : 'Nueva' }} Categoría</h1>
-            <p class="text-sm text-gray-500 mt-0.5">{{ $category->exists ? 'Actualiza los datos de la categoría' : 'Crea una nueva categoría de productos' }}</p>
+            <h1 class="text-2xl font-bold text-gray-900">{{ $category->exists ? __('Editar categoría') : __('Nueva categoría') }}</h1>
+            <p class="text-sm text-gray-500 mt-0.5">{{ $category->exists ? __('Actualiza los datos de la categoría') : __('Crea una nueva categoría de productos') }}</p>
         </div>
         <a href="{{ route('categorias.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="m15 18-6-6 6-6"/>
             </svg>
-            Volver
+            {{ __('Volver') }}
         </a>
     </div>
 
@@ -33,14 +33,14 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Información de la Categoría</h2>
-                    <p class="text-sm text-gray-500">Datos básicos de la categoría</p>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Información de la Categoría') }}</h2>
+                    <p class="text-sm text-gray-500">{{ __('Datos básicos de la categoría') }}</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="mb-4">
-                    <label for="nombre" class="block text-sm font-medium text-gray-900 mb-2">Nombre *</label>
+                    <label for="nombre" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Nombre') }} *</label>
                     <input
                         type="text"
                         id="nombre"
@@ -55,13 +55,13 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="parent_id" class="block text-sm font-medium text-gray-900 mb-2">Categoría Padre</label>
+                    <label for="parent_id" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Categoría Padre') }}</label>
                     <select
                         id="parent_id"
                         name="parent_id"
                         class="w-full px-3 py-3 border rounded-xl text-sm transition-colors box-border focus:outline-none focus:ring-2 {{ $errors->has('parent_id') ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-500/20' }}"
                     >
-                        <option value="">Ninguna (Categoría raíz)</option>
+                        <option value="">{{ __('Ninguna (Categoría raíz)') }}</option>
                         @foreach($parentCategories as $parent)
                             <option value="{{ $parent->id }}" {{ old('parent_id', $category->parent_id) == $parent->id ? 'selected' : '' }}>
                                 {{ $parent->nombre }}
@@ -75,7 +75,7 @@
             </div>
 
             <div class="mb-4">
-                <label for="descripcion" class="block text-sm font-medium text-gray-900 mb-2">Descripción</label>
+                <label for="descripcion" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Descripción') }}</label>
                 <textarea
                     id="descripcion"
                     name="descripcion"
@@ -96,8 +96,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Estado</h2>
-                    <p class="text-sm text-gray-500">Configuración de activación</p>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Estado') }}</h2>
+                    <p class="text-sm text-gray-500">{{ __('Configuración de activación') }}</p>
                 </div>
             </div>
 
@@ -110,16 +110,16 @@
                         class="w-[18px] h-[18px] accent-indigo-600 cursor-pointer"
                         {{ old('activo', $category->activo ?? true) ? 'checked' : '' }}
                     >
-                    Categoría activa
+                    {{ __('Categoría activa') }}
                 </label>
-                <p class="text-xs text-gray-400 mt-1">Las categorías inactivas no estarán disponibles para nuevos productos</p>
+                <p class="text-xs text-gray-400 mt-1">{{ __('Las categorías inactivas no estarán disponibles para nuevos productos') }}</p>
             </div>
         </div>
 
         <div class="flex items-center gap-4 justify-end mt-8">
-            <a href="{{ route('categorias.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">Cancelar</a>
+            <a href="{{ route('categorias.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">{{ __('Cancelar') }}</a>
             <button type="submit" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors cursor-pointer border-none">
-                {{ $category->exists ? 'Actualizar' : 'Crear' }} Categoría
+                {{ $category->exists ? __('Actualizar categoría') : __('Crear categoría') }}
             </button>
         </div>
     </form>

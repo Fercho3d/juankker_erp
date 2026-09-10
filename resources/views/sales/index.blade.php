@@ -4,14 +4,14 @@
     <div class="page-container">
         <div class="page-header">
             <div>
-                <h1 class="page-title">Historial de Ventas</h1>
-                <p class="page-subtitle">Consulta y administra las ventas realizadas</p>
+                <h1 class="page-title">{{ __('Historial de Ventas') }}</h1>
+                <p class="page-subtitle">{{ __('Consulta y administra las ventas realizadas') }}</p>
             </div>
             <a href="{{ route('pos.index') }}" class="btn-primary">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M12 5v14M5 12h14" />
                 </svg>
-                Nueva Venta
+                {{ __('Nueva Venta') }}
             </a>
         </div>
 
@@ -20,14 +20,14 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Folio</th>
-                            <th>Fecha</th>
-                            <th>Cliente</th>
-                            <th>Vendedor</th>
-                            <th>Items</th>
-                            <th>Total</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
+                            <th>{{ __('Folio') }}</th>
+                            <th>{{ __('Fecha') }}</th>
+                            <th>{{ __('Cliente') }}</th>
+                            <th>{{ __('Vendedor') }}</th>
+                            <th>{{ __('Items') }}</th>
+                            <th>{{ __('Total') }}</th>
+                            <th>{{ __('Estado') }}</th>
+                            <th>{{ __('Acciones') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -54,7 +54,7 @@
                                             <span>{{ $sale->client->nombre_completo }}</span>
                                         </div>
                                     @else
-                                        <span class="text-muted fst-italic">Público General</span>
+                                        <span class="text-muted fst-italic">{{ __('Público General') }}</span>
                                     @endif
                                 </td>
                                 <td>{{ $sale->user->name }}</td>
@@ -64,16 +64,16 @@
                                 <td class="fw-bold text-dark">${{ number_format($sale->total, 2) }}</td>
                                 <td>
                                     @if($sale->estatus == 'completada')
-                                        <span class="badge badge-success">Completada</span>
+                                        <span class="badge badge-success">{{ __('Completada') }}</span>
                                     @elseif($sale->estatus == 'cancelada')
-                                        <span class="badge badge-danger">Cancelada</span>
+                                        <span class="badge badge-danger">{{ __('Cancelada') }}</span>
                                     @else
-                                        <span class="badge badge-warning">Pendiente</span>
+                                        <span class="badge badge-warning">{{ __('Pendiente') }}</span>
                                     @endif
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <a href="{{ route('sales.show', $sale) }}" class="btn-icon" title="Ver Detalle">
+                                        <a href="{{ route('sales.show', $sale) }}" class="btn-icon" title="{{ __('Ver Detalle') }}">
                                             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
                                                 viewBox="0 0 24 24">
                                                 <path
@@ -81,7 +81,7 @@
                                                 <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                             </svg>
                                         </a>
-                                        <a href="{{ route('sales.pdf', $sale) }}" class="btn-icon text-danger" title="Descargar PDF"
+                                        <a href="{{ route('sales.pdf', $sale) }}" class="btn-icon text-danger" title="{{ __('Descargar PDF') }}"
                                             target="_blank">
                                             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
                                                 viewBox="0 0 24 24">
@@ -105,9 +105,9 @@
                         <path
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z" />
                     </svg>
-                    <h3>No hay ventas registradas</h3>
-                    <p>Realiza tu primera venta desde el punto de venta.</p>
-                    <a href="{{ route('pos.index') }}" class="btn-link mt-2">Ir al POS &rarr;</a>
+                    <h3>{{ __('No hay ventas registradas') }}</h3>
+                    <p>{{ __('Realiza tu primera venta desde el punto de venta.') }}</p>
+                    <a href="{{ route('pos.index') }}" class="btn-link mt-2">{{ __('Ir al POS') }} &rarr;</a>
                 </div>
             @endif
         </div>

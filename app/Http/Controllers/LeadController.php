@@ -201,7 +201,7 @@ class LeadController extends Controller
         });
 
         return redirect()->route('crm.tablero')
-            ->with('status', "Se dieron de alta {$creados} prospectos. Omitidos por duplicado o vacíos: {$omitidos}.");
+            ->with('status', __('Se dieron de alta :creados prospectos. Omitidos por duplicado o vacíos: :omitidos.', ['creados' => $creados, 'omitidos' => $omitidos]));
     }
 
     /* -------------------- Internos -------------------- */
@@ -239,7 +239,7 @@ class LeadController extends Controller
 
         return $request->expectsJson()
             ? response()->json(['ok' => true])
-            : redirect()->route('crm.tablero')->with('status', 'Prospecto enviado a la papelera.');
+            : redirect()->route('crm.tablero')->with('status', __('Prospecto enviado a la papelera.'));
     }
 
     public function papelera(Request $request)
@@ -261,7 +261,7 @@ class LeadController extends Controller
         $lead->restore();
         $lead->update(['motivo_descarte' => null]);
 
-        return back()->with('status', 'Prospecto restaurado: '.($lead->empresa ?: $lead->nombre));
+        return back()->with('status', __('Prospecto restaurado: :nombre', ['nombre' => $lead->empresa ?: $lead->nombre]));
     }
 
     private function autorizar(Lead $lead): void

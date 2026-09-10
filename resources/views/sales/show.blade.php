@@ -23,9 +23,9 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
                 <div class="flex items-center gap-3 mb-1">
-                    <h1 class="text-2xl font-bold text-slate-800">Venta #{{ $sale->folio }}</h1>
+                    <h1 class="text-2xl font-bold text-slate-800">{{ __('Venta #:folio', ['folio' => $sale->folio]) }}</h1>
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-                        Completada
+                        {{ __('Completada') }}
                     </span>
                 </div>
                 <p class="text-slate-500 text-sm flex items-center gap-2">
@@ -37,11 +37,11 @@
             <div class="flex items-center gap-3">
                 <a href="{{ route('sales.index') }}"
                     class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 hover:text-slate-800 transition-colors text-sm font-medium flex items-center gap-2">
-                    <i class="ri-arrow-left-line"></i> Volver
+                    <i class="ri-arrow-left-line"></i> {{ __('Volver') }}
                 </a>
                 <a href="{{ route('sales.pdf', $sale) }}" target="_blank"
                     class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-2 shadow-sm shadow-indigo-200">
-                    <i class="ri-file-pdf-line"></i> Descargar PDF
+                    <i class="ri-file-pdf-line"></i> {{ __('Descargar PDF') }}
                 </a>
             </div>
         </div>
@@ -53,17 +53,17 @@
                     <div class="p-6 border-b border-slate-100 bg-slate-50/50">
                         <h2 class="font-semibold text-slate-800 flex items-center gap-2">
                             <i class="ri-shopping-bag-3-line text-indigo-500"></i>
-                            Productos Vendidos
+                            {{ __('Productos Vendidos') }}
                         </h2>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left">
                             <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
                                 <tr>
-                                    <th class="px-6 py-3 font-semibold">Producto</th>
-                                    <th class="px-6 py-3 font-semibold text-center">Cant.</th>
-                                    <th class="px-6 py-3 font-semibold text-right">Precio Unit.</th>
-                                    <th class="px-6 py-3 font-semibold text-right">Total</th>
+                                    <th class="px-6 py-3 font-semibold">{{ __('Producto') }}</th>
+                                    <th class="px-6 py-3 font-semibold text-center">{{ __('Cant.') }}</th>
+                                    <th class="px-6 py-3 font-semibold text-right">{{ __('Precio Unit.') }}</th>
+                                    <th class="px-6 py-3 font-semibold text-right">{{ __('Total') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
@@ -100,13 +100,13 @@
                         <i class="ri-information-line text-lg"></i>
                     </div>
                     <div>
-                        <h4 class="font-medium text-indigo-900 text-sm">Información Adicional</h4>
+                        <h4 class="font-medium text-indigo-900 text-sm">{{ __('Información Adicional') }}</h4>
                         <p class="text-indigo-700 text-sm mt-1">
-                            Esta venta fue realizada por <strong>{{ $sale->user->name }}</strong>.
+                            {{ __('Esta venta fue realizada por') }} <strong>{{ $sale->user->name }}</strong>.
                             @if($sale->client)
-                                Cliente registrado: <strong>{{ $sale->client->nombre_completo }}</strong>.
+                                {{ __('Cliente registrado:') }} <strong>{{ $sale->client->nombre_completo }}</strong>.
                             @else
-                                Venta a público general.
+                                {{ __('Venta a público general.') }}
                             @endif
                         </p>
                     </div>
@@ -119,7 +119,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                     <h3
                         class="font-semibold text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
-                        Resumen de Pago
+                        {{ __('Resumen de Pago') }}
                         <span
                             class="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-1 rounded-md uppercase tracking-wide">
                             {{ $sale->metodo_pago }}
@@ -128,15 +128,15 @@
 
                     <div class="space-y-3">
                         <div class="flex justify-between items-center text-sm">
-                            <span class="text-slate-500">Subtotal</span>
+                            <span class="text-slate-500">{{ __('Subtotal') }}</span>
                             <span class="font-medium text-slate-700">${{ number_format($sale->subtotal, 2) }}</span>
                         </div>
                         <div class="flex justify-between items-center text-sm">
-                            <span class="text-slate-500">IVA (16%)</span>
+                            <span class="text-slate-500">{{ __('IVA (16%)') }}</span>
                             <span class="font-medium text-slate-700">${{ number_format($sale->impuesto, 2) }}</span>
                         </div>
                         <div class="pt-3 mt-3 border-t border-dashed border-slate-200 flex justify-between items-end">
-                            <span class="text-slate-800 font-bold">Total</span>
+                            <span class="text-slate-800 font-bold">{{ __('Total') }}</span>
                             <span class="text-2xl font-black text-indigo-600">${{ number_format($sale->total, 2) }}</span>
                         </div>
                     </div>
@@ -145,7 +145,7 @@
                 <!-- Client Info -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                     <h3 class="font-semibold text-slate-800 mb-4 pb-3 border-b border-slate-100">
-                        Datos del Cliente
+                        {{ __('Datos del Cliente') }}
                     </h3>
                     <div class="flex items-center gap-4">
                         <div
@@ -154,13 +154,13 @@
                         </div>
                         <div>
                             <div class="font-medium text-slate-900">
-                                {{ $sale->client ? $sale->client->nombre_completo : 'Público General' }}
+                                {{ $sale->client ? $sale->client->nombre_completo : __('Público General') }}
                             </div>
                             @if($sale->client)
                                 <div class="text-xs text-slate-500 mt-0.5">{{ $sale->client->email }}</div>
                                 <div class="text-xs text-slate-500">{{ $sale->client->telefono }}</div>
                             @else
-                                <div class="text-xs text-slate-500 mt-0.5">Venta Mostrador</div>
+                                <div class="text-xs text-slate-500 mt-0.5">{{ __('Venta Mostrador') }}</div>
                             @endif
                         </div>
                     </div>

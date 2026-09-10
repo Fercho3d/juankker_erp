@@ -67,7 +67,7 @@ class BrandController extends Controller
     private function authorizeBrand(Brand $brand)
     {
         if ($brand->organization_id !== Auth::user()->organization_id) {
-            abort(403, 'No autorizado');
+            abort(403, __('No autorizado'));
         }
     }
 

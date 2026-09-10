@@ -13,13 +13,13 @@ class BetaRequestController extends Controller
     {
         // Honeypot: si el campo oculto viene lleno, es un bot; fingimos éxito.
         if ($request->filled('website')) {
-            return back()->with('status', '¡Gracias! Te contactaremos pronto.');
+            return back()->with('status', __('¡Gracias! Te contactaremos pronto.'));
         }
 
         $key = 'beta:'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 3)) {
-            return back()->withErrors(['email' => 'Demasiadas solicitudes. Intenta más tarde.']);
+            return back()->withErrors(['email' => __('Demasiadas solicitudes. Intenta más tarde.')]);
         }
         RateLimiter::hit($key, 3600);
 
@@ -41,6 +41,6 @@ class BetaRequestController extends Controller
             'user_agent' => (string) $request->userAgent(),
         ]);
 
-        return back()->with('status', '¡Gracias! Revisaremos tu solicitud y te enviaremos una invitación.');
+        return back()->with('status', __('¡Gracias! Revisaremos tu solicitud y te enviaremos una invitación.'));
     }
 }

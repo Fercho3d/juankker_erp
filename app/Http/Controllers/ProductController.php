@@ -132,7 +132,7 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withErrors(['error' => 'Error al crear el producto: ' . $e->getMessage()])->withInput();
+            return back()->withErrors(['error' => __('Error al crear el producto: :error', ['error' => $e->getMessage()])])->withInput();
         }
     }
 
@@ -263,7 +263,7 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withErrors(['error' => 'Error al actualizar el producto: ' . $e->getMessage()])->withInput();
+            return back()->withErrors(['error' => __('Error al actualizar el producto: :error', ['error' => $e->getMessage()])])->withInput();
         }
     }
 
@@ -279,7 +279,7 @@ class ProductController extends Controller
     private function authorizeProduct(Product $product)
     {
         if ($product->organization_id !== Auth::user()->organization_id) {
-            abort(403, 'No autorizado');
+            abort(403, __('No autorizado'));
         }
     }
 

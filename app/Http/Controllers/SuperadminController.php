@@ -127,7 +127,7 @@ class SuperadminController extends Controller
             'trial_ends_at' => $data['trial_ends_at'] ?? $organization->trial_ends_at,
         ])->save();
 
-        return back()->with('status', 'Suscripción actualizada.');
+        return back()->with('status', __('Suscripción actualizada.'));
     }
 
     public function activateTrial(Organization $organization)
@@ -138,7 +138,7 @@ class SuperadminController extends Controller
             'is_active' => true,
         ]);
 
-        return back()->with('status', 'Prueba de 30 días activada.');
+        return back()->with('status', __('Prueba de 30 días activada.'));
     }
 
     /* ==================== IMPERSONACIÓN ==================== */
@@ -148,7 +148,7 @@ class SuperadminController extends Controller
         $request->session()->put('impersonator_id', Auth::id());
         Auth::login($user);
 
-        return redirect('/')->with('status', "Ahora ves el ERP como {$user->name}.");
+        return redirect('/')->with('status', __('Ahora ves el ERP como :nombre.', ['nombre' => $user->name]));
     }
 
     public function stopImpersonating(Request $request)
@@ -182,7 +182,7 @@ class SuperadminController extends Controller
         $data['features'] = $this->parseList($request->input('features'));
         Plan::create($data);
 
-        return back()->with('status', 'Plan creado.');
+        return back()->with('status', __('Plan creado.'));
     }
 
     public function updatePlan(Request $request, Plan $plan)
@@ -199,14 +199,14 @@ class SuperadminController extends Controller
             });
         }
 
-        return back()->with('status', 'Plan actualizado.');
+        return back()->with('status', __('Plan actualizado.'));
     }
 
     public function destroyPlan(Plan $plan)
     {
         $plan->delete();
 
-        return back()->with('status', 'Plan desactivado.');
+        return back()->with('status', __('Plan desactivado.'));
     }
 
     public function updateSettings(Request $request)
@@ -214,7 +214,7 @@ class SuperadminController extends Controller
         Setting::put('show_plans', $request->boolean('show_plans') ? '1' : '0');
         Setting::put('show_prices', $request->boolean('show_prices') ? '1' : '0');
 
-        return back()->with('status', 'Visibilidad actualizada.');
+        return back()->with('status', __('Visibilidad actualizada.'));
     }
 
     private function validatePlan(Request $request, ?Plan $plan = null): array
@@ -273,7 +273,7 @@ class SuperadminController extends Controller
 
         rescue(fn () => Mail::to($invitation->email)->send(new InvitacionMail($invitation)), null, false);
 
-        return back()->with('status', "Invitación enviada a {$invitation->email}.");
+        return back()->with('status', __('Invitación enviada a :email.', ['email' => $invitation->email]));
     }
 
     public function resendInvitation(Invitation $invitation)
@@ -281,14 +281,14 @@ class SuperadminController extends Controller
         $invitation->update(['sent_at' => now(), 'expires_at' => now()->addDays(14)]);
         rescue(fn () => Mail::to($invitation->email)->send(new InvitacionMail($invitation)), null, false);
 
-        return back()->with('status', 'Invitación reenviada.');
+        return back()->with('status', __('Invitación reenviada.'));
     }
 
     public function destroyInvitation(Invitation $invitation)
     {
         $invitation->delete();
 
-        return back()->with('status', 'Invitación eliminada.');
+        return back()->with('status', __('Invitación eliminada.'));
     }
 
     /* ==================== SOLICITUDES BETA ==================== */
@@ -316,13 +316,13 @@ class SuperadminController extends Controller
         rescue(fn () => Mail::to($invitation->email)->send(new InvitacionMail($invitation)), null, false);
         $betaRequest->update(['status' => 'invitado', 'invited_at' => now()]);
 
-        return back()->with('status', "Invitación enviada a {$betaRequest->email}.");
+        return back()->with('status', __('Invitación enviada a :email.', ['email' => $betaRequest->email]));
     }
 
     public function dismissBeta(BetaRequest $betaRequest)
     {
         $betaRequest->update(['status' => 'descartado']);
 
-        return back()->with('status', 'Solicitud descartada.');
+        return back()->with('status', __('Solicitud descartada.'));
     }
 }

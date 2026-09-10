@@ -63,6 +63,6 @@ class InventoryController extends Controller
 
         // TODO: Record movement history (future enhancement)
 
-        return back()->with('success', 'Stock actualizado correctamente.');
+        return back()->with('success', __('Stock actualizado correctamente.'));
     }
 }

@@ -83,7 +83,7 @@ class CategoryController extends Controller
     private function authorizeCategory(Category $category)
     {
         if ($category->organization_id !== Auth::user()->organization_id) {
-            abort(403, 'No autorizado');
+            abort(403, __('No autorizado'));
         }
     }
 

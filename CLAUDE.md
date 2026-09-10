@@ -42,6 +42,26 @@ organización, y las rutas se protegen con `premium:<modulo>`.
 Al agregar un módulo nuevo: dale su clave en `plans.modules`, protégelo con
 `premium:<clave>` y agrega el enlace en `layouts/app.blade.php`.
 
+### Menú, tema e idiomas
+
+- **Cascarón:** `layouts/app.blade.php` (menú lateral por secciones, barra superior
+  y menú de usuario) con estilos propios en `public/css/shell.css` y
+  `public/js/shell.js`, sin Tailwind ni compilación. Un módulo nuevo se agrega
+  al arreglo `$nav` del layout, con su ícono en `partials/nav-icon`.
+- **Tema** claro/oscuro/sistema (`App\Support\Theme`) e **idioma** es/en
+  (`App\Support\Locale`), mismo esquema que CargoSuite: se guardan en
+  `users.theme`/`users.locale` y en cookie, y los aplica `SetLocale` y
+  `partials/theme-script`.
+- **Modo oscuro:** las vistas usan colores de Tailwind escritos a mano y
+  `public/css/dark.css` los reasigna bajo `html.dark`. Si una vista nueva usa un
+  tono que no está ahí y se ve mal en oscuro, se agrega a esa hoja.
+- **Idiomas:** el español es la lengua base. Todo texto visible va en
+  `__('Texto en español')` y su traducción en `lang/en.json`; lo que falte sale
+  en español. Frases con datos van con marcadores (`__('Van :n', ['n' => $n])`)
+  y plurales con `trans_choice`. En JavaScript, `{{ Js::from(__('...')) }}`:
+  **no** `@json()`, que parte el argumento por las comas. Revisa lo pendiente con
+  `php artisan idiomas:revisar`.
+
 ## Despliegue
 
 Ver `DESPLIEGUE.md`. En resumen: producción es manual por SSH/scp contra el

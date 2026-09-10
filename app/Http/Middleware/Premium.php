@@ -30,7 +30,7 @@ class Premium
 
         if ($blocked) {
             return redirect()->route('pricing')
-                ->with('premium_required', 'Esta función es Premium. Activa un plan para desbloquearla.');
+                ->with('premium_required', __('Esta función es Premium. Activa un plan para desbloquearla.'));
         }
 
         return $next($request);

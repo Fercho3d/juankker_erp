@@ -69,14 +69,14 @@ class ProductAttributeValueController extends Controller
     private function authorizeAttribute(ProductAttribute $attribute)
     {
         if ($attribute->organization_id !== Auth::user()->organization_id) {
-            abort(403, 'No autorizado');
+            abort(403, __('No autorizado'));
         }
     }
 
     private function authorizeValue(ProductAttributeValue $value, ProductAttribute $attribute)
     {
         if ($value->product_attribute_id !== $attribute->id) {
-            abort(403, 'No autorizado');
+            abort(403, __('No autorizado'));
         }
     }
 }

@@ -8,14 +8,14 @@
 <div class="max-w-7xl mx-auto px-6 py-8">
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ $product->exists ? 'Editar' : 'Nuevo' }} Producto</h1>
-            <p class="text-sm text-gray-500 mt-0.5">{{ $product->exists ? 'Actualiza los datos del producto' : 'Crea un nuevo producto' }}</p>
+            <h1 class="text-2xl font-bold text-gray-900">{{ $product->exists ? __('Editar producto') : __('Nuevo producto') }}</h1>
+            <p class="text-sm text-gray-500 mt-0.5">{{ $product->exists ? __('Actualiza los datos del producto') : __('Crea un nuevo producto') }}</p>
         </div>
         <a href="{{ route('productos.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="m15 18-6-6 6-6"/>
             </svg>
-            Volver
+            {{ __('Volver') }}
         </a>
     </div>
 
@@ -25,7 +25,7 @@
                 <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
             </svg>
             <div>
-                <strong>Hay errores en el formulario:</strong>
+                <strong>{{ __('Hay errores en el formulario:') }}</strong>
                 <ul class="mt-2 ml-6 list-disc">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -50,13 +50,13 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Información Básica</h2>
-                    <p class="text-sm text-gray-500">Datos generales del producto</p>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Información Básica') }}</h2>
+                    <p class="text-sm text-gray-500">{{ __('Datos generales del producto') }}</p>
                 </div>
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-900 mb-2">Tipo de Producto *</label>
+                <label class="block text-sm font-medium text-gray-900 mb-2">{{ __('Tipo de Producto') }} *</label>
                 <div class="flex gap-6">
                     <label class="flex items-center gap-2 text-sm font-medium text-gray-900 cursor-pointer">
                         <input
@@ -66,7 +66,7 @@
                             {{ old('tipo_producto', $product->tipo_producto ?? 'simple') === 'simple' ? 'checked' : '' }}
                             {{ $product->exists ? 'disabled' : '' }}
                         >
-                        <span>Producto Simple</span>
+                        <span>{{ __('Producto Simple') }}</span>
                     </label>
                     <label class="flex items-center gap-2 text-sm font-medium text-gray-900 cursor-pointer">
                         <input
@@ -76,27 +76,27 @@
                             {{ old('tipo_producto', $product->tipo_producto) === 'variable' ? 'checked' : '' }}
                             {{ $product->exists ? 'disabled' : '' }}
                         >
-                        <span>Producto Variable</span>
+                        <span>{{ __('Producto Variable') }}</span>
                     </label>
                 </div>
                 @if($product->exists)
                     <input type="hidden" name="tipo_producto" value="{{ $product->tipo_producto }}">
-                    <p class="text-xs text-gray-400 mt-1">El tipo de producto no se puede cambiar una vez creado</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ __('El tipo de producto no se puede cambiar una vez creado') }}</p>
                 @else
-                    <p class="text-xs text-gray-400 mt-1">Simple: un solo producto. Variable: producto con variantes (tallas, colores, etc.)</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ __('Simple: un solo producto. Variable: producto con variantes (tallas, colores, etc.)') }}</p>
                 @endif
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="mb-4">
-                    <label for="codigo" class="block text-sm font-medium text-gray-900 mb-2">Código Interno *</label>
+                    <label for="codigo" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Código Interno') }} *</label>
                     <input
                         type="text"
                         id="codigo"
                         name="codigo"
                         class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm transition-colors box-border focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20 @error('codigo') border-red-400 @enderror"
                         value="{{ old('codigo', $product->codigo) }}"
-                        placeholder="PROD-001"
+                        placeholder="{{ __('PROD-001') }}"
                         required
                     >
                     @error('codigo')
@@ -105,7 +105,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="nombre" class="block text-sm font-medium text-gray-900 mb-2">Nombre *</label>
+                    <label for="nombre" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Nombre') }} *</label>
                     <input
                         type="text"
                         id="nombre"
@@ -121,7 +121,7 @@
             </div>
 
             <div class="mb-4">
-                <label for="descripcion" class="block text-sm font-medium text-gray-900 mb-2">Descripción</label>
+                <label for="descripcion" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Descripción') }}</label>
                 <textarea
                     id="descripcion"
                     name="descripcion"
@@ -135,13 +135,13 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="mb-4">
-                    <label for="category_id" class="block text-sm font-medium text-gray-900 mb-2">Categoría</label>
+                    <label for="category_id" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Categoría') }}</label>
                     <select
                         id="category_id"
                         name="category_id"
                         class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm transition-colors box-border focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20 @error('category_id') border-red-400 @enderror"
                     >
-                        <option value="">Seleccionar categoría</option>
+                        <option value="">{{ __('Seleccionar categoría') }}</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
                                 {{ $category->nombre }}
@@ -154,13 +154,13 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="brand_id" class="block text-sm font-medium text-gray-900 mb-2">Marca</label>
+                    <label for="brand_id" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Marca') }}</label>
                     <select
                         id="brand_id"
                         name="brand_id"
                         class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm transition-colors box-border focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20 @error('brand_id') border-red-400 @enderror"
                     >
-                        <option value="">Seleccionar marca</option>
+                        <option value="">{{ __('Seleccionar marca') }}</option>
                         @foreach($brands as $brand)
                             <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>
                                 {{ $brand->nombre }}
@@ -173,13 +173,13 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="supplier_id" class="block text-sm font-medium text-gray-900 mb-2">Proveedor</label>
+                    <label for="supplier_id" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Proveedor') }}</label>
                     <select
                         id="supplier_id"
                         name="supplier_id"
                         class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm transition-colors box-border focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20 @error('supplier_id') border-red-400 @enderror"
                     >
-                        <option value="">Seleccionar proveedor</option>
+                        <option value="">{{ __('Seleccionar proveedor') }}</option>
                         @foreach($suppliers as $supplier)
                             <option value="{{ $supplier->id }}" {{ old('supplier_id', $product->supplier_id) == $supplier->id ? 'selected' : '' }}>
                                 {{ $supplier->razon_social }}
@@ -202,14 +202,14 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Precios</h2>
-                    <p class="text-sm text-gray-500">Costos y precios de venta</p>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Precios') }}</h2>
+                    <p class="text-sm text-gray-500">{{ __('Costos y precios de venta') }}</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="mb-4">
-                    <label for="precio_compra" class="block text-sm font-medium text-gray-900 mb-2">Precio de Compra</label>
+                    <label for="precio_compra" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Precio de Compra') }}</label>
                     <input
                         type="number"
                         id="precio_compra"
@@ -225,7 +225,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="precio_venta" class="block text-sm font-medium text-gray-900 mb-2">Precio de Venta *</label>
+                    <label for="precio_venta" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Precio de Venta') }} *</label>
                     <input
                         type="number"
                         id="precio_venta"
@@ -242,7 +242,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="precio_mayoreo" class="block text-sm font-medium text-gray-900 mb-2">Precio Mayoreo</label>
+                    <label for="precio_mayoreo" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Precio Mayoreo') }}</label>
                     <input
                         type="number"
                         id="precio_mayoreo"
@@ -268,14 +268,14 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Inventario</h2>
-                    <p class="text-sm text-gray-500">Control de stock y unidades</p>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Inventario') }}</h2>
+                    <p class="text-sm text-gray-500">{{ __('Control de stock y unidades') }}</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="mb-4">
-                    <label for="unidad_medida" class="block text-sm font-medium text-gray-900 mb-2">Unidad de Medida *</label>
+                    <label for="unidad_medida" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Unidad de Medida') }} *</label>
                     <select
                         id="unidad_medida"
                         name="unidad_medida"
@@ -294,7 +294,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="stock_minimo" class="block text-sm font-medium text-gray-900 mb-2">Stock Mínimo</label>
+                    <label for="stock_minimo" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Stock Mínimo') }}</label>
                     <input
                         type="number"
                         id="stock_minimo"
@@ -306,7 +306,7 @@
                     @error('stock_minimo')
                         <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
                     @enderror
-                    <p class="text-xs text-gray-400 mt-1">Alerta cuando el stock esté por debajo de este número</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ __('Alerta cuando el stock esté por debajo de este número') }}</p>
                 </div>
             </div>
 
@@ -319,15 +319,15 @@
                         class="w-[18px] h-[18px] accent-indigo-600 cursor-pointer"
                         {{ old('permite_decimales', $product->permite_decimales) ? 'checked' : '' }}
                     >
-                    Permite cantidades decimales
+                    {{ __('Permite cantidades decimales') }}
                 </label>
-                <p class="text-xs text-gray-400 mt-1">Útil para productos vendidos por peso o volumen (ej: 1.5 kg)</p>
+                <p class="text-xs text-gray-400 mt-1">{{ __('Útil para productos vendidos por peso o volumen (ej: 1.5 kg)') }}</p>
             </div>
 
             @if(!$product->exists || $product->tipo_producto === 'simple')
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="simple-product-fields">
                     <div class="mb-4">
-                        <label for="stock_inicial" class="block text-sm font-medium text-gray-900 mb-2">Stock Inicial</label>
+                        <label for="stock_inicial" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Stock Inicial') }}</label>
                         <input
                             type="number"
                             id="stock_inicial"
@@ -336,11 +336,11 @@
                             value="{{ old('stock_inicial', $product->exists ? $product->variants->first()?->stock_actual : 0) }}"
                             min="0"
                         >
-                        <p class="text-xs text-gray-400 mt-1">Cantidad inicial en inventario</p>
+                        <p class="text-xs text-gray-400 mt-1">{{ __('Cantidad inicial en inventario') }}</p>
                     </div>
 
                     <div class="mb-4">
-                        <label for="codigo_barras" class="block text-sm font-medium text-gray-900 mb-2">Código de Barras</label>
+                        <label for="codigo_barras" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Código de Barras') }}</label>
                         <input
                             type="text"
                             id="codigo_barras"
@@ -349,7 +349,7 @@
                             value="{{ old('codigo_barras', $product->exists ? $product->variants->first()?->codigo_barras : '') }}"
                             placeholder="7501234567890"
                         >
-                        <p class="text-xs text-gray-400 mt-1">EAN, UPC u otro código de barras</p>
+                        <p class="text-xs text-gray-400 mt-1">{{ __('EAN, UPC u otro código de barras') }}</p>
                     </div>
                 </div>
             @endif
@@ -365,8 +365,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Variantes del Producto</h2>
-                    <p class="text-sm text-gray-500">Genera combinaciones de atributos (tallas, colores, etc.)</p>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Variantes del Producto') }}</h2>
+                    <p class="text-sm text-gray-500">{{ __('Genera combinaciones de atributos (tallas, colores, etc.)') }}</p>
                 </div>
             </div>
 
@@ -374,7 +374,7 @@
                 @if(!$product->exists)
                     {{-- Creating new variable product --}}
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-900 mb-2">Selecciona los atributos que aplican:</label>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">{{ __('Selecciona los atributos que aplican:') }}</label>
                         @foreach($attributes as $attribute)
                             <div class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
                                 <label class="flex items-center gap-2 text-sm font-medium text-gray-900 cursor-pointer mb-2">
@@ -395,7 +395,7 @@
                                     @else
                                         <div class="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg inline-flex items-center gap-2">
                                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                            Este atributo no tiene valores registrados. <a href="{{ route('atributos-producto.index') }}" class="underline hover:text-amber-800" target="_blank">Agregar valores</a>
+                                            {{ __('Este atributo no tiene valores registrados.') }} <a href="{{ route('atributos-producto.index') }}" class="underline hover:text-amber-800" target="_blank">{{ __('Agregar valores') }}</a>
                                         </div>
                                     @endif
                                 </div>
@@ -404,28 +404,28 @@
                     </div>
 
                     <button type="button" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors cursor-pointer border-none mb-6 shadow-sm shadow-indigo-200" onclick="generateVariants()">
-                        Generar Variantes
+                        {{ __('Generar Variantes') }}
                     </button>
 
                     <div id="variants-table-container" class="hidden">
-                        <h3 class="mb-4 text-lg font-semibold">Variantes y Precios</h3>
+                        <h3 class="mb-4 text-lg font-semibold">{{ __('Variantes y Precios') }}</h3>
                         <div id="variants-table" class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm"></div>
-                        <p class="text-xs text-gray-500 mt-2 text-right">* Los precios y stock se pueden ajustar individualmente después.</p>
+                        <p class="text-xs text-gray-500 mt-2 text-right">* {{ __('Los precios y stock se pueden ajustar individualmente después.') }}</p>
                     </div>
                 @else
                     {{-- Editing existing variable product --}}
                     <div id="existing-variants">
-                        <h3 class="mb-4 text-lg font-semibold">Variantes Existentes</h3>
+                        <h3 class="mb-4 text-lg font-semibold">{{ __('Variantes Existentes') }}</h3>
                         <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
                             <table class="w-full text-sm border-collapse">
                                 <thead class="bg-gray-50 border-b-2 border-gray-200">
                                     <tr>
-                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">SKU</th>
-                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Variante</th>
-                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Precio Venta</th>
-                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Stock</th>
-                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Código Barras</th>
-                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">Activo</th>
+                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('SKU') }}</th>
+                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('Variante') }}</th>
+                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('Precio Venta') }}</th>
+                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('Stock') }}</th>
+                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('Código Barras') }}</th>
+                                        <th class="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{{ __('Activo') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -441,7 +441,7 @@
                                                     $attrIds = $variant->attributeValues->pluck('id')->join(',');
                                                 @endphp
                                                 <input type="hidden" name="variants[{{ $index }}][attribute_value_ids]" value="{{ $attrIds }}">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ $attrs ?: 'Sin atributos' }}</span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ $attrs ?: __('Sin atributos') }}</span>
                                             </td>
                                             <td class="px-4 py-3.5 text-gray-900 align-middle">
                                                 <input type="number" name="variants[{{ $index }}][precio_venta]" class="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" value="{{ $variant->precio_venta }}" step="0.01" required>
@@ -474,19 +474,19 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Datos Fiscales</h2>
-                    <p class="text-sm text-gray-500">Información para facturación</p>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Datos Fiscales') }}</h2>
+                    <p class="text-sm text-gray-500">{{ __('Información para facturación') }}</p>
                 </div>
             </div>
 
             <div class="mb-4">
-                <label for="codigo_sat" class="block text-sm font-medium text-gray-900 mb-2">Código SAT</label>
+                <label for="codigo_sat" class="block text-sm font-medium text-gray-900 mb-2">{{ __('Código SAT') }}</label>
                 <select
                     id="codigo_sat"
                     name="codigo_sat"
                     class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm transition-colors box-border focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20 @error('codigo_sat') border-red-400 @enderror"
                 >
-                    <option value="">Seleccionar código SAT</option>
+                    <option value="">{{ __('Seleccionar código SAT') }}</option>
                     @foreach($codigosSat as $codigo => $descripcion)
                         <option value="{{ $codigo }}" {{ old('codigo_sat', $product->codigo_sat) === $codigo ? 'selected' : '' }}>
                             {{ $descripcion }}
@@ -496,7 +496,7 @@
                 @error('codigo_sat')
                     <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
                 @enderror
-                <p class="text-xs text-gray-400 mt-1">Requerido para generar facturas electrónicas (CFDI)</p>
+                <p class="text-xs text-gray-400 mt-1">{{ __('Requerido para generar facturas electrónicas (CFDI)') }}</p>
             </div>
         </div>
 
@@ -509,8 +509,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">Estado</h2>
-                    <p class="text-sm text-gray-500">Configuración de activación</p>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-0.5">{{ __('Estado') }}</h2>
+                    <p class="text-sm text-gray-500">{{ __('Configuración de activación') }}</p>
                 </div>
             </div>
 
@@ -523,16 +523,16 @@
                         class="w-[18px] h-[18px] accent-indigo-600 cursor-pointer"
                         {{ old('activo', $product->activo ?? true) ? 'checked' : '' }}
                     >
-                    Producto activo
+                    {{ __('Producto activo') }}
                 </label>
-                <p class="text-xs text-gray-400 mt-1">Los productos inactivos no estarán disponibles para ventas</p>
+                <p class="text-xs text-gray-400 mt-1">{{ __('Los productos inactivos no estarán disponibles para ventas') }}</p>
             </div>
         </div>
 
         <div class="flex items-center gap-4 justify-end mt-8">
-            <a href="{{ route('productos.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">Cancelar</a>
+            <a href="{{ route('productos.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors no-underline">{{ __('Cancelar') }}</a>
             <button type="submit" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors cursor-pointer border-none">
-                {{ $product->exists ? 'Actualizar' : 'Crear' }} Producto
+                {{ $product->exists ? __('Actualizar producto') : __('Crear producto') }}
             </button>
         </div>
     </form>
@@ -595,7 +595,7 @@ function generateVariants() {
     const checkedAttributeCheckboxes = document.querySelectorAll('.attribute-checkbox:checked');
     
     if (checkedAttributeCheckboxes.length === 0) {
-        alert('Por favor selecciona primero qué atributos (Color, Talla, etc.) tendrá este producto.');
+        alert({{ \Illuminate\Support\Js::from(__('Por favor selecciona primero qué atributos (Color, Talla, etc.) tendrá este producto.')) }});
         return;
     }
     
@@ -616,7 +616,8 @@ function generateVariants() {
         });
         
         if (selectedValues.length === 0) {
-            alert(`Has seleccionado el atributo "${attrName}" pero no has elegido ningún valor (ej: Rojo, Pequeño) para él.\n\nPor favor selecciona al menos una opción para "${attrName}".`);
+            alert(({{ \Illuminate\Support\Js::from(__('Has seleccionado el atributo ":attr" pero no has elegido ningún valor (ej: Rojo, Pequeño) para él.')) }} + '\n\n'
+                + {{ \Illuminate\Support\Js::from(__('Por favor selecciona al menos una opción para ":attr".')) }}).split(':attr').join(attrName));
             hasError = true;
             return;
         }
@@ -633,7 +634,7 @@ function generateVariants() {
     if (hasError) return;
 
     if (selectedAttributes.length === 0) {
-        alert('Por favor selecciona al menos un atributo con valores.');
+        alert({{ \Illuminate\Support\Js::from(__('Por favor selecciona al menos un atributo con valores.')) }});
         return;
     }
 

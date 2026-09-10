@@ -9,12 +9,12 @@
 
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Pendientes de hoy</h1>
-            <p class="text-sm text-gray-500 mt-0.5">{{ now()->translatedFormat('l d \d\e F') }}</p>
+            <h1 class="text-2xl font-bold text-gray-900">{{ __('Pendientes de hoy') }}</h1>
+            <p class="text-sm text-gray-500 mt-0.5">{{ now()->translatedFormat(__('l d \d\e F')) }}</p>
         </div>
         <div class="flex items-center gap-2">
-            <a href="{{ route('crm.tablero') }}" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:border-gray-400 no-underline">Ver embudo</a>
-            <a href="{{ route('crm.leads.create') }}" class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 no-underline">Nuevo prospecto</a>
+            <a href="{{ route('crm.tablero') }}" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:border-gray-400 no-underline">{{ __('Ver embudo') }}</a>
+            <a href="{{ route('crm.leads.create') }}" class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 no-underline">{{ __('Nuevo prospecto') }}</a>
         </div>
     </div>
 
@@ -24,25 +24,25 @@
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-200 border border-gray-200 rounded-xl overflow-hidden mb-8">
         <div class="bg-white px-4 py-3.5">
-            <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold">En la mesa</span>
+            <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold">{{ __('En la mesa') }}</span>
             <span class="block text-xl font-bold text-gray-900 tabular-nums mt-1">${{ number_format($resumen['valor_en_mesa'], 0) }}</span>
         </div>
         <div class="bg-white px-4 py-3.5">
-            <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Mensualidad en juego</span>
+            <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold">{{ __('Mensualidad en juego') }}</span>
             <span class="block text-xl font-bold text-emerald-600 tabular-nums mt-1">${{ number_format($resumen['mrr_en_mesa'], 0) }}</span>
         </div>
         <div class="bg-white px-4 py-3.5">
-            <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Prospectos abiertos</span>
+            <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold">{{ __('Prospectos abiertos') }}</span>
             <span class="block text-xl font-bold text-gray-900 tabular-nums mt-1">{{ $resumen['leads_abiertos'] }}</span>
         </div>
         <div class="bg-white px-4 py-3.5">
-            <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Ganado este mes</span>
+            <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold">{{ __('Ganado este mes') }}</span>
             <span class="block text-xl font-bold text-gray-900 tabular-nums mt-1">${{ number_format($resumen['ganado_mes_monto'], 0) }}</span>
         </div>
     </div>
 
     {{-- Seguimientos --}}
-    <h2 class="text-base font-bold text-gray-900 mb-3">A quién le toca hoy <span class="text-gray-400 font-medium">({{ $leads->count() }})</span></h2>
+    <h2 class="text-base font-bold text-gray-900 mb-3">{{ __('A quién le toca hoy') }} <span class="text-gray-400 font-medium">({{ $leads->count() }})</span></h2>
 
     @if ($leads->count())
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-8">
@@ -53,12 +53,12 @@
                     <span class="shrink-0 w-2 h-2 rounded-full {{ $lead->estaVencido() ? 'bg-rose-500' : 'bg-amber-400' }}"></span>
                     <div class="min-w-0 flex-1">
                         <span class="block text-sm font-semibold text-gray-900 truncate">{{ $lead->empresa ?: $lead->nombre }}</span>
-                        <span class="block text-xs text-gray-500 truncate">{{ $lead->proxima_accion ?: 'Dar seguimiento' }}</span>
+                        <span class="block text-xs text-gray-500 truncate">{{ $lead->proxima_accion ?: __('Dar seguimiento') }}</span>
                     </div>
                     <span class="shrink-0 text-xs font-medium {{ $lead->estaVencido() ? 'text-rose-600' : 'text-gray-500' }} tabular-nums">
-                        {{ $lead->estaVencido() ? 'Venció '.$lead->proxima_accion_at->format('d/m') : 'Hoy' }}
+                        {{ $lead->estaVencido() ? __('Venció el :fecha', ['fecha' => $lead->proxima_accion_at->format('d/m')]) : __('Hoy') }}
                     </span>
-                    <span class="shrink-0 hidden sm:inline text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">{{ $lead->stage->nombre }}</span>
+                    <span class="shrink-0 hidden sm:inline text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">{{ __($lead->stage->nombre ?? '') }}</span>
                 </a>
                 {{-- El hueco del teléfono se aparta aunque no haya, para que las columnas no bailen --}}
                 @if ($tel = $lead->telefonoDigitos())
@@ -72,13 +72,13 @@
         </div>
     @else
         <div class="bg-white rounded-xl border border-gray-200 px-4 py-8 text-center mb-8">
-            <p class="text-sm text-gray-500 m-0">Nada pendiente para hoy. Si el embudo tiene prospectos abiertos, agéndales la siguiente acción.</p>
+            <p class="text-sm text-gray-500 m-0">{{ __('Nada pendiente para hoy. Si el embudo tiene prospectos abiertos, agéndales la siguiente acción.') }}</p>
         </div>
     @endif
 
     {{-- Actividades agendadas --}}
     @if ($actividades->count())
-        <h2 class="text-base font-bold text-gray-900 mb-3">Actividades agendadas</h2>
+        <h2 class="text-base font-bold text-gray-900 mb-3">{{ __('Actividades agendadas') }}</h2>
         <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-8">
             @foreach ($actividades as $actividad)
                 <div class="flex items-center gap-4 px-4 py-3 {{ !$loop->last ? 'border-b border-gray-100' : '' }}">
@@ -90,7 +90,7 @@
                     <span class="shrink-0 text-xs text-gray-400 tabular-nums">{{ $actividad->programada_at?->format('d/m H:i') }}</span>
                     <form method="POST" action="{{ route('crm.actividades.completar', $actividad) }}" class="shrink-0">
                         @csrf
-                        <button type="submit" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 border-0 cursor-pointer">Hecho</button>
+                        <button type="submit" class="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 border-0 cursor-pointer">{{ __('Hecho') }}</button>
                     </form>
                 </div>
             @endforeach
@@ -99,8 +99,8 @@
 
     {{-- Sin próxima acción: la fuga silenciosa del embudo --}}
     @if ($sinSeguimiento->count())
-        <h2 class="text-base font-bold text-gray-900 mb-1">Sin próxima acción <span class="text-gray-400 font-medium">({{ number_format($totalSinSeguimiento) }})</span></h2>
-        <p class="text-sm text-gray-500 mb-3">Estos prospectos están abiertos pero nadie va a hacer nada con ellos. Aquí es por donde se fuga el embudo.</p>
+        <h2 class="text-base font-bold text-gray-900 mb-1">{{ __('Sin próxima acción') }} <span class="text-gray-400 font-medium">({{ number_format($totalSinSeguimiento) }})</span></h2>
+        <p class="text-sm text-gray-500 mb-3">{{ __('Estos prospectos están abiertos pero nadie va a hacer nada con ellos. Aquí es por donde se fuga el embudo.') }}</p>
         <div class="bg-white rounded-xl border border-amber-200 overflow-hidden">
             @foreach ($sinSeguimiento as $lead)
                 <div class="flex items-center hover:bg-amber-50/50 transition {{ !$loop->last ? 'border-b border-gray-100' : '' }}">
@@ -109,9 +109,9 @@
                     <div class="min-w-0 flex-1">
                         <span class="block text-sm font-semibold text-gray-900 truncate">{{ $lead->empresa ?: $lead->nombre }}</span>
                     </div>
-                    <span class="shrink-0 hidden sm:inline text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">{{ $lead->stage->nombre }}</span>
+                    <span class="shrink-0 hidden sm:inline text-[11px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">{{ __($lead->stage->nombre ?? '') }}</span>
                     @if ($lead->diasSinContacto() !== null)
-                        <span class="shrink-0 hidden sm:inline text-xs text-gray-400 tabular-nums w-32 text-right whitespace-nowrap">{{ $lead->diasSinContacto() }} días sin contacto</span>
+                        <span class="shrink-0 hidden sm:inline text-xs text-gray-400 tabular-nums w-32 text-right whitespace-nowrap">{{ trans_choice(':n día sin contacto|:n días sin contacto', $lead->diasSinContacto(), ['n' => $lead->diasSinContacto()]) }}</span>
                     @endif
                 </a>
                 {{-- El hueco del teléfono se aparta aunque no haya, para que las columnas no bailen --}}
@@ -126,8 +126,8 @@
         </div>
         @if ($totalSinSeguimiento > $sinSeguimiento->count())
             <p class="text-sm text-gray-500 mt-3">
-                Van los {{ $sinSeguimiento->count() }} más grandes de {{ number_format($totalSinSeguimiento) }}.
-                <a href="{{ route('crm.tablero') }}" class="font-semibold text-indigo-600 no-underline hover:underline">Filtrar en el tablero →</a>
+                {{ __('Van los :n más grandes de :total.', ['n' => $sinSeguimiento->count(), 'total' => number_format($totalSinSeguimiento)]) }}
+                <a href="{{ route('crm.tablero') }}" class="font-semibold text-indigo-600 no-underline hover:underline">{{ __('Filtrar en el tablero') }} →</a>
             </p>
         @endif
     @endif
