@@ -19,3 +19,32 @@
 ## Coding Style & Standards
 - Follow PSR-12 and Laravel's latest conventions.
 - Keep methods lean. If a method exceeds 20 lines, suggest a refactor instead of just adding more code.
+## Arquitectura del proyecto
+
+ERP SaaS multi-tenant en Laravel 10. Todo dato de negocio cuelga de
+`organization_id`; el scope de tenant se aplica en cada consulta, no por
+middleware global. Los planes (`plans.modules`) definen qué módulos ve cada
+organización, y las rutas se protegen con `premium:<modulo>`.
+
+### Módulo CRM
+
+- **Modelos:** `CrmStage` (etapas del embudo, se siembran solas por organización),
+  `Lead` (prospecto y oportunidad en una sola entidad), `CrmActivity` (bitácora
+  y agenda a la vez).
+- **Pantallas:** `/crm` pendientes del día, `/crm/tablero` Kanban,
+  `/crm/leads/{id}` ficha con bitácora, `/crm/importar` alta masiva.
+- **API:** `/api/crm/*` con tokens de Sanctum. Genera uno con
+  `php artisan crm:token <correo>`.
+- **Prospección:** `denue:prospectar` (API del INEGI, requiere `DENUE_TOKEN`) y
+  `denue:csv` (archivos descargados, sin token).
+- `Lead.client_id` enlaza al `Client` del ERP cuando el prospecto se gana.
+
+Al agregar un módulo nuevo: dale su clave en `plans.modules`, protégelo con
+`premium:<clave>` y agrega el enlace en `layouts/app.blade.php`.
+
+## Despliegue
+
+Ver `DESPLIEGUE.md`. En resumen: producción es manual por SSH/scp contra el
+host `smileintelli`, **no** por `git pull` — `origin/main` está atrás de lo que
+corre en línea. Después de subir archivos hay que correr `migrate --force` y
+limpiar las cachés de rutas, configuración y vistas.
