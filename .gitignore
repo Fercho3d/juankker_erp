@@ -17,3 +17,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Ajustes locales de Claude Code (rutas y accesos de esta maquina)
+.claude/settings.local.json
