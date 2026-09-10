@@ -20,3 +20,6 @@ yarn-error.log
 
 # Ajustes locales de Claude Code (rutas y accesos de esta maquina)
 .claude/settings.local.json
+
+# Marca del último commit desplegado (la escribe scripts/desplegar.sh en el servidor)
+.deployed-commit
