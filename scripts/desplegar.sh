@@ -97,7 +97,8 @@ fi
 tr '\n' '\0' < "$TRABAJO/subir.txt" | xargs -0 git archive --format=zip -o "$TRABAJO/paquete.zip" HEAD --
 
 # ------------------------------------------------------------------- respaldos
-FECHA=$(date +%F-%H%M)
+# Con la hora del servidor: ahí viven los respaldos y ahí se van a buscar.
+FECHA=$(remoto 'date +%F-%H%M')
 paso "Respaldando base de datos y código en $RESPALDOS"
 remoto sudo bash -s -- "$FECHA" "$RUTA" "$RESPALDOS" <<'REMOTO'
 set -euo pipefail

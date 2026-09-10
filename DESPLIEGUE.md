@@ -11,9 +11,11 @@ Los archivos son de `www-data`, no de `ubuntu`: sube a `/tmp` y descomprime con
 necesita un `HOME` escribible (`sudo -u www-data env HOME=/tmp php artisan
 tinker`), porque `/var/www/.config` es de solo lectura.
 
-**Último despliegue:** 2026-09-09 — commit `993183e` (módulo CRM completo:
-código, rutas y las tres migraciones `2026_09_09_*`). Usa ese commit como
-`<ultimo-desplegado>` en el paso 1.
+**Último despliegue:** lo registra `scripts/desplegar.sh` en el servidor. Para
+saber qué commit corre en línea (y usarlo como `<ultimo-desplegado>` si
+despliegas a mano):
+
+    ssh smileintelli 'sudo cat /var/www/erp/.deployed-commit'
 
 El repositorio `origin` (github.com/Fercho3d/juankker_erp) **no es la fuente de
 producción**: `origin/main` está varios commits atrás de lo que corre en línea.
