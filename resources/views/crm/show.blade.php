@@ -18,9 +18,14 @@
             </div>
             <div class="flex items-center gap-2">
                 <a href="{{ route('crm.leads.edit', $lead) }}" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:border-gray-400 no-underline">Editar</a>
-                <form method="POST" action="{{ route('crm.leads.destroy', $lead) }}" onsubmit="return confirm('¿Eliminar este prospecto y todo su historial?')">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-rose-600 hover:border-rose-300 bg-transparent cursor-pointer">Eliminar</button>
+                <form method="POST" action="{{ route('crm.leads.descartar', $lead) }}" class="flex items-center gap-2">
+                    @csrf
+                    <select name="motivo" class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500" aria-label="Motivo del descarte">
+                        @foreach (\App\Models\Lead::MOTIVOS_DESCARTE as $valor => $etiqueta)
+                            <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-rose-600 hover:border-rose-300 bg-transparent cursor-pointer">Descartar</button>
                 </form>
             </div>
         </div>

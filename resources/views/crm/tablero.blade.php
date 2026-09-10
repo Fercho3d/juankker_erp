@@ -15,6 +15,7 @@
         <div class="flex items-center gap-2">
             <a href="{{ route('crm.pendientes') }}" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:border-gray-400 no-underline">Pendientes de hoy</a>
             <a href="{{ route('crm.leads.importar.form') }}" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:border-gray-400 no-underline">Alta masiva</a>
+            <a href="{{ route('crm.papelera') }}" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:border-gray-400 no-underline">Papelera <span class="text-gray-400">{{ number_format($enPapelera) }}</span></a>
             <a href="{{ route('crm.leads.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 no-underline">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Nuevo prospecto
@@ -63,7 +64,9 @@
         <select name="tamano" onchange="this.form.submit()" class="px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15">
             <option value="">Cualquier tamaño</option>
             @foreach (\App\Models\Lead::TAMANOS as $min => $etiqueta)
-                <option value="{{ $min }}" @selected((int) ($filtros['tamano'] ?? 0) === $min)>{{ $etiqueta }}</option>
+                @if ($n = $opciones['tamanos'][$min] ?? 0)
+                    <option value="{{ $min }}" @selected(($filtros['tamano'] ?? '') === (string) $min)>{{ $etiqueta }} personas ({{ number_format($n) }})</option>
+                @endif
             @endforeach
         </select>
         <select name="municipio" onchange="this.form.submit()" class="px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15">
@@ -127,7 +130,7 @@
                             @endif
                             @if ($lead->sector || $lead->personal_min || $lead->municipio)
                                 <span class="block text-[11px] text-gray-500 mt-1 truncate">
-                                    {{ collect([$lead->sector, $lead->personal_min ? $lead->personal_min.'+ pers.' : null, $lead->municipio])->filter()->implode(' · ') }}
+                                    {{ collect([$lead->sector, $lead->rangoPersonal() ? $lead->rangoPersonal().' pers.' : null, $lead->municipio])->filter()->implode(' · ') }}
                                 </span>
                             @endif
 
@@ -158,6 +161,22 @@
                 </div>
             </div>
         @endforeach
+
+        {{-- Papelera: soltar una tarjeta aquí la descarta con el motivo elegido --}}
+        <div class="flex-shrink-0 w-[230px] rounded-xl border-2 border-dashed border-gray-300 p-4 flex flex-col items-center text-center gap-2 transition"
+             ondragover="event.preventDefault(); this.classList.add('border-rose-400','bg-rose-50')"
+             ondragleave="this.classList.remove('border-rose-400','bg-rose-50')"
+             ondrop="descartar(event, this)">
+            <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" class="text-gray-400" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14"/></svg>
+            <span class="text-sm font-semibold text-gray-800">Papelera</span>
+            <span class="text-xs text-gray-500">Arrastra aquí a quien no es prospecto. Se puede restaurar.</span>
+            <select id="motivo-descarte" class="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500" aria-label="Motivo al soltar">
+                @foreach (\App\Models\Lead::MOTIVOS_DESCARTE as $valor => $etiqueta)
+                    <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                @endforeach
+            </select>
+            <a href="{{ route('crm.papelera') }}" class="text-xs font-semibold text-indigo-600 no-underline hover:underline mt-1">Ver descartados ({{ number_format($enPapelera) }})</a>
+        </div>
     </div>
 </div>
 
@@ -182,6 +201,27 @@ function soltar(evento, etapaId, columna) {
     .then(r => r.ok ? r.json() : Promise.reject(r))
     .then(() => window.location.reload())
     .catch(() => alert('No se pudo mover el prospecto. Recarga la página e inténtalo de nuevo.'));
+}
+
+function descartar(evento, zona) {
+    evento.preventDefault();
+    zona.classList.remove('border-rose-400', 'bg-rose-50');
+
+    const leadId = evento.dataTransfer.getData('text/plain');
+    if (!leadId) return;
+
+    fetch(`/crm/leads/${leadId}/descartar`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        },
+        body: JSON.stringify({ motivo: document.getElementById('motivo-descarte').value }),
+    })
+    .then(r => r.ok ? r.json() : Promise.reject(r))
+    .then(() => window.location.reload())
+    .catch(() => alert('No se pudo descartar el prospecto. Recarga la página e inténtalo de nuevo.'));
 }
 </script>
 @endpush

@@ -238,7 +238,7 @@ class DenueProspectar extends Command
         $barra = $this->output->createProgressBar($negocios->count());
 
         foreach ($negocios as $n) {
-            $duplicado = Lead::deOrganizacion($orgId)
+            $duplicado = Lead::withTrashed()->deOrganizacion($orgId)
                 ->where(function ($q) use ($n) {
                     $q->where('empresa', $n['empresa']);
                     if ($n['telefono']) {

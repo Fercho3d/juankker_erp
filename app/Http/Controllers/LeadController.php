@@ -9,6 +9,7 @@ use App\Models\Lead;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class LeadController extends Controller
 {
@@ -166,7 +167,7 @@ class LeadController extends Controller
                 $email = $campos[3] ?? null;
 
                 // Evita duplicados por teléfono o correo dentro de la organización.
-                $duplicado = Lead::deOrganizacion($orgId)
+                $duplicado = Lead::withTrashed()->deOrganizacion($orgId)
                     ->where(function ($q) use ($telefono, $email, $empresa) {
                         $q->where('empresa', $empresa);
                         if ($telefono) {
@@ -223,6 +224,44 @@ class LeadController extends Controller
             'motivo_perdida' => 'nullable|string|max:255',
             'notas' => 'nullable|string',
         ]);
+    }
+
+    /** A la papelera: sale del embudo y de las métricas, pero se puede restaurar. */
+    public function descartar(Request $request, Lead $lead)
+    {
+        $this->autorizar($lead);
+        $validated = $request->validate([
+            'motivo' => ['nullable', Rule::in(array_keys(Lead::MOTIVOS_DESCARTE))],
+        ]);
+
+        $lead->update(['motivo_descarte' => $validated['motivo'] ?? null]);
+        $lead->delete();
+
+        return $request->expectsJson()
+            ? response()->json(['ok' => true])
+            : redirect()->route('crm.tablero')->with('status', 'Prospecto enviado a la papelera.');
+    }
+
+    public function papelera(Request $request)
+    {
+        $leads = Lead::onlyTrashed()
+            ->deOrganizacion(Auth::user()->organization_id)
+            ->search($request->input('search'))
+            ->when($request->input('motivo'), fn ($q, $v) => $q->where('motivo_descarte', $v))
+            ->orderByDesc('deleted_at')
+            ->paginate(50)
+            ->withQueryString();
+
+        return view('crm.papelera', ['leads' => $leads]);
+    }
+
+    public function restaurar(int $id)
+    {
+        $lead = Lead::onlyTrashed()->deOrganizacion(Auth::user()->organization_id)->findOrFail($id);
+        $lead->restore();
+        $lead->update(['motivo_descarte' => null]);
+
+        return back()->with('status', 'Prospecto restaurado: '.($lead->empresa ?: $lead->nombre));
     }
 
     private function autorizar(Lead $lead): void

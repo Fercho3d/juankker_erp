@@ -19,6 +19,7 @@ class CrmSmokeTest extends TestCase
             '/crm/tablero?sector=Comercio+al+por+menor&tamano=11&contacto=telefono&search=refacc',
             '/crm/leads/nuevo',
             '/crm/importar',
+            '/crm/papelera',
             "/crm/leads/{$lead->id}",
             "/crm/leads/{$lead->id}/editar",
         ];

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lead extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'organization_id', 'stage_id', 'owner_id', 'client_id',
@@ -15,7 +16,7 @@ class Lead extends Model
         'origen', 'giro', 'sector', 'personal_min', 'municipio',
         'valor_estimado', 'valor_mensual', 'probabilidad',
         'proxima_accion', 'proxima_accion_at', 'ultimo_contacto_at',
-        'cerrado_at', 'motivo_perdida', 'notas', 'orden',
+        'cerrado_at', 'motivo_perdida', 'motivo_descarte', 'notas', 'orden',
     ];
 
     protected $casts = [
@@ -37,14 +38,26 @@ class Lead extends Model
         'otro' => 'Otro',
     ];
 
-    /** Cortes del DENUE: el estrato "11 a 30 personas" se guarda como 11. */
+    public const MOTIVOS_DESCARTE = [
+        'ya_tiene_sistema' => 'Ya tiene sistema',
+        'no_es_perfil' => 'No es nuestro perfil',
+        'datos_malos' => 'Cerró o los datos están mal',
+        'no_contactar' => 'Pidió no ser contactado',
+        'otro' => 'Otro',
+    ];
+
+    /**
+     * Estratos de personal del DENUE, por su piso: el estrato "11 a 30 personas"
+     * se guarda como personal_min = 11, así que cada rango es un valor exacto.
+     */
     public const TAMANOS = [
-        6 => '6+ personas',
-        11 => '11+ personas',
-        31 => '31+ personas',
-        51 => '51+ personas',
-        101 => '101+ personas',
-        251 => '251+ personas',
+        0 => '0 a 5',
+        6 => '6 a 10',
+        11 => '11 a 30',
+        31 => '31 a 50',
+        51 => '51 a 100',
+        101 => '101 a 250',
+        251 => '251 o más',
     ];
 
     /** Sector SCIAN (dos primeros dígitos) => nombre con el que se filtra. */
@@ -122,7 +135,7 @@ class Lead extends Model
         return $query
             ->search($f['search'] ?? null)
             ->when($f['sector'] ?? null, fn ($q, $v) => $q->where('sector', $v))
-            ->when($f['tamano'] ?? null, fn ($q, $v) => $q->where('personal_min', '>=', (int) $v))
+            ->when(($f['tamano'] ?? '') !== '', fn ($q) => $q->where('personal_min', (int) $f['tamano']))
             ->when($f['municipio'] ?? null, fn ($q, $v) => $q->where('municipio', $v))
             ->when(($f['contacto'] ?? null) === 'telefono', fn ($q) => $q->whereNotNull('telefono'))
             ->when(($f['contacto'] ?? null) === 'email', fn ($q) => $q->whereNotNull('email'));
@@ -154,6 +167,12 @@ class Lead extends Model
         return $this->proxima_accion_at !== null
             && $this->proxima_accion_at->isPast()
             && ! $this->proxima_accion_at->isToday();
+    }
+
+    /** "11 a 30", o null si el lead no viene del DENUE. */
+    public function rangoPersonal(): ?string
+    {
+        return self::TAMANOS[$this->personal_min] ?? null;
     }
 
     public static function sectorDe(?string $scian, ?string $giro = null): ?string

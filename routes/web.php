@@ -87,6 +87,9 @@ Route::middleware('auth')->group(function () {
         Route::put('leads/{lead}', [LeadController::class, 'update'])->whereNumber('lead')->name('leads.update');
         Route::delete('leads/{lead}', [LeadController::class, 'destroy'])->whereNumber('lead')->name('leads.destroy');
         Route::post('leads/{lead}/convertir', [LeadController::class, 'convertir'])->whereNumber('lead')->name('leads.convertir');
+        Route::post('leads/{lead}/descartar', [LeadController::class, 'descartar'])->whereNumber('lead')->name('leads.descartar');
+        Route::get('papelera', [LeadController::class, 'papelera'])->name('papelera');
+        Route::post('papelera/{id}/restaurar', [LeadController::class, 'restaurar'])->whereNumber('id')->name('leads.restaurar');
 
         Route::post('leads/{lead}/actividades', [CrmActivityController::class, 'store'])->whereNumber('lead')->name('actividades.store');
         Route::post('actividades/{actividad}/completar', [CrmActivityController::class, 'completar'])->name('actividades.completar');

@@ -21,6 +21,7 @@ class CrmController extends Controller
         $orgId = Auth::user()->organization_id;
 
         $actividades = CrmActivity::deOrganizacion($orgId)
+            ->whereHas('lead')
             ->pendientes()
             ->where('programada_at', '<=', now()->endOfDay())
             ->with('lead')
@@ -52,7 +53,9 @@ class CrmController extends Controller
     public function tablero(Request $request)
     {
         $orgId = Auth::user()->organization_id;
-        $filtros = array_filter($request->only(['search', 'sector', 'tamano', 'municipio', 'contacto']));
+        // Sin array_filter a secas: descartaría el rango "0 a 5".
+        $filtros = array_filter($request->only(['search', 'sector', 'tamano', 'municipio', 'contacto']),
+            fn ($v) => $v !== null && $v !== '');
 
         $leads = Lead::deOrganizacion($orgId)
             ->filtrar($filtros)
@@ -68,6 +71,7 @@ class CrmController extends Controller
             'filtros' => $filtros,
             'opciones' => $this->opcionesDeFiltro($orgId),
             'tope' => self::TOPE_POR_LISTA,
+            'enPapelera' => Lead::onlyTrashed()->deOrganizacion($orgId)->count(),
             'resumen' => self::resumen($orgId),
         ]);
     }
@@ -83,7 +87,11 @@ class CrmController extends Controller
             ->selectRaw("{$campo} as valor, count(*) as n")->groupBy($campo)
             ->orderByDesc('n')->pluck('n', 'valor');
 
-        return ['sectores' => $conteo('sector'), 'municipios' => $conteo('municipio')];
+        return [
+            'sectores' => $conteo('sector'),
+            'municipios' => $conteo('municipio'),
+            'tamanos' => $conteo('personal_min'),
+        ];
     }
 
     /**
