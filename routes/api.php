@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
  | Uso:   curl -H "Authorization: Bearer <token>" -H "Accept: application/json" \
  |             https://tu-erp.test/api/crm/resumen
  */
-Route::middleware('auth:sanctum')->prefix('crm')->name('api.crm.')->group(function () {
+Route::middleware(['auth:sanctum', 'acceso:crm'])->prefix('crm')->name('api.crm.')->group(function () {
     $crm = \App\Http\Controllers\Api\CrmApiController::class;
 
     Route::get('resumen', [$crm, 'resumen'])->name('resumen');

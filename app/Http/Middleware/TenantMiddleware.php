@@ -23,6 +23,15 @@ class TenantMiddleware
             return $next($request);
         }
 
+        if (! $user->activo) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')
+                ->withErrors(['email' => __('Tu acceso a esta organización está desactivado.')]);
+        }
+
         $org = $user->organization;
 
         if ($org && ! $org->isActive() && ! $this->isExempt($request)) {

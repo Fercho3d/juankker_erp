@@ -100,6 +100,22 @@ class Lead extends Model
         return $query->where('organization_id', $organizationId);
     }
 
+    /**
+     * Los prospectos que puede ver este usuario: los de su organización y, si su
+     * perfil es de "sólo sus prospectos", nada más los que tiene asignados.
+     */
+    public function scopeVisiblesPara($query, User $user)
+    {
+        return $query->where('leads.organization_id', $user->organization_id)
+            ->when($user->veSoloSusProspectos(), fn ($q) => $q->where('leads.owner_id', $user->id));
+    }
+
+    public function visiblePara(User $user): bool
+    {
+        return $this->organization_id === $user->organization_id
+            && (! $user->veSoloSusProspectos() || $this->owner_id === $user->id);
+    }
+
     public function scopeAbiertos($query)
     {
         return $query->whereHas('stage', function ($q) {
@@ -138,7 +154,10 @@ class Lead extends Model
             ->when(($f['tamano'] ?? '') !== '', fn ($q) => $q->where('personal_min', (int) $f['tamano']))
             ->when($f['municipio'] ?? null, fn ($q, $v) => $q->where('municipio', $v))
             ->when(($f['contacto'] ?? null) === 'telefono', fn ($q) => $q->whereNotNull('telefono'))
-            ->when(($f['contacto'] ?? null) === 'email', fn ($q) => $q->whereNotNull('email'));
+            ->when(($f['contacto'] ?? null) === 'email', fn ($q) => $q->whereNotNull('email'))
+            ->when($f['responsable'] ?? null, fn ($q, $v) => $v === 'sin'
+                ? $q->whereNull('owner_id')
+                : $q->where('owner_id', (int) $v));
     }
 
     public function scopePendientes($query)

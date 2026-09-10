@@ -11,6 +11,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class POSController extends Controller
 {
@@ -61,7 +62,10 @@ class POSController extends Controller
         ]);
 
         $sale = $this->getCurrentSale();
-        $variant = ProductVariant::find($request->variant_id);
+        // Sólo variantes de la propia organización: antes se podía vender (y
+        // descontar el inventario) de un producto de otra empresa.
+        $variant = ProductVariant::whereHas('product', fn ($q) => $q->where('organization_id', Auth::user()->organization_id))
+            ->findOrFail($request->variant_id);
 
         // Check stock
         if ($variant->stock_actual < $request->quantity) {
@@ -130,7 +134,7 @@ class POSController extends Controller
     // API: Assign Client
     public function assignClient(Request $request)
     {
-        $request->validate(['client_id' => 'nullable|exists:clients,id']);
+        $request->validate(['client_id' => ['nullable', Rule::exists('clients', 'id')->where('organization_id', Auth::user()->organization_id)]]);
 
         $sale = $this->getCurrentSale();
         $sale->client_id = $request->client_id;

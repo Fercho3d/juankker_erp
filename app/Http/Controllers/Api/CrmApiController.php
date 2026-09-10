@@ -10,6 +10,7 @@ use App\Models\Lead;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 /**
  * API del CRM sobre tokens de Sanctum.
@@ -27,7 +28,7 @@ class CrmApiController extends Controller
 
     private function buscar(Request $request, int $id): Lead
     {
-        return Lead::deOrganizacion($this->orgId($request))->findOrFail($id);
+        return Lead::visiblesPara($request->user())->findOrFail($id);
     }
 
     /**
@@ -35,7 +36,7 @@ class CrmApiController extends Controller
      */
     public function resumen(Request $request): JsonResponse
     {
-        return response()->json(CrmController::resumen($this->orgId($request)));
+        return response()->json(CrmController::resumen($request->user()));
     }
 
     public function etapas(Request $request): JsonResponse
@@ -57,7 +58,7 @@ class CrmApiController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Lead::deOrganizacion($this->orgId($request))
+        $query = Lead::visiblesPara($request->user())
             ->with('stage')
             ->search($request->input('search'));
 
@@ -145,7 +146,7 @@ class CrmApiController extends Controller
             'leads.*.valor_estimado' => 'nullable|numeric|min:0',
             'leads.*.valor_mensual' => 'nullable|numeric|min:0',
             'leads.*.notas' => 'nullable|string',
-            'stage_id' => 'nullable|integer|exists:crm_stages,id',
+            'stage_id' => ['nullable', 'integer', Rule::exists('crm_stages', 'id')->where('organization_id', $request->user()->organization_id)],
         ]);
 
         $etapa = $validated['stage_id'] ?? CrmStage::paraOrganizacion($orgId)->first()->id;
@@ -154,7 +155,7 @@ class CrmApiController extends Controller
 
         DB::transaction(function () use ($validated, $orgId, $etapa, $request, &$creados, &$omitidos) {
             foreach ($validated['leads'] as $fila) {
-                $duplicado = Lead::deOrganizacion($orgId)
+                $duplicado = Lead::withTrashed()->deOrganizacion($orgId)
                     ->where(function ($q) use ($fila) {
                         $q->where('empresa', $fila['empresa']);
                         if (! empty($fila['telefono'])) {
@@ -262,7 +263,7 @@ class CrmApiController extends Controller
     {
         $orgId = $this->orgId($request);
 
-        $leads = Lead::deOrganizacion($orgId)->pendientes()->with('stage')
+        $leads = Lead::visiblesPara($request->user())->pendientes()->with('stage')
             ->orderBy('proxima_accion_at')->get();
 
         return response()->json([
@@ -270,7 +271,7 @@ class CrmApiController extends Controller
                 ->map(fn ($l) => $this->serializar($l))->values(),
             'hoy' => $leads->filter(fn ($l) => $l->proxima_accion_at?->isToday())
                 ->map(fn ($l) => $this->serializar($l))->values(),
-            'sin_proxima_accion' => Lead::deOrganizacion($orgId)->abiertos()
+            'sin_proxima_accion' => Lead::visiblesPara($request->user())->abiertos()
                 ->whereNull('proxima_accion_at')->with('stage')->get()
                 ->map(fn ($l) => $this->serializar($l))->values(),
         ]);
@@ -315,8 +316,8 @@ class CrmApiController extends Controller
             'empresa' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'telefono' => 'nullable|string|max:30',
-            'stage_id' => 'nullable|integer|exists:crm_stages,id',
-            'client_id' => 'nullable|integer|exists:clients,id',
+            'stage_id' => ['nullable', 'integer', Rule::exists('crm_stages', 'id')->where('organization_id', auth()->user()->organization_id)],
+            'client_id' => ['nullable', 'integer', Rule::exists('clients', 'id')->where('organization_id', auth()->user()->organization_id)],
             'origen' => 'nullable|string|max:50',
             'valor_estimado' => 'nullable|numeric|min:0|max:99999999',
             'valor_mensual' => 'nullable|numeric|min:0|max:99999999',

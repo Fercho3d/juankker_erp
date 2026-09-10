@@ -2,35 +2,48 @@
     $tema = \App\Support\Theme::current();
     $temaResuelto = \App\Support\Theme::resolved();
 
-    // Menú lateral por secciones: [etiqueta, ruta, activo, ícono, es Pro].
+    // Menú lateral por secciones: [etiqueta, ruta, activo, ícono, es Pro, módulo].
+    // Sólo se ve lo que el perfil del usuario permite; una sección vacía no sale.
     $nav = [];
     if (auth()->check()) {
         $u = auth()->user();
-        $nav = [
+        $secciones = [
             __('Ventas') => [
-                [__('Pendientes'), route('crm.pendientes'), request()->routeIs('crm.pendientes'), 'agenda', true],
-                [__('Embudo'), route('crm.tablero'), request()->routeIs('crm.tablero', 'crm.leads.*', 'crm.papelera'), 'embudo', true],
-                [__('Punto de venta'), route('pos.index'), request()->routeIs('pos.*'), 'pos', true],
-                [__('Ventas'), route('sales.index'), request()->routeIs('sales.*'), 'recibo', true],
+                [__('Pendientes'), 'crm.pendientes', ['crm.pendientes'], 'agenda', true, 'crm'],
+                [__('Embudo'), 'crm.tablero', ['crm.tablero', 'crm.leads.*', 'crm.papelera'], 'embudo', true, 'crm'],
+                [__('Punto de venta'), 'pos.index', ['pos.*'], 'pos', true, 'pos'],
+                [__('Ventas'), 'sales.index', ['sales.*'], 'recibo', true, 'ventas'],
             ],
             __('Catálogo') => [
-                [__('Productos'), route('productos.index'), request()->routeIs('productos.*'), 'paquete', false],
-                [__('Inventario'), route('inventario.index'), request()->routeIs('inventario.*'), 'almacen', true],
-                [__('Categorías'), route('categorias.index'), request()->routeIs('categorias.*'), 'etiqueta', false],
-                [__('Marcas'), route('marcas.index'), request()->routeIs('marcas.*'), 'marca', false],
-                [__('Atributos'), route('atributos-producto.index'), request()->routeIs('atributos-producto.*'), 'atributos', false],
+                [__('Productos'), 'productos.index', ['productos.*'], 'paquete', false, 'productos'],
+                [__('Inventario'), 'inventario.index', ['inventario.*'], 'almacen', true, 'inventario'],
+                [__('Categorías'), 'categorias.index', ['categorias.*'], 'etiqueta', false, 'productos'],
+                [__('Marcas'), 'marcas.index', ['marcas.*'], 'marca', false, 'productos'],
+                [__('Atributos'), 'atributos-producto.index', ['atributos-producto.*'], 'atributos', false, 'productos'],
             ],
             __('Contactos') => [
-                [__('Clientes'), route('clientes.index'), request()->routeIs('clientes.*'), 'usuarios', false],
-                [__('Proveedores'), route('proveedores.index'), request()->routeIs('proveedores.*'), 'camion', false],
+                [__('Clientes'), 'clientes.index', ['clientes.*'], 'usuarios', false, 'clientes'],
+                [__('Proveedores'), 'proveedores.index', ['proveedores.*'], 'camion', false, 'proveedores'],
             ],
-            __('Cuenta') => array_filter([
+            __('Cuenta') => [
+                [__('Equipo'), 'team.index', ['team.*'], 'equipo', false, 'equipo'],
                 $u->isSuperadmin()
-                    ? [__('Superadmin'), route('superadmin.dashboard'), request()->routeIs('superadmin.*'), 'escudo', false]
-                    : [__('Mi plan'), route('subscription.index'), request()->routeIs('subscription.*'), 'tarjeta', false],
-                [__('Mi perfil'), route('profile.edit'), request()->routeIs('profile.*'), 'usuario', false],
-            ]),
+                    ? [__('Superadmin'), 'superadmin.dashboard', ['superadmin.*'], 'escudo', false, null]
+                    : [__('Mi plan'), 'subscription.index', ['subscription.*'], 'tarjeta', false, 'plan'],
+                [__('Mi perfil'), 'profile.edit', ['profile.*'], 'usuario', false, null],
+            ],
         ];
+        foreach ($secciones as $seccion => $items) {
+            $visibles = [];
+            foreach ($items as [$etiqueta, $ruta, $patrones, $icono, $esPro, $modulo]) {
+                if ($modulo === null || $u->puede($modulo)) {
+                    $visibles[] = [$etiqueta, route($ruta), request()->routeIs(...$patrones), $icono, $esPro];
+                }
+            }
+            if ($visibles) {
+                $nav[$seccion] = $visibles;
+            }
+        }
     }
 
     $activo = collect($nav)->flatten(1)->first(fn ($item) => $item[2]);
@@ -62,7 +75,7 @@
 @auth
     <aside class="shell-sidebar" id="shell-sidebar" aria-label="{{ __('Menú principal') }}">
         <div class="shell-brand">
-            <a href="{{ route('crm.pendientes') }}" class="shell-brand-link">
+            <a href="{{ auth()->user()->inicio() }}" class="shell-brand-link">
                 <span class="shell-logo" aria-hidden="true">J</span>
                 <span class="shell-brand-name">Juankker <span>ERP</span></span>
             </a>
@@ -134,11 +147,16 @@
                     <a href="{{ route('profile.edit') }}" class="shell-menu-item" role="menuitem">
                         @include('partials.nav-icon', ['icon' => 'usuario']) {{ __('Mi perfil') }}
                     </a>
-                    @unless (auth()->user()->isSuperadmin())
+                    @if (auth()->user()->puede('equipo'))
+                        <a href="{{ route('team.index') }}" class="shell-menu-item" role="menuitem">
+                            @include('partials.nav-icon', ['icon' => 'equipo']) {{ __('Equipo') }}
+                        </a>
+                    @endif
+                    @if (! auth()->user()->isSuperadmin() && auth()->user()->puede('plan'))
                         <a href="{{ route('subscription.index') }}" class="shell-menu-item" role="menuitem">
                             @include('partials.nav-icon', ['icon' => 'tarjeta']) {{ __('Mi plan') }}
                         </a>
-                    @endunless
+                    @endif
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="shell-menu-item is-danger" role="menuitem">

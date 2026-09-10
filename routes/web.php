@@ -32,6 +32,8 @@ use App\Http\Controllers\CrmController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\CrmActivityController;
 use App\Http\Controllers\PreferenceController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TeamInvitationController;
 
 Route::get('/', [WelcomeController::class, 'index']);
 
@@ -44,6 +46,8 @@ Route::get('/precios', [PricingController::class, 'index'])->name('pricing');
 Route::post('/beta', [BetaRequestController::class, 'store'])->name('beta.store');
 
 Route::middleware('guest')->group(function () {
+    Route::get('/unirse/{token}', [TeamInvitationController::class, 'show'])->name('team.join');
+    Route::post('/unirse/{token}', [TeamInvitationController::class, 'accept'])->name('team.join.accept');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/register/verify', [AuthController::class, 'showVerifyForm'])->name('register.verify');
@@ -71,13 +75,32 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Suscripción del tenant.
-    Route::get('/suscripcion', [SubscriptionController::class, 'index'])->name('subscription.index');
-    Route::get('/suscripcion/upgrade/{plan}', [SubscriptionController::class, 'upgrade'])->name('subscription.upgrade');
-    Route::post('/suscripcion/confirmar/{plan}', [SubscriptionController::class, 'confirm'])->name('subscription.confirm');
-    Route::post('/suscripcion/cancelar', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::middleware('acceso:plan')->group(function () {
+        Route::get('/suscripcion', [SubscriptionController::class, 'index'])->name('subscription.index');
+        Route::get('/suscripcion/upgrade/{plan}', [SubscriptionController::class, 'upgrade'])->name('subscription.upgrade');
+        Route::post('/suscripcion/confirmar/{plan}', [SubscriptionController::class, 'confirm'])->name('subscription.confirm');
+        Route::post('/suscripcion/cancelar', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    });
+
+    // Equipo: miembros, invitaciones y perfiles de acceso.
+    Route::middleware('acceso:equipo')->prefix('equipo')->name('team.')->group(function () {
+        Route::get('/', [TeamController::class, 'index'])->name('index');
+        Route::post('invitaciones', [TeamController::class, 'invite'])->name('invite');
+        Route::post('invitaciones/{invitacion}/reenviar', [TeamController::class, 'resend'])->name('resend');
+        Route::delete('invitaciones/{invitacion}', [TeamController::class, 'cancelInvitation'])->name('invitation.cancel');
+        Route::put('miembros/{miembro}', [TeamController::class, 'updateMember'])->name('member.update');
+        Route::post('miembros/{miembro}/desactivar', [TeamController::class, 'deactivate'])->name('member.deactivate');
+        Route::post('miembros/{miembro}/activar', [TeamController::class, 'activate'])->name('member.activate');
+
+        Route::get('perfiles/nuevo', [TeamController::class, 'createRole'])->name('role.create');
+        Route::post('perfiles', [TeamController::class, 'storeRole'])->name('role.store');
+        Route::get('perfiles/{perfil}/editar', [TeamController::class, 'editRole'])->name('role.edit');
+        Route::put('perfiles/{perfil}', [TeamController::class, 'updateRole'])->name('role.update');
+        Route::delete('perfiles/{perfil}', [TeamController::class, 'destroyRole'])->name('role.destroy');
+    });
 
     // CRM (Premium)
-    Route::middleware('premium:crm')->prefix('crm')->name('crm.')->group(function () {
+    Route::middleware(['premium:crm', 'acceso:crm'])->prefix('crm')->name('crm.')->group(function () {
         Route::get('/', [CrmController::class, 'pendientes'])->name('pendientes');
         Route::get('tablero', [CrmController::class, 'tablero'])->name('tablero');
         Route::post('leads/{lead}/mover', [CrmController::class, 'mover'])->name('leads.mover');
@@ -93,6 +116,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('leads/{lead}', [LeadController::class, 'destroy'])->whereNumber('lead')->name('leads.destroy');
         Route::post('leads/{lead}/convertir', [LeadController::class, 'convertir'])->whereNumber('lead')->name('leads.convertir');
         Route::post('leads/{lead}/descartar', [LeadController::class, 'descartar'])->whereNumber('lead')->name('leads.descartar');
+        Route::post('leads/{lead}/asignar', [LeadController::class, 'asignar'])->whereNumber('lead')->name('leads.asignar');
+        Route::post('asignar', [CrmController::class, 'asignarEnBloque'])->name('leads.asignar-bloque');
         Route::get('papelera', [LeadController::class, 'papelera'])->name('papelera');
         Route::post('papelera/{id}/restaurar', [LeadController::class, 'restaurar'])->whereNumber('id')->name('leads.restaurar');
 
@@ -101,10 +126,11 @@ Route::middleware('auth')->group(function () {
     });
 
     // Clients & Suppliers
-    Route::resource('clientes', ClientController::class)->except(['show'])->parameters(['clientes' => 'cliente']);
-    Route::resource('proveedores', SupplierController::class)->except(['show'])->parameters(['proveedores' => 'proveedore']);
+    Route::resource('clientes', ClientController::class)->except(['show'])->parameters(['clientes' => 'cliente'])->middleware('acceso:clientes');
+    Route::resource('proveedores', SupplierController::class)->except(['show'])->parameters(['proveedores' => 'proveedore'])->middleware('acceso:proveedores');
 
-    // Product Categories & Brands
+    // Catálogo: productos, categorías, marcas y atributos
+    Route::middleware('acceso:productos')->group(function () {
     Route::resource('categorias', CategoryController::class)->except(['show'])->parameters(['categorias' => 'categoria']);
     Route::resource('marcas', BrandController::class)->except(['show'])->parameters(['marcas' => 'marca']);
 
@@ -121,9 +147,11 @@ Route::middleware('auth')->group(function () {
         Route::put('valores/{valor}', [ProductAttributeValueController::class, 'update'])->name('valores.update');
         Route::delete('valores/{valor}', [ProductAttributeValueController::class, 'destroy'])->name('valores.destroy');
     });
+    }); // fin catálogo
 
     // POS Routes (Premium)
     Route::middleware('premium')->group(function () {
+    Route::middleware('acceso:pos')->group(function () {
     Route::get('/pos', [App\Http\Controllers\POSController::class, 'index'])->name('pos.index');
     Route::prefix('pos')->name('pos.')->group(function () {
         Route::get('search', [App\Http\Controllers\POSController::class, 'search'])->name('search');
@@ -135,14 +163,17 @@ Route::middleware('auth')->group(function () {
         Route::post('cart/cancel', [App\Http\Controllers\POSController::class, 'cancelSale'])->name('cancel');
         Route::post('checkout', [App\Http\Controllers\POSController::class, 'checkout'])->name('checkout');
     });
+    }); // fin punto de venta
 
     // Sales History
+    Route::middleware('acceso:ventas')->group(function () {
     Route::get('/ventas', [App\Http\Controllers\SaleController::class, 'index'])->name('sales.index');
     Route::get('/ventas/{sale}', [App\Http\Controllers\SaleController::class, 'show'])->name('sales.show');
     Route::get('/ventas/{sale}/pdf', [App\Http\Controllers\SaleController::class, 'downloadPdf'])->name('sales.pdf');
+    }); // fin ventas
 
     // Inventory
-    Route::resource('inventario', App\Http\Controllers\InventoryController::class)->only(['index', 'update']);
+    Route::resource('inventario', App\Http\Controllers\InventoryController::class)->only(['index', 'update'])->middleware('acceso:inventario');
     }); // fin grupo premium (POS, ventas, inventario)
 });
 

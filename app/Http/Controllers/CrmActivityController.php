@@ -56,7 +56,7 @@ class CrmActivityController extends Controller
 
     public function completar(CrmActivity $actividad)
     {
-        if ($actividad->organization_id !== Auth::user()->organization_id) {
+        if ($actividad->organization_id !== Auth::user()->organization_id || ! $actividad->lead?->visiblePara(Auth::user())) {
             abort(403);
         }
 
@@ -68,7 +68,7 @@ class CrmActivityController extends Controller
 
     private function autorizar(Lead $lead): void
     {
-        if ($lead->organization_id !== Auth::user()->organization_id) {
+        if (! $lead->visiblePara(Auth::user())) {
             abort(403);
         }
     }

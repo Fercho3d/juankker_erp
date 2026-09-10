@@ -166,7 +166,7 @@ class AuthController extends Controller
 
         if ($secs = $throttle->bloqueado($email, $ip)) {
             throw ValidationException::withMessages([
-                'email' => 'Demasiados intentos. Intenta de nuevo en '.ceil($secs / 60).' min.',
+                'email' => __('Demasiados intentos. Intenta de nuevo en :min min.', ['min' => ceil($secs / 60)]),
             ]);
         }
 
@@ -174,22 +174,28 @@ class AuthController extends Controller
 
         if (Auth::attempt(['email' => $email, 'password' => $credentials['password']], $remember)) {
             $throttle->exito($email, $ip);
-            $request->session()->regenerate();
-
             $user = Auth::user();
+
+            if (! $user->activo) {
+                Auth::logout();
+
+                return back()->withErrors(['email' => __('Tu acceso a esta organización está desactivado.')])->onlyInput('email');
+            }
+
+            $request->session()->regenerate();
             $user->forceFill([
                 'last_login_at' => now(),
                 'login_count' => (int) $user->login_count + 1,
             ])->save();
             AuditLog::record('login');
 
-            return redirect()->intended('/');
+            return redirect()->intended($user->inicio());
         }
 
         $throttle->fallo($email, $ip);
 
         return back()->withErrors([
-            'email' => 'Las credenciales no coinciden con nuestros registros.',
+            'email' => __('auth.failed'),
         ])->onlyInput('email');
     }
 

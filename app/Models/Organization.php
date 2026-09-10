@@ -99,6 +99,13 @@ class Organization extends Model
 
     /* -------------------- Límites por plan -------------------- */
 
+    /** Miembros activos a los que se les puede asignar un prospecto. */
+    public function vendedores(): \Illuminate\Support\Collection
+    {
+        return $this->users()->activos()->where('is_superadmin', false)->with('role', 'organization')
+            ->orderBy('name')->get()->filter(fn (User $u) => $u->puede('crm'))->values();
+    }
+
     public function userCount(): int
     {
         return $this->users()->where('is_superadmin', false)->count();

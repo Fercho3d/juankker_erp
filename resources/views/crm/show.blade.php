@@ -159,6 +159,26 @@
                     <span class="text-sm text-gray-400">{{ __('Sin datos de contacto.') }}</span>
                 @endif
 
+                <div class="pt-3 border-t border-gray-100">
+                    <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1">{{ __('Responsable') }}</span>
+                    @if ($responsables->count())
+                        <form method="POST" action="{{ route('crm.leads.asignar', $lead) }}">
+                            @csrf
+                            <select name="owner_id" onchange="this.form.submit()" aria-label="{{ __('Responsable') }}"
+                                    class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white cursor-pointer focus:outline-none focus:border-indigo-500">
+                                @unless ($responsables->contains('id', $lead->owner_id))
+                                    <option value="" selected disabled>{{ $lead->owner?->name ?? __('Sin asignar') }}</option>
+                                @endunless
+                                @foreach ($responsables as $responsable)
+                                    <option value="{{ $responsable->id }}" @selected($lead->owner_id === $responsable->id)>{{ $responsable->name }}</option>
+                                @endforeach
+                            </select>
+                        </form>
+                    @else
+                        <span class="block text-sm text-gray-900">{{ $lead->owner?->name ?? __('Sin asignar') }}</span>
+                    @endif
+                </div>
+
                 @if ($lead->proxima_accion_at)
                     <div class="pt-3 border-t border-gray-100">
                         <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold">{{ __('Próxima acción') }}</span>

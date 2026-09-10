@@ -39,8 +39,22 @@ organización, y las rutas se protegen con `premium:<modulo>`.
   `denue:csv` (archivos descargados, sin token).
 - `Lead.client_id` enlaza al `Client` del ERP cuando el prospecto se gana.
 
-Al agregar un módulo nuevo: dale su clave en `plans.modules`, protégelo con
-`premium:<clave>` y agrega el enlace en `layouts/app.blade.php`.
+Al agregar un módulo nuevo: dale su clave en `plans.modules` y en
+`Role::MODULOS`, protege sus rutas con `premium:<clave>` **y** `acceso:<clave>`, y
+agrega el enlace al arreglo `$nav` de `layouts/app.blade.php` con esa misma clave.
+
+### Equipo y perfiles
+
+- `/equipo`: miembros, invitaciones por correo (`TeamInvitation`, 7 días) y
+  perfiles (`Role`) con los módulos marcados. El dueño, el perfil Administrador y
+  quien no tiene perfil (usuarios de antes) tienen acceso completo.
+- `acceso:<modulo>` manda a su inicio a quien no tenga el módulo (403 en JSON).
+  El plan (`premium`) se sigue revisando aparte.
+- **CRM:** un perfil ve "todo el embudo" o "sólo sus prospectos". Toda consulta de
+  leads que se muestre pasa por `Lead::visiblesPara($user)` y todo acceso a uno
+  por `$lead->visiblePara($user)`, **también en la API**. La deduplicación de las
+  importaciones sí mira toda la organización, a propósito.
+- Las pruebas de `tests/Feature/EquipoTest.php` cuidan todo lo anterior.
 
 ### Menú, tema e idiomas
 

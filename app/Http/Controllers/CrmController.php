@@ -18,23 +18,23 @@ class CrmController extends Controller
      */
     public function pendientes()
     {
-        $orgId = Auth::user()->organization_id;
+        $user = Auth::user();
 
-        $actividades = CrmActivity::deOrganizacion($orgId)
-            ->whereHas('lead')
+        $actividades = CrmActivity::deOrganizacion($user->organization_id)
+            ->whereHas('lead', fn ($q) => $q->visiblesPara($user))
             ->pendientes()
             ->where('programada_at', '<=', now()->endOfDay())
             ->with('lead')
             ->orderBy('programada_at')
             ->get();
 
-        $leads = Lead::deOrganizacion($orgId)
+        $leads = Lead::visiblesPara($user)
             ->pendientes()
             ->with('stage')
             ->orderBy('proxima_accion_at')
             ->get();
 
-        $sinSeguimiento = Lead::deOrganizacion($orgId)->abiertos()->whereNull('proxima_accion_at');
+        $sinSeguimiento = Lead::visiblesPara($user)->abiertos()->whereNull('proxima_accion_at');
 
         return view('crm.pendientes', [
             'actividades' => $actividades,
@@ -43,7 +43,7 @@ class CrmController extends Controller
                 ->orderByDesc('personal_min')->orderBy('updated_at')
                 ->limit(self::TOPE_POR_LISTA)->get(),
             'totalSinSeguimiento' => $sinSeguimiento->count(),
-            'resumen' => self::resumen($orgId),
+            'resumen' => self::resumen($user),
         ]);
     }
 
@@ -52,13 +52,13 @@ class CrmController extends Controller
      */
     public function tablero(Request $request)
     {
-        $orgId = Auth::user()->organization_id;
-        // Sin array_filter a secas: descartaría el rango "0 a 5".
-        $filtros = array_filter($request->only(['search', 'sector', 'tamano', 'municipio', 'contacto']),
-            fn ($v) => $v !== null && $v !== '');
+        $user = Auth::user();
+        $orgId = $user->organization_id;
+        $filtros = self::filtrosDe($request);
 
-        $leads = Lead::deOrganizacion($orgId)
+        $leads = Lead::visiblesPara($user)
             ->filtrar($filtros)
+            ->with('owner:id,name')
             ->orderBy('orden')
             ->orderByDesc('valor_estimado')
             ->orderByDesc('personal_min')
@@ -69,11 +69,41 @@ class CrmController extends Controller
             'etapas' => CrmStage::paraOrganizacion($orgId),
             'leadsPorEtapa' => $leads,
             'filtros' => $filtros,
-            'opciones' => $this->opcionesDeFiltro($orgId),
+            'opciones' => $this->opcionesDeFiltro($user),
             'tope' => self::TOPE_POR_LISTA,
-            'enPapelera' => Lead::onlyTrashed()->deOrganizacion($orgId)->count(),
-            'resumen' => self::resumen($orgId),
+            'enPapelera' => Lead::onlyTrashed()->visiblesPara($user)->count(),
+            'resumen' => self::resumen($user),
+            'veTodo' => ! $user->veSoloSusProspectos(),
+            'responsables' => $user->veSoloSusProspectos() ? collect() : $user->organization->vendedores(),
         ]);
+    }
+
+    /** Filtros del tablero. Sin array_filter a secas: descartaría el rango "0 a 5". */
+    private static function filtrosDe(Request $request): array
+    {
+        $claves = ['search', 'sector', 'tamano', 'municipio', 'contacto'];
+        if (! Auth::user()->veSoloSusProspectos()) {
+            $claves[] = 'responsable';
+        }
+
+        return array_filter($request->only($claves), fn ($v) => $v !== null && $v !== '');
+    }
+
+    /**
+     * Reparte en un solo paso los prospectos que coinciden con los filtros del
+     * tablero (no sólo los que caben en pantalla). Sólo para quien ve todo.
+     */
+    public function asignarEnBloque(Request $request)
+    {
+        $user = Auth::user();
+        abort_if($user->veSoloSusProspectos(), 403);
+
+        $destino = $request->validate(['owner_id' => ['required', 'integer']])['owner_id'];
+        abort_unless($user->organization->vendedores()->contains('id', $destino), 422);
+
+        $total = Lead::visiblesPara($user)->filtrar(self::filtrosDe($request))->update(['owner_id' => $destino]);
+
+        return back()->with('status', trans_choice(':n prospecto asignado.|:n prospectos asignados.', $total, ['n' => number_format($total)]));
     }
 
     /**
@@ -81,9 +111,9 @@ class CrmController extends Controller
      *
      * @return array<string, \Illuminate\Support\Collection<string, int>>
      */
-    private function opcionesDeFiltro(int $orgId): array
+    private function opcionesDeFiltro(\App\Models\User $user): array
     {
-        $conteo = fn (string $campo) => Lead::deOrganizacion($orgId)->whereNotNull($campo)
+        $conteo = fn (string $campo) => Lead::visiblesPara($user)->whereNotNull($campo)
             ->selectRaw("{$campo} as valor, count(*) as n")->groupBy($campo)
             ->orderByDesc('n')->pluck('n', 'valor');
 
@@ -115,7 +145,7 @@ class CrmController extends Controller
             return response()->json([
                 'ok' => true,
                 'lead' => $lead->fresh()->load('stage'),
-                'resumen' => self::resumen(Auth::user()->organization_id),
+                'resumen' => self::resumen(Auth::user()),
             ]);
         }
 
@@ -158,17 +188,17 @@ class CrmController extends Controller
      *
      * @return array<string, mixed>
      */
-    public static function resumen(int $orgId): array
+    public static function resumen(\App\Models\User $user): array
     {
-        $abiertos = Lead::deOrganizacion($orgId)->abiertos()->get();
+        $abiertos = Lead::visiblesPara($user)->abiertos()->get();
 
         $inicioMes = now()->startOfMonth();
-        $ganadosMes = Lead::deOrganizacion($orgId)
+        $ganadosMes = Lead::visiblesPara($user)
             ->whereHas('stage', fn ($q) => $q->where('es_ganada', true))
             ->where('cerrado_at', '>=', $inicioMes)
             ->get();
 
-        $perdidosMes = Lead::deOrganizacion($orgId)
+        $perdidosMes = Lead::visiblesPara($user)
             ->whereHas('stage', fn ($q) => $q->where('es_perdida', true))
             ->where('cerrado_at', '>=', $inicioMes)
             ->count();
@@ -193,7 +223,7 @@ class CrmController extends Controller
 
     private function autorizar(Lead $lead): void
     {
-        if ($lead->organization_id !== Auth::user()->organization_id) {
+        if (! $lead->visiblePara(Auth::user())) {
             abort(403);
         }
     }

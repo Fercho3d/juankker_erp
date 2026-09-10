@@ -52,6 +52,7 @@
                     @endforeach
                 </select>
             </div>
+            @include('crm.responsable-select', ['seleccionado' => null])
         </div>
 
         <div>

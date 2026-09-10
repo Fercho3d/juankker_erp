@@ -80,6 +80,15 @@
             <option value="telefono" @selected(($filtros['contacto'] ?? '') === 'telefono')>{{ __('Con teléfono') }}</option>
             <option value="email" @selected(($filtros['contacto'] ?? '') === 'email')>{{ __('Con correo') }}</option>
         </select>
+        @if ($veTodo && $responsables->count())
+            <select name="responsable" onchange="this.form.submit()" class="px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15" aria-label="{{ __('Responsable') }}">
+                <option value="">{{ __('Todos los responsables') }}</option>
+                <option value="sin" @selected(($filtros['responsable'] ?? '') === 'sin')>{{ __('Sin asignar') }}</option>
+                @foreach ($responsables as $responsable)
+                    <option value="{{ $responsable->id }}" @selected(($filtros['responsable'] ?? '') === (string) $responsable->id)>{{ $responsable->name }}</option>
+                @endforeach
+            </select>
+        @endif
         @if ($filtros)
             <a href="{{ route('crm.tablero') }}" class="px-3 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-900 no-underline">{{ __('Limpiar filtros') }}</a>
         @endif
@@ -89,6 +98,27 @@
         {{ $filtros ? __(':n prospectos con estos filtros.', ['n' => $totalProspectos]) : __(':n prospectos.', ['n' => $totalProspectos]) }}
         {{ __('Los más grandes van primero; cada columna muestra hasta :tope.', ['tope' => $tope]) }}
     </p>
+
+    @if ($veTodo && $responsables->count() && $totalProspectos !== '0')
+        {{-- Reparte todo lo que coincide con los filtros, no sólo lo que cabe en pantalla --}}
+        <form method="POST" action="{{ route('crm.leads.asignar-bloque') }}"
+              class="flex flex-wrap items-center gap-2.5 px-4 py-3 mb-5 bg-indigo-50 border border-indigo-100 rounded-xl"
+              onsubmit="return confirm({{ \Illuminate\Support\Js::from(__('¿Asignar los :n prospectos de este filtro?', ['n' => $totalProspectos])) }})">
+            @csrf
+            @foreach ($filtros as $clave => $valor)
+                <input type="hidden" name="{{ $clave }}" value="{{ $valor }}">
+            @endforeach
+            <span class="text-sm text-indigo-900 font-medium">{{ __('Asignar los :n prospectos de este filtro a', ['n' => $totalProspectos]) }}</span>
+            <select name="owner_id" required class="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white" aria-label="{{ __('Responsable') }}">
+                {{-- Sin preselección: un clic distraído no debe mandar todo el filtro al primero de la lista --}}
+                <option value="" selected disabled>{{ __('Elige a quién…') }}</option>
+                @foreach ($responsables as $responsable)
+                    <option value="{{ $responsable->id }}">{{ $responsable->name }}</option>
+                @endforeach
+            </select>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 cursor-pointer border-0">{{ __('Asignar') }}</button>
+        </form>
+    @endif
 
     {{-- Tablero --}}
     <div class="flex gap-4 overflow-x-auto pb-4 items-start">
@@ -143,6 +173,10 @@
                                     <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">+${{ number_format($lead->valor_mensual, 0) }}{{ __('/mes') }}</span>
                                 @endif
                                 <span class="text-[11px] text-gray-400 tabular-nums ml-auto">{{ $lead->probabilidad }}%</span>
+                                @if ($veTodo && $lead->owner)
+                                    <span class="shrink-0 w-5 h-5 rounded-full grid place-items-center text-[10px] font-bold text-white" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"
+                                          title="{{ __('Responsable') }}: {{ $lead->owner->name }}">{{ mb_strtoupper(mb_substr($lead->owner->name, 0, 1)) }}</span>
+                                @endif
                             </div>
 
                             @if ($lead->proxima_accion_at)

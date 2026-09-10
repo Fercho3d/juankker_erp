@@ -46,12 +46,11 @@ class IdiomasRevisar extends Command
     /** @return list<string> */
     private function llavesUsadas(): array
     {
-        $archivos = collect(File::allFiles(resource_path('views')))
+        return collect(File::allFiles(resource_path('views')))
             ->merge(File::allFiles(app_path()))
-            ->reject(fn (SplFileInfo $f) => str_contains($f->getPathname(), '/emails/'));
-
-        return $archivos
             ->flatMap(fn (SplFileInfo $f) => $this->literales($f->getContents()))
+            // "auth.failed" y compañía viven en los archivos PHP de lang/, no en el JSON
+            ->reject(fn (string $llave) => preg_match('/^[a-z_]+\.[a-z_.]+$/', $llave))
             ->unique()->values()->all();
     }
 

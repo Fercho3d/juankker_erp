@@ -61,6 +61,7 @@
                     @endforeach
                 </select>
             </div>
+            @include('crm.responsable-select', ['seleccionado' => $lead->owner_id])
         </div>
 
         <hr class="border-gray-100 m-0">
