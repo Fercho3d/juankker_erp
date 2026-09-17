@@ -38,5 +38,6 @@ Route::middleware(['auth:sanctum', 'acceso:crm'])->prefix('crm')->name('api.crm.
     Route::get('leads/{lead}', [$crm, 'show'])->whereNumber('lead')->name('leads.show');
     Route::put('leads/{lead}', [$crm, 'update'])->whereNumber('lead')->name('leads.update');
     Route::post('leads/{lead}/mover', [$crm, 'mover'])->whereNumber('lead')->name('leads.mover');
+    Route::post('leads/{lead}/borradores', [$crm, 'borrador'])->whereNumber('lead')->name('leads.borrador');
     Route::post('leads/{lead}/actividades', [$crm, 'actividad'])->whereNumber('lead')->name('leads.actividad');
 });

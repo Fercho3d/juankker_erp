@@ -769,5 +769,21 @@
     "Abrir en mi correo": "Open in my email",
     "Ya lo mandé: registrar en la bitácora": "Sent: log it in the history",
     "Ya se usaron los borradores con IA de hoy. Mañana hay más.": "Today's AI drafts are used up. More tomorrow.",
-    "No se pudo generar el borrador. Intenta en un momento.": "The draft could not be generated. Try again shortly."
+    "No se pudo generar el borrador. Intenta en un momento.": "The draft could not be generated. Try again shortly.",
+    ":n personas": ":n people",
+    "Asunto:": "Subject:",
+    "Borrador descartado.": "Draft discarded.",
+    "Copiado": "Copied",
+    "Copiar": "Copy",
+    "Correo registrado en la bitácora de :empresa.": "Email logged in :empresa's history.",
+    "Correos": "Emails",
+    "Correos por mandar": "Emails to send",
+    "Enviar": "Send",
+    "No hay correos por mandar.": "No emails to send.",
+    "No se pudo copiar": "Could not copy",
+    "No se pudo enviar el correo. Intenta en un momento.": "The email could not be sent. Try again shortly.",
+    "Revisa cada correo antes de mandarlo. Al marcarlo como enviado queda en la bitácora del prospecto y se agenda una llamada de seguimiento.": "Review each email before sending it. Once marked as sent, it is logged in the lead's history and a follow-up call is scheduled.",
+    "Ya lo mandé": "I sent it",
+    "Ya se mandaron los correos de hoy. Mañana hay más.": "Today's emails have been sent. More tomorrow.",
+    "¿Mandar este correo a :correo?": "Send this email to :correo?"
 }

@@ -10,6 +10,7 @@
         $secciones = [
             __('Ventas') => [
                 [__('Pendientes'), 'crm.pendientes', ['crm.pendientes'], 'agenda', true, 'crm'],
+                [__('Correos'), 'crm.correos', ['crm.correos'], 'correo', true, 'crm'],
                 [__('Embudo'), 'crm.tablero', ['crm.tablero', 'crm.leads.*', 'crm.papelera'], 'embudo', true, 'crm'],
                 [__('Punto de venta'), 'pos.index', ['pos.*'], 'pos', true, 'pos'],
                 [__('Ventas'), 'sales.index', ['sales.*'], 'recibo', true, 'ventas'],

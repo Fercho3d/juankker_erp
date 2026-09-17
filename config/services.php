@@ -37,6 +37,15 @@ return [
         'correos_por_dia' => env('IA_CORREOS_POR_DIA', 10),
     ],
 
+    // Envío a prospectos desde el ERP con el mailer `prospeccion`. Ese buzón es
+    // de una sola empresa, así que sólo esa organización puede usarlo.
+    'crm_envio' => [
+        'organizacion' => env('CRM_ENVIO_ORGANIZACION'),
+        'remitente' => env('CRM_MAIL_USERNAME'),
+        'nombre' => env('CRM_MAIL_NOMBRE'),
+        'por_dia' => env('CRM_ENVIOS_POR_DIA', 20),
+    ],
+
     'turnstile' => [
         'site' => env('TURNSTILE_SITE_KEY'),
         'secret' => env('TURNSTILE_SECRET'),

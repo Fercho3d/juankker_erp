@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CrmCorreoController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
@@ -116,6 +117,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('leads/{lead}', [LeadController::class, 'destroy'])->whereNumber('lead')->name('leads.destroy');
         Route::post('leads/{lead}/convertir', [LeadController::class, 'convertir'])->whereNumber('lead')->name('leads.convertir');
         Route::post('leads/{lead}/descartar', [LeadController::class, 'descartar'])->whereNumber('lead')->name('leads.descartar');
+        Route::get('correos', [CrmCorreoController::class, 'index'])->name('correos');
+        Route::post('correos/{borrador}/enviar', [CrmCorreoController::class, 'enviar'])->whereNumber('borrador')->name('correos.enviar');
+        Route::post('correos/{borrador}/enviado', [CrmCorreoController::class, 'enviado'])->whereNumber('borrador')->name('correos.enviado');
+        Route::delete('correos/{borrador}', [CrmCorreoController::class, 'destroy'])->whereNumber('borrador')->name('correos.destroy');
         Route::post('leads/{lead}/correo-ia', [LeadController::class, 'borradorCorreo'])->whereNumber('lead')->name('leads.correo-ia');
         Route::post('leads/{lead}/asignar', [LeadController::class, 'asignar'])->whereNumber('lead')->name('leads.asignar');
         Route::post('asignar', [CrmController::class, 'asignarEnBloque'])->name('leads.asignar-bloque');

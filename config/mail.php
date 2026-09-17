@@ -46,6 +46,18 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
         ],
 
+        // Buzón propio para escribir a prospectos desde /crm/correos: no se usa
+        // el mailer del sistema para no arriesgar los correos de contraseña.
+        'prospeccion' => [
+            'transport' => 'smtp',
+            'host' => env('CRM_MAIL_HOST', 'smtp.migadu.com'),
+            'port' => env('CRM_MAIL_PORT', 465),
+            'encryption' => env('CRM_MAIL_ENCRYPTION', 'ssl'),
+            'username' => env('CRM_MAIL_USERNAME'),
+            'password' => env('CRM_MAIL_PASSWORD'),
+            'timeout' => 20,
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],

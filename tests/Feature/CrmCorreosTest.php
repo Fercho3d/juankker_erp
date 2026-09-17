@@ -1,0 +1,77 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\CrmBorrador;
+use App\Models\Lead;
+use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Mail;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
+
+/**
+ * Corre sobre la base local: DatabaseTransactions deshace todo al terminar.
+ */
+class CrmCorreosTest extends TestCase
+{
+    use DatabaseTransactions;
+
+    private User $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->user = User::find(1);
+        config([
+            'services.crm_envio.organizacion' => $this->user->organization_id,
+            'services.crm_envio.remitente' => 'contacto@empresa.test',
+            'mail.mailers.prospeccion' => ['transport' => 'array', 'password' => 'secreta'],
+        ]);
+    }
+
+    private function borrador(): CrmBorrador
+    {
+        $lead = Lead::deOrganizacion($this->user->organization_id)->whereNotNull('email')->firstOrFail();
+
+        return CrmBorrador::create([
+            'organization_id' => $lead->organization_id, 'lead_id' => $lead->id,
+            'asunto' => 'Asunto de prueba', 'cuerpo' => 'Cuerpo de prueba',
+        ]);
+    }
+
+    public function test_la_api_deja_el_borrador_en_la_bandeja(): void
+    {
+        $lead = Lead::deOrganizacion($this->user->organization_id)->firstOrFail();
+        Sanctum::actingAs($this->user);
+        $this->postJson("/api/crm/leads/{$lead->id}/borradores", ['asunto' => 'Desde la API', 'cuerpo' => 'Hola'])->assertCreated();
+
+        $this->actingAs($this->user)->get(route('crm.correos'))->assertSee('Desde la API');
+    }
+
+    public function test_ya_lo_mande_lo_registra_en_la_bitacora(): void
+    {
+        $borrador = $this->borrador();
+
+        $this->actingAs($this->user)->post(route('crm.correos.enviado', $borrador));
+
+        $this->assertDatabaseHas('crm_activities', ['lead_id' => $borrador->lead_id, 'tipo' => 'email', 'descripcion' => "Asunto de prueba\n\nCuerpo de prueba"]);
+    }
+
+    public function test_enviar_lo_manda_por_el_buzon_de_la_empresa(): void
+    {
+        $borrador = $this->borrador();
+
+        $this->actingAs($this->user)->post(route('crm.correos.enviar', $borrador));
+
+        $this->assertSame('Asunto de prueba', Mail::mailer('prospeccion')->getSymfonyTransport()->messages()->first()?->getOriginalMessage()->getSubject());
+    }
+
+    public function test_otra_empresa_no_puede_usar_ese_buzon(): void
+    {
+        $borrador = $this->borrador();
+        config(['services.crm_envio.organizacion' => 999]);
+
+        $this->actingAs($this->user)->post(route('crm.correos.enviar', $borrador))->assertForbidden();
+    }
+}

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CrmController;
 use App\Models\CrmActivity;
+use App\Models\CrmBorrador;
 use App\Models\CrmStage;
 use App\Models\Lead;
 use Illuminate\Http\JsonResponse;
@@ -223,6 +224,27 @@ class CrmApiController extends Controller
         CrmController::aplicarEtapa($modelo, $etapa, $modelo->stage->nombre ?? '—');
 
         return response()->json($this->serializar($modelo->fresh()->load('stage')));
+    }
+
+    /**
+     * Deja un correo listo en la bandeja /crm/correos para que el vendedor lo
+     * revise y lo mande desde su buzón.
+     */
+    public function borrador(Request $request, int $lead): JsonResponse
+    {
+        $modelo = $this->buscar($request, $lead);
+        $validated = $request->validate([
+            'asunto' => 'required|string|max:255',
+            'cuerpo' => 'required|string|max:10000',
+        ]);
+
+        $borrador = CrmBorrador::create($validated + [
+            'organization_id' => $modelo->organization_id,
+            'lead_id' => $modelo->id,
+            'user_id' => $request->user()->id,
+        ]);
+
+        return response()->json(['borrador_id' => $borrador->id], 201);
     }
 
     public function actividad(Request $request, int $lead): JsonResponse

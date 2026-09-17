@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Client;
 use App\Models\CrmActivity;
+use App\Models\CrmBorrador;
 use App\Models\CrmStage;
 use App\Models\Lead;
 use App\Models\Product;
@@ -103,6 +104,10 @@ class AislamientoEntreEmpresasTest extends TestCase
         $this->blancos['actividad'] = CrmActivity::create([
             'organization_id' => $org, 'lead_id' => $this->blancos['lead']->id, 'tipo' => 'llamada',
             'descripcion' => $this->secreto('actividad'), 'programada_at' => now(),
+        ]);
+        $this->blancos['borrador'] = CrmBorrador::create([
+            'organization_id' => $org, 'lead_id' => $this->blancos['lead']->id,
+            'asunto' => $this->secreto('asunto'), 'cuerpo' => $this->secreto('cuerpo'),
         ]);
         $this->blancos['perfil'] = Role::paraOrganizacion($org)->firstWhere('es_admin', false);
         $this->blancos['invitacion'] = tap((new TeamInvitation([
@@ -214,7 +219,7 @@ class AislamientoEntreEmpresasTest extends TestCase
     public function test_los_listados_y_busquedas_no_muestran_nada_ajeno(): void
     {
         $pantallas = ['/clientes', '/proveedores', '/productos', '/categorias', '/marcas', '/atributos-producto',
-            '/inventario', '/ventas', '/pos', '/crm', '/crm/tablero', '/crm/papelera', '/crm/leads/nuevo', '/crm/importar',
+            '/inventario', '/ventas', '/pos', '/crm', '/crm/tablero', '/crm/papelera', '/crm/leads/nuevo', '/crm/importar', '/crm/correos',
             '/equipo', '/productos/create', '/clientes?search=SECRETO', '/productos?search=SECRETO', '/inventario?search=SECRETO',
             '/crm/tablero?search=SECRETO', '/crm/papelera?search=SECRETO', '/pos/search?q=SECRETO'];
         $api = ['/api/crm/leads', '/api/crm/leads?search=SECRETO', '/api/crm/pendientes', '/api/crm/etapas', '/api/crm/resumen'];
