@@ -74,7 +74,17 @@ class CrmApiController extends Controller
             $query->pendientes();
         }
 
-        $leads = $query->orderByDesc('valor_estimado')
+        if ($request->boolean('con_email')) {
+            $query->whereNotNull('email');
+        }
+
+        if ($request->boolean('sin_seguimiento')) {
+            $query->abiertos()->whereNull('proxima_accion_at');
+        }
+
+        $leads = $query
+            ->when($request->input('orden') === 'mejores', fn ($q) => $q->mejoresPrimero($this->orgId($request)))
+            ->orderByDesc('valor_estimado')
             ->paginate(min($request->integer('per_page', 50), 200));
 
         return response()->json([
@@ -288,6 +298,10 @@ class CrmApiController extends Controller
             'empresa' => $lead->empresa,
             'email' => $lead->email,
             'telefono' => $lead->telefono,
+            'giro' => $lead->giro,
+            'sector' => $lead->sector,
+            'personal' => $lead->rangoPersonal(),
+            'municipio' => $lead->municipio,
             'etapa' => $lead->stage?->nombre,
             'stage_id' => $lead->stage_id,
             'origen' => $lead->origen,
