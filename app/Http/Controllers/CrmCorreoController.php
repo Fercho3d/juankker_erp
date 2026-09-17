@@ -18,7 +18,7 @@ class CrmCorreoController extends Controller
     {
         return view('crm.correos', [
             'borradores' => CrmBorrador::pendientesPara(Auth::user())->with('lead')->oldest()->get(),
-            'puedeEnviar' => self::puedeEnviar(),
+            'buzonPropio' => self::conBuzonPropio(),
         ]);
     }
 
@@ -50,7 +50,7 @@ class CrmCorreoController extends Controller
     public function prueba(CrmBorrador $borrador)
     {
         $this->autorizar($borrador);
-        $propio = config('services.crm_envio.remitente');
+        $propio = self::conBuzonPropio() ? config('services.crm_envio.remitente') : Auth::user()->email;
 
         return $this->mandar($borrador, $propio, false)
             ? back()->with('status', __('Prueba enviada a :correo.', ['correo' => $propio]))
@@ -59,16 +59,20 @@ class CrmCorreoController extends Controller
 
     private function mandar(CrmBorrador $borrador, string $para, bool $conCopia): bool
     {
-        abort_unless(self::puedeEnviar(), 403);
-        $remitente = config('services.crm_envio.remitente');
+        $propio = self::conBuzonPropio();
+        $usuario = Auth::user();
+        $remitente = $propio ? config('services.crm_envio.remitente') : config('mail.from.address');
+        $nombre = $propio ? config('services.crm_envio.nombre') : $usuario->name;
+        $copia = $propio ? $remitente : $usuario->email;
 
         try {
-            Mail::mailer('prospeccion')->raw($borrador->cuerpo, function ($m) use ($borrador, $para, $conCopia, $remitente) {
-                $m->from($remitente, config('services.crm_envio.nombre'))
+            Mail::mailer($propio ? 'prospeccion' : config('mail.default'))->raw($borrador->cuerpo, function ($m) use ($borrador, $para, $conCopia, $remitente, $nombre, $usuario, $copia) {
+                $m->from($remitente, $nombre)
+                    ->replyTo($usuario->email, $usuario->name)
                     ->to($para)
                     ->subject($conCopia ? $borrador->asunto : __('[Prueba] :asunto', ['asunto' => $borrador->asunto]));
                 if ($conCopia) {
-                    $m->bcc($remitente);
+                    $m->bcc($copia);
                 }
             });
         } catch (Throwable $e) {
@@ -112,7 +116,11 @@ class CrmCorreoController extends Controller
         return back()->with('status', __('Borrador descartado.'));
     }
 
-    private static function puedeEnviar(): bool
+    /**
+     * Con `CRM_MAIL_*` el correo sale del buzón de la empresa; sin eso sale por
+     * el mailer del sistema, a nombre del vendedor y con respuesta a su correo.
+     */
+    private static function conBuzonPropio(): bool
     {
         return config('services.crm_envio.remitente') && config('mail.mailers.prospeccion.password')
             && (string) Auth::user()->organization_id === (string) config('services.crm_envio.organizacion');

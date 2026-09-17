@@ -86,11 +86,13 @@ class CrmCorreosTest extends TestCase
         $this->assertNull($borrador->fresh()->enviado_at);
     }
 
-    public function test_otra_empresa_no_puede_usar_ese_buzon(): void
+    public function test_sin_buzon_propio_sale_por_el_mailer_del_sistema(): void
     {
         $borrador = $this->borrador();
-        config(['services.crm_envio.organizacion' => 999]);
+        config(['services.crm_envio.organizacion' => 999, 'mail.default' => 'array', 'mail.from.address' => 'no-reply@empresa.test']);
 
-        $this->actingAs($this->user)->post(route('crm.correos.enviar', $borrador))->assertForbidden();
+        $this->actingAs($this->user)->post(route('crm.correos.enviar', $borrador));
+
+        $this->assertSame('no-reply@empresa.test', Mail::mailer('array')->getSymfonyTransport()->messages()->first()?->getOriginalMessage()->getFrom()[0]->getAddress());
     }
 }

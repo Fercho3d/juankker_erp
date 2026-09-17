@@ -789,5 +789,7 @@
     "Enviar prueba": "Send a test",
     "Enviar al cliente": "Send to client",
     "Prueba enviada a :correo.": "Test sent to :correo.",
-    "[Prueba] :asunto": "[Test] :asunto"
+    "[Prueba] :asunto": "[Test] :asunto",
+    "Los correos salen de :correo.": "Emails are sent from :correo.",
+    "Los correos salen de :correo y las respuestas llegan a tu cuenta.": "Emails are sent from :correo and replies reach your account."
 }

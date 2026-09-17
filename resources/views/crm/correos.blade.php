@@ -11,6 +11,9 @@
         <h1 class="text-2xl font-bold text-gray-900">{{ __('Correos por mandar') }} <span class="text-gray-400 font-medium">({{ $borradores->count() }})</span></h1>
         <p class="text-sm text-gray-500 mt-1">
             {{ __('Revisa cada correo antes de mandarlo. Al marcarlo como enviado queda en la bitácora del prospecto y se agenda una llamada de seguimiento.') }}
+            {{ $buzonPropio
+                ? __('Los correos salen de :correo.', ['correo' => config('services.crm_envio.remitente')])
+                : __('Los correos salen de :correo y las respuestas llegan a tu cuenta.', ['correo' => config('mail.from.address')]) }}
         </p>
     </div>
 
@@ -39,20 +42,18 @@
             <pre class="text-sm text-gray-700 whitespace-pre-wrap font-sans m-0 p-3 rounded-lg bg-gray-50 border border-gray-200">{{ $borrador->cuerpo }}</pre>
 
             <div class="flex flex-wrap gap-2 mt-3">
-                @if ($puedeEnviar)
-                    <form method="POST" action="{{ route('crm.correos.prueba', $borrador) }}">
+                <form method="POST" action="{{ route('crm.correos.prueba', $borrador) }}">
                         @csrf
-                        <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-700 bg-white hover:border-gray-400 cursor-pointer">{{ __('Enviar prueba') }}</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-700 bg-white hover:border-gray-400 cursor-pointer">{{ __('Enviar prueba') }}</button>
+                </form>
+                @if ($lead->email)
+                    <form method="POST" action="{{ route('crm.correos.enviar', $borrador) }}" onsubmit="return confirm({{ Js::from(__('¿Mandar este correo a :correo?', ['correo' => strtolower($lead->email)])) }})">
+                        @csrf
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 border-0 cursor-pointer">{{ __('Enviar al cliente') }}</button>
                     </form>
-                    @if ($lead->email)
-                        <form method="POST" action="{{ route('crm.correos.enviar', $borrador) }}" onsubmit="return confirm({{ Js::from(__('¿Mandar este correo a :correo?', ['correo' => strtolower($lead->email)])) }})">
-                            @csrf
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 border-0 cursor-pointer">{{ __('Enviar al cliente') }}</button>
-                        </form>
-                    @endif
                 @endif
                 @if ($mailto = $borrador->mailto())
-                    <a href="{{ $mailto }}" class="px-4 py-2 text-xs font-semibold rounded-lg no-underline {{ $puedeEnviar ? 'border border-gray-200 text-gray-700 hover:border-gray-400' : 'bg-indigo-600 text-white hover:bg-indigo-700' }}">{{ __('Abrir en mi correo') }}</a>
+                    <a href="{{ $mailto }}" class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-700 no-underline hover:border-gray-400">{{ __('Abrir en mi correo') }}</a>
                 @endif
                 <button type="button" data-copiar="{{ $borrador->asunto }}&#10;&#10;{{ $borrador->cuerpo }}"
                         class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-700 bg-white hover:border-gray-400 cursor-pointer">{{ __('Copiar') }}</button>
