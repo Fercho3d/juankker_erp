@@ -17,9 +17,10 @@ despliegas a mano):
 
     ssh smileintelli 'sudo cat /var/www/erp/.deployed-commit'
 
-El repositorio `origin` (github.com/Fercho3d/juankker_erp) **no es la fuente de
-producción**: `origin/main` está varios commits atrás de lo que corre en línea.
-Mientras eso siga así, el despliegue es manual y este documento es la referencia.
+El código vive en `origin` (github.com/Fercho3d/juankker_erp), pero producción
+**no se actualiza con `git pull`**: el servidor recibe archivos sueltos desde
+`scripts/desplegar.sh`. Haz push antes de desplegar para que GitHub, tu máquina
+y producción apunten al mismo commit, y compruébalo con `.deployed-commit`.
 
 ## Despliegue automatizado
 
