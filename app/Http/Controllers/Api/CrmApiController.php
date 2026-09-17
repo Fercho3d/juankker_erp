@@ -247,6 +247,22 @@ class CrmApiController extends Controller
         return response()->json(['borrador_id' => $borrador->id], 201);
     }
 
+    /**
+     * Corrige un borrador que todavía no se manda.
+     */
+    public function actualizarBorrador(Request $request, int $borrador): JsonResponse
+    {
+        $modelo = CrmBorrador::where('organization_id', $this->orgId($request))->whereNull('enviado_at')->findOrFail($borrador);
+        abort_unless($modelo->lead?->visiblePara($request->user()), 404);
+
+        $modelo->update($request->validate([
+            'asunto' => 'sometimes|required|string|max:255',
+            'cuerpo' => 'sometimes|required|string|max:10000',
+        ]));
+
+        return response()->json(['borrador_id' => $modelo->id]);
+    }
+
     public function actividad(Request $request, int $lead): JsonResponse
     {
         $modelo = $this->buscar($request, $lead);

@@ -49,6 +49,16 @@ class CrmCorreosTest extends TestCase
         $this->actingAs($this->user)->get(route('crm.correos'))->assertSee('Desde la API');
     }
 
+    public function test_la_api_corrige_un_borrador(): void
+    {
+        $borrador = $this->borrador();
+        Sanctum::actingAs($this->user);
+
+        $this->putJson("/api/crm/borradores/{$borrador->id}", ['cuerpo' => 'Con teléfono'])->assertOk();
+
+        $this->assertSame('Con teléfono', $borrador->fresh()->cuerpo);
+    }
+
     public function test_ya_lo_mande_lo_registra_en_la_bitacora(): void
     {
         $borrador = $this->borrador();
