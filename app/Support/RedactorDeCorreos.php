@@ -57,11 +57,16 @@ class RedactorDeCorreos
     {
         $key = config('services.anthropic.key') ?: throw new RuntimeException('Falta ANTHROPIC_API_KEY.');
 
+        $modelo = config('services.anthropic.model');
+
         $mensaje = (new Client(apiKey: $key))->messages->create(
-            model: config('services.anthropic.model'),
+            model: $modelo,
             maxTokens: 2000,
             system: self::INSTRUCCIONES,
-            outputConfig: ['effort' => 'low', 'format' => self::FORMATO],
+            // Haiku no acepta el parámetro de esfuerzo
+            outputConfig: str_contains($modelo, 'haiku')
+                ? ['format' => self::FORMATO]
+                : ['effort' => 'low', 'format' => self::FORMATO],
             messages: [['role' => 'user', 'content' => $contexto]],
         );
 
