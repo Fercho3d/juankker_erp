@@ -127,3 +127,19 @@ Para probar un envío sin abrir el sitio:
 ## Variables de entorno propias del proyecto
 
     DENUE_TOKEN=      # Token del API del DENUE (INEGI), para los comandos de prospección
+    ANTHROPIC_API_KEY=         # Borradores con IA en la ficha del prospecto; sin ella el panel no sale
+    ANTHROPIC_MODEL=           # claude-opus-5 por defecto; claude-haiku-4-5 cuesta ~5 veces menos
+    IA_CORREOS_POR_DIA=10      # Tope de borradores con IA por empresa
+
+    # Envío directo desde /crm/correos por el buzón propio (Migadu), no por Resend:
+    # correo en frío por Resend arriesga la cuenta que manda los de contraseña.
+    CRM_ENVIO_ORGANIZACION=2   # Única organización dueña de ese buzón
+    CRM_MAIL_USERNAME=contacto@juancker.com
+    CRM_MAIL_PASSWORD=         # Contraseña del buzón en Migadu
+    CRM_MAIL_NOMBRE="Juan Fernando Salas · Juancker"
+    CRM_ENVIOS_POR_DIA=20
+
+Sin `CRM_MAIL_PASSWORD` el botón "Enviar" no aparece y quedan "Abrir en mi
+correo" y "Ya lo mandé". El SDK de Anthropic (`anthropic-ai/sdk`) vive en
+`vendor/`, que el script no sube: antes de poner la llave corre
+`composer install --no-dev` en el servidor.
