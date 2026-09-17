@@ -126,7 +126,7 @@
         </div>
         @if ($totalSinSeguimiento > $sinSeguimiento->count())
             <p class="text-sm text-gray-500 mt-3">
-                {{ __('Van los :n más grandes de :total.', ['n' => $sinSeguimiento->count(), 'total' => number_format($totalSinSeguimiento)]) }}
+                {{ __('Van los :n más prometedores de :total.', ['n' => $sinSeguimiento->count(), 'total' => number_format($totalSinSeguimiento)]) }}
                 <a href="{{ route('crm.tablero') }}" class="font-semibold text-indigo-600 no-underline hover:underline">{{ __('Filtrar en el tablero') }} →</a>
             </p>
         @endif

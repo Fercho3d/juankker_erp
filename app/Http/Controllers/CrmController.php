@@ -40,7 +40,7 @@ class CrmController extends Controller
             'actividades' => $actividades,
             'leads' => $leads,
             'sinSeguimiento' => (clone $sinSeguimiento)->with('stage')
-                ->orderByDesc('personal_min')->orderBy('updated_at')
+                ->mejoresPrimero($user->organization_id)->orderBy('updated_at')
                 ->limit(self::TOPE_POR_LISTA)->get(),
             'totalSinSeguimiento' => $sinSeguimiento->count(),
             'resumen' => self::resumen($user),

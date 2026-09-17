@@ -160,6 +160,26 @@ class Lead extends Model
                 : $q->where('owner_id', (int) $v));
     }
 
+    /**
+     * Los que más conviene trabajar primero, sin gastar IA: se parecen a los que
+     * ya se ganaron, se les puede escribir o llamar y tienen tamaño y probabilidad.
+     */
+    public function scopeMejoresPrimero($query, int $organizationId)
+    {
+        $sectoresGanados = self::deOrganizacion($organizationId)
+            ->whereHas('stage', fn ($q) => $q->where('es_ganada', true))
+            ->whereNotNull('sector')->distinct()->pluck('sector')->all();
+        $parecido = $sectoresGanados
+            ? 'CASE WHEN leads.sector IN ('.implode(',', array_fill(0, count($sectoresGanados), '?')).') THEN 3 ELSE 0 END'
+            : '0';
+
+        return $query->orderByRaw(
+            "{$parecido} + (leads.email IS NOT NULL) * 2 + (leads.telefono IS NOT NULL)"
+            .' + (COALESCE(leads.personal_min, 0) >= 11) * 2 + COALESCE(leads.probabilidad, 0) / 25 DESC',
+            $sectoresGanados
+        );
+    }
+
     public function scopePendientes($query)
     {
         return $query->abiertos()

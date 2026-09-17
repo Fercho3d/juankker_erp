@@ -708,7 +708,7 @@
     "Valor eliminado exitosamente": "Value deleted successfully",
     "Valores": "Values",
     "Valores: :nombre": "Values: :nombre",
-    "Van los :n más grandes de :total.": "Showing the :n largest of :total.",
+    "Van los :n más prometedores de :total.": "Showing the :n most promising of :total.",
     "Variable": "Variable",
     "Variante": "Variant",
     "Variantes del Producto": "Product Variants",
@@ -761,5 +761,13 @@
     "¿Qué pasó? Lo que te dijo, lo que quedó pendiente…": "What happened? What they said, what's still pending…",
     "¿Ya tienes cuenta?": "Already have an account?",
     "Únete a :empresa": "Join :empresa",
-    "Útil para productos vendidos por peso o volumen (ej: 1.5 kg)": "Useful for products sold by weight or volume (e.g. 1.5 kg)"
+    "Útil para productos vendidos por peso o volumen (ej: 1.5 kg)": "Useful for products sold by weight or volume (e.g. 1.5 kg)",
+    "Correo con IA": "AI email",
+    "¿Qué le quieres ofrecer?": "What do you want to offer?",
+    "Redactar borrador": "Draft email",
+    "Revísalo antes de mandarlo: la IA puede equivocarse.": "Review it before sending: AI can make mistakes.",
+    "Abrir en mi correo": "Open in my email",
+    "Ya lo mandé: registrar en la bitácora": "Sent: log it in the history",
+    "Ya se usaron los borradores con IA de hoy. Mañana hay más.": "Today's AI drafts are used up. More tomorrow.",
+    "No se pudo generar el borrador. Intenta en un momento.": "The draft could not be generated. Try again shortly."
 }

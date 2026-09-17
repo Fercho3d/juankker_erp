@@ -116,6 +116,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('leads/{lead}', [LeadController::class, 'destroy'])->whereNumber('lead')->name('leads.destroy');
         Route::post('leads/{lead}/convertir', [LeadController::class, 'convertir'])->whereNumber('lead')->name('leads.convertir');
         Route::post('leads/{lead}/descartar', [LeadController::class, 'descartar'])->whereNumber('lead')->name('leads.descartar');
+        Route::post('leads/{lead}/correo-ia', [LeadController::class, 'borradorCorreo'])->whereNumber('lead')->name('leads.correo-ia');
         Route::post('leads/{lead}/asignar', [LeadController::class, 'asignar'])->whereNumber('lead')->name('leads.asignar');
         Route::post('asignar', [CrmController::class, 'asignarEnBloque'])->name('leads.asignar-bloque');
         Route::get('papelera', [LeadController::class, 'papelera'])->name('papelera');

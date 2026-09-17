@@ -190,6 +190,38 @@
                 @endif
             </div>
 
+            {{-- Borrador de correo con IA: se revisa y se manda desde el correo del vendedor --}}
+            <div class="bg-white rounded-xl border border-gray-200 p-5">
+                <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">{{ __('Correo con IA') }}</span>
+                <form method="POST" action="{{ route('crm.leads.correo-ia', $lead) }}" class="flex flex-col gap-2">
+                    @csrf
+                    <textarea name="objetivo" rows="2" required maxlength="300" placeholder="{{ __('¿Qué le quieres ofrecer?') }}"
+                              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-indigo-500">{{ old('objetivo', session('crm.objetivo_correo')) }}</textarea>
+                    @error('objetivo')
+                        <span class="text-xs text-rose-600">{{ $message }}</span>
+                    @enderror
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 border-0 cursor-pointer">{{ __('Redactar borrador') }}</button>
+                </form>
+
+                @if ($borrador = session('borrador'))
+                    <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-2">
+                        <span class="text-sm font-semibold text-gray-900">{{ $borrador['asunto'] }}</span>
+                        <p class="text-sm text-gray-700 m-0 whitespace-pre-line">{{ $borrador['cuerpo'] }}</p>
+                        <p class="text-xs text-gray-400 m-0">{{ __('Revísalo antes de mandarlo: la IA puede equivocarse.') }}</p>
+                        @if ($lead->email)
+                            <a href="mailto:{{ $lead->email }}?subject={{ rawurlencode($borrador['asunto']) }}&body={{ rawurlencode($borrador['cuerpo']) }}"
+                               class="px-4 py-2 text-center bg-gray-900 text-white text-xs font-semibold rounded-lg hover:bg-gray-800 no-underline">{{ __('Abrir en mi correo') }}</a>
+                        @endif
+                        <form method="POST" action="{{ route('crm.actividades.store', $lead) }}">
+                            @csrf
+                            <input type="hidden" name="tipo" value="email">
+                            <input type="hidden" name="descripcion" value="{{ $borrador['asunto'] }}&#10;&#10;{{ $borrador['cuerpo'] }}">
+                            <button type="submit" class="w-full px-4 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 border-0 cursor-pointer">{{ __('Ya lo mandé: registrar en la bitácora') }}</button>
+                        </form>
+                    </div>
+                @endif
+            </div>
+
             {{-- Convertir en cliente del ERP --}}
             <div class="bg-white rounded-xl border border-gray-200 p-5">
                 <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">{{ __('Cliente del ERP') }}</span>

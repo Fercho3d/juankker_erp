@@ -6,10 +6,12 @@ use App\Models\Client;
 use App\Models\CrmActivity;
 use App\Models\CrmStage;
 use App\Models\Lead;
+use App\Support\RedactorDeCorreos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Throwable;
 
 class LeadController extends Controller
 {
@@ -51,6 +53,30 @@ class LeadController extends Controller
             'tipos' => CrmActivity::TIPOS,
             'responsables' => $this->responsables(),
         ]);
+    }
+
+    /**
+     * Borrador de correo con IA. No se envía: el vendedor lo revisa y lo manda
+     * desde su propio correo.
+     */
+    public function borradorCorreo(Request $request, Lead $lead, RedactorDeCorreos $redactor)
+    {
+        $this->autorizar($lead);
+        $objetivo = $request->validate(['objetivo' => 'required|string|max:300'])['objetivo'];
+        session(['crm.objetivo_correo' => $objetivo]);
+
+        try {
+            $borrador = $redactor->redactar($lead, $objetivo);
+        } catch (Throwable $e) {
+            report($e);
+            $borrador = false;
+        }
+
+        return $borrador
+            ? back()->with('borrador', $borrador)
+            : back()->withErrors(['objetivo' => $borrador === null
+                ? __('Ya se usaron los borradores con IA de hoy. Mañana hay más.')
+                : __('No se pudo generar el borrador. Intenta en un momento.')]);
     }
 
     public function edit(Lead $lead)
