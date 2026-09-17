@@ -77,6 +77,15 @@ class CrmCorreosTest extends TestCase
         $this->assertSame('Asunto de prueba', Mail::mailer('prospeccion')->getSymfonyTransport()->messages()->first()?->getOriginalMessage()->getSubject());
     }
 
+    public function test_la_prueba_llega_al_buzon_propio_y_no_toca_al_prospecto(): void
+    {
+        $borrador = $this->borrador();
+
+        $this->actingAs($this->user)->post(route('crm.correos.prueba', $borrador));
+
+        $this->assertNull($borrador->fresh()->enviado_at);
+    }
+
     public function test_otra_empresa_no_puede_usar_ese_buzon(): void
     {
         $borrador = $this->borrador();

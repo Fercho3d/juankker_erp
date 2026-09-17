@@ -118,6 +118,7 @@ Route::middleware('auth')->group(function () {
         Route::post('leads/{lead}/convertir', [LeadController::class, 'convertir'])->whereNumber('lead')->name('leads.convertir');
         Route::post('leads/{lead}/descartar', [LeadController::class, 'descartar'])->whereNumber('lead')->name('leads.descartar');
         Route::get('correos', [CrmCorreoController::class, 'index'])->name('correos');
+        Route::post('correos/{borrador}/prueba', [CrmCorreoController::class, 'prueba'])->whereNumber('borrador')->name('correos.prueba');
         Route::post('correos/{borrador}/enviar', [CrmCorreoController::class, 'enviar'])->whereNumber('borrador')->name('correos.enviar');
         Route::post('correos/{borrador}/enviado', [CrmCorreoController::class, 'enviado'])->whereNumber('borrador')->name('correos.enviado');
         Route::delete('correos/{borrador}', [CrmCorreoController::class, 'destroy'])->whereNumber('borrador')->name('correos.destroy');

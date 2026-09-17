@@ -23,34 +23,61 @@ class CrmCorreoController extends Controller
     }
 
     /**
-     * Lo manda el ERP desde el buzón de la empresa, con copia al mismo buzón
-     * para que quede en su correo, y lo registra igual que "Ya lo mandé".
+     * Lo manda el ERP al prospecto desde el buzón de la empresa, con copia al
+     * mismo buzón, y lo registra igual que "Ya lo mandé".
      */
     public function enviar(CrmBorrador $borrador)
     {
         $lead = $this->autorizar($borrador)->lead;
         $cupo = 'crm-envio:'.$borrador->organization_id;
 
-        if (! self::puedeEnviar() || ! $lead->email) {
+        if (! $lead->email) {
             abort(403);
         }
         if (! RateLimiter::attempt($cupo, (int) config('services.crm_envio.por_dia'), fn () => true, 86400)) {
             return back()->withErrors(['envio' => __('Ya se mandaron los correos de hoy. Mañana hay más.')]);
         }
 
+        return $this->mandar($borrador, strtolower($lead->email), true)
+            ? $this->enviado($borrador)
+            : back()->withErrors(['envio' => __('No se pudo enviar el correo. Intenta en un momento.')]);
+    }
+
+    /**
+     * El mismo correo al buzón propio, para ver cómo llega. No toca al
+     * prospecto ni su bitácora.
+     */
+    public function prueba(CrmBorrador $borrador)
+    {
+        $this->autorizar($borrador);
+        $propio = config('services.crm_envio.remitente');
+
+        return $this->mandar($borrador, $propio, false)
+            ? back()->with('status', __('Prueba enviada a :correo.', ['correo' => $propio]))
+            : back()->withErrors(['envio' => __('No se pudo enviar el correo. Intenta en un momento.')]);
+    }
+
+    private function mandar(CrmBorrador $borrador, string $para, bool $conCopia): bool
+    {
+        abort_unless(self::puedeEnviar(), 403);
+        $remitente = config('services.crm_envio.remitente');
+
         try {
-            Mail::mailer('prospeccion')->raw($borrador->cuerpo, fn ($m) => $m
-                ->from(config('services.crm_envio.remitente'), config('services.crm_envio.nombre'))
-                ->to(strtolower($lead->email))
-                ->bcc(config('services.crm_envio.remitente'))
-                ->subject($borrador->asunto));
+            Mail::mailer('prospeccion')->raw($borrador->cuerpo, function ($m) use ($borrador, $para, $conCopia, $remitente) {
+                $m->from($remitente, config('services.crm_envio.nombre'))
+                    ->to($para)
+                    ->subject($conCopia ? $borrador->asunto : __('[Prueba] :asunto', ['asunto' => $borrador->asunto]));
+                if ($conCopia) {
+                    $m->bcc($remitente);
+                }
+            });
         } catch (Throwable $e) {
             report($e);
 
-            return back()->withErrors(['envio' => __('No se pudo enviar el correo. Intenta en un momento.')]);
+            return false;
         }
 
-        return $this->enviado($borrador);
+        return true;
     }
 
     /**

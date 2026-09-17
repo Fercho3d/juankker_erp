@@ -785,5 +785,9 @@
     "Revisa cada correo antes de mandarlo. Al marcarlo como enviado queda en la bitácora del prospecto y se agenda una llamada de seguimiento.": "Review each email before sending it. Once marked as sent, it is logged in the lead's history and a follow-up call is scheduled.",
     "Ya lo mandé": "I sent it",
     "Ya se mandaron los correos de hoy. Mañana hay más.": "Today's emails have been sent. More tomorrow.",
-    "¿Mandar este correo a :correo?": "Send this email to :correo?"
+    "¿Mandar este correo a :correo?": "Send this email to :correo?",
+    "Enviar prueba": "Send a test",
+    "Enviar al cliente": "Send to client",
+    "Prueba enviada a :correo.": "Test sent to :correo.",
+    "[Prueba] :asunto": "[Test] :asunto"
 }

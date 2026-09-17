@@ -39,11 +39,17 @@
             <pre class="text-sm text-gray-700 whitespace-pre-wrap font-sans m-0 p-3 rounded-lg bg-gray-50 border border-gray-200">{{ $borrador->cuerpo }}</pre>
 
             <div class="flex flex-wrap gap-2 mt-3">
-                @if ($puedeEnviar && $lead->email)
-                    <form method="POST" action="{{ route('crm.correos.enviar', $borrador) }}" onsubmit="return confirm({{ Js::from(__('¿Mandar este correo a :correo?', ['correo' => strtolower($lead->email)])) }})">
+                @if ($puedeEnviar)
+                    <form method="POST" action="{{ route('crm.correos.prueba', $borrador) }}">
                         @csrf
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 border-0 cursor-pointer">{{ __('Enviar') }}</button>
+                        <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-700 bg-white hover:border-gray-400 cursor-pointer">{{ __('Enviar prueba') }}</button>
                     </form>
+                    @if ($lead->email)
+                        <form method="POST" action="{{ route('crm.correos.enviar', $borrador) }}" onsubmit="return confirm({{ Js::from(__('¿Mandar este correo a :correo?', ['correo' => strtolower($lead->email)])) }})">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 border-0 cursor-pointer">{{ __('Enviar al cliente') }}</button>
+                        </form>
+                    @endif
                 @endif
                 @if ($mailto = $borrador->mailto())
                     <a href="{{ $mailto }}" class="px-4 py-2 text-xs font-semibold rounded-lg no-underline {{ $puedeEnviar ? 'border border-gray-200 text-gray-700 hover:border-gray-400' : 'bg-indigo-600 text-white hover:bg-indigo-700' }}">{{ __('Abrir en mi correo') }}</a>
