@@ -191,6 +191,7 @@
             </div>
 
             {{-- Borrador de correo con IA: se revisa y se manda desde el correo del vendedor --}}
+            @if (config('services.anthropic.key'))
             <div class="bg-white rounded-xl border border-gray-200 p-5">
                 <span class="block text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-2">{{ __('Correo con IA') }}</span>
                 <form method="POST" action="{{ route('crm.leads.correo-ia', $lead) }}" class="flex flex-col gap-2">
@@ -221,6 +222,7 @@
                     </div>
                 @endif
             </div>
+            @endif
 
             {{-- Convertir en cliente del ERP --}}
             <div class="bg-white rounded-xl border border-gray-200 p-5">

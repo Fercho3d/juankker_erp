@@ -25,6 +25,7 @@ class CrmCorreoIaTest extends TestCase
     public function test_el_borrador_se_muestra_en_la_ficha(): void
     {
         $lead = $this->unLead();
+        config(['services.anthropic.key' => 'llave-de-prueba']);
         $this->mock(RedactorDeCorreos::class)->shouldReceive('redactar')
             ->andReturn(['asunto' => 'Asunto de prueba', 'cuerpo' => 'Cuerpo de prueba']);
 
@@ -33,6 +34,15 @@ class CrmCorreoIaTest extends TestCase
             ->followingRedirects()
             ->post(route('crm.leads.correo-ia', $lead), ['objetivo' => 'Demo del ERP'])
             ->assertSee('Asunto de prueba');
+    }
+
+    public function test_sin_llave_no_aparece_el_panel(): void
+    {
+        config(['services.anthropic.key' => null]);
+
+        $this->actingAs(User::find(1))
+            ->get(route('crm.leads.show', $this->unLead()))
+            ->assertDontSee('Redactar borrador');
     }
 
     public function test_sin_cupo_no_llama_a_la_ia(): void
