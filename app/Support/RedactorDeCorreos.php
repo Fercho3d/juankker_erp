@@ -5,6 +5,7 @@ namespace App\Support;
 use Anthropic\Client;
 use App\Models\Lead;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -24,6 +25,9 @@ class RedactorDeCorreos
         datos, precios, nombres ni cifras que no aparezcan. Cierra con una sola
         pregunta concreta para agendar una llamada o visita. No pongas firma.
         TXT;
+
+    /** Dólares por millón de tokens (entrada, salida) para estimar el gasto en el log. */
+    private const PRECIOS = ['haiku' => [1, 5], 'sonnet' => [2, 10], 'opus' => [5, 25]];
 
     private const FORMATO = [
         'type' => 'json_schema',
@@ -69,6 +73,15 @@ class RedactorDeCorreos
                 : ['effort' => 'low', 'format' => self::FORMATO],
             messages: [['role' => 'user', 'content' => $contexto]],
         );
+
+        $precio = collect(self::PRECIOS)->first(fn ($p, $familia) => str_contains($modelo, $familia), [5, 25]);
+        $uso = $mensaje->usage;
+        Log::info('correo-ia', [
+            'modelo' => $modelo,
+            'entrada' => $uso->inputTokens,
+            'salida' => $uso->outputTokens,
+            'usd' => round(($uso->inputTokens * $precio[0] + $uso->outputTokens * $precio[1]) / 1e6, 5),
+        ]);
 
         foreach ($mensaje->content as $bloque) {
             if ($mensaje->stopReason === 'end_turn' && $bloque->type === 'text') {
