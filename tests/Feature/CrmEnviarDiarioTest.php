@@ -8,6 +8,7 @@ use App\Models\CrmStage;
 use App\Models\Lead;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Tests\TestCase;
 
@@ -72,6 +73,18 @@ class CrmEnviarDiarioTest extends TestCase
         $this->artisan('crm:enviar-diario');
 
         $this->assertFalse(CrmBorrador::where('lead_id', $lead->id)->exists());
+    }
+
+    public function test_manda_el_resumen_al_buzon_de_la_empresa(): void
+    {
+        $this->prospecto('Resumida');
+
+        $this->artisan('crm:enviar-diario');
+
+        $resumen = collect(Mail::mailer('prospeccion')->getSymfonyTransport()->messages())
+            ->map(fn ($m) => $m->getOriginalMessage())
+            ->first(fn ($m) => str_starts_with($m->getSubject(), 'Envío diario'));
+        $this->assertStringContainsString('Resumida', $resumen?->getTextBody() ?? '');
     }
 
     public function test_no_vuelve_a_escribir_a_quien_ya_se_contacto(): void

@@ -7,7 +7,9 @@ use App\Models\Lead;
 use App\Models\User;
 use App\Support\EnvioDeCorreos;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
+use Throwable;
 
 class CrmEnviarDiario extends Command
 {
@@ -42,6 +44,7 @@ class CrmEnviarDiario extends Command
             ->limit($config['por_dia'])
             ->get();
 
+        $resumen = [];
         foreach ($leads as $i => $lead) {
             $this->line(($i + 1).". {$lead->empresa} <".strtolower($lead->email).'>');
             if ($this->option('simular')) {
@@ -60,14 +63,40 @@ class CrmEnviarDiario extends Command
                 'cuerpo' => str_replace(':lista', $config['listas'][$lead->sector], $config['cuerpo']),
             ]);
             // Si falla se queda en la bandeja para mandarlo a mano.
-            if (EnvioDeCorreos::mandar($borrador, strtolower($lead->email), true, $dueno)) {
+            $enviado = EnvioDeCorreos::mandar($borrador, strtolower($lead->email), true, $dueno);
+            if ($enviado) {
                 EnvioDeCorreos::registrarEnviado($borrador, $dueno);
             }
+            $resumen[] = ($enviado ? '✓ ' : '✗ ')."{$lead->empresa} · {$lead->sector}\n  ".strtolower($lead->email)
+                ."\n  ".route('crm.leads.show', $lead);
             sleep($config['pausa_segundos']);
+        }
+
+        if ($resumen) {
+            $this->avisar($dueno, $resumen);
         }
 
         $this->info("Prospectos del día: {$leads->count()}.");
 
         return self::SUCCESS;
+    }
+
+    /** Resumen al buzón de la empresa: a quién se le escribió hoy y cuáles fallaron. */
+    private function avisar(User $dueno, array $resumen): void
+    {
+        $buzon = EnvioDeCorreos::remitente($dueno);
+        $fallidos = count(array_filter($resumen, fn ($r) => str_starts_with($r, '✗')));
+        $texto = 'Hoy se les escribió a estas empresas con la plantilla del envío diario:'."\n\n"
+            .implode("\n\n", $resumen)
+            .($fallidos ? "\n\n✗ = no se pudo enviar; quedó en ".route('crm.correos').' para mandarlo a mano.' : '')
+            ."\n\nEmbudo: ".route('crm.tablero');
+
+        try {
+            Mail::mailer(EnvioDeCorreos::conBuzonPropio($dueno) ? 'prospeccion' : config('mail.default'))
+                ->raw($texto, fn ($m) => $m->from($buzon, 'ERP Juancker')->to($buzon)
+                    ->subject('Envío diario: '.(count($resumen) - $fallidos).' correos a prospectos'));
+        } catch (Throwable $e) {
+            report($e);
+        }
     }
 }
