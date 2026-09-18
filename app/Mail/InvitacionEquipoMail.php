@@ -18,7 +18,7 @@ class InvitacionEquipoMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject(__(':nombre te invitó a su equipo en Juankker ERP', ['nombre' => $this->invitadoPor]))
+        return $this->subject(__(':nombre te invitó a su equipo en Juancker ERP', ['nombre' => $this->invitadoPor]))
             ->view('emails.invitacion-equipo');
     }
 }

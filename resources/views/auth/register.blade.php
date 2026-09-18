@@ -6,7 +6,7 @@
     <div class="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <span class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold mb-3">{{ __('30 días gratis · sin tarjeta') }}</span>
         <h1 class="text-2xl font-bold text-gray-900 mb-1">{{ __('Crea tu cuenta') }}</h1>
-        <p class="text-sm text-gray-500 mb-6">{{ __('Empieza a administrar tu empresa con el ERP de Juankker.') }}</p>
+        <p class="text-sm text-gray-500 mb-6">{{ __('Empieza a administrar tu empresa con el ERP de Juancker.') }}</p>
 
         <form method="POST" action="{{ route('register') }}" class="space-y-4">
             @csrf

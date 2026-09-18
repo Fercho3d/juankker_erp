@@ -61,7 +61,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $titulo ? $titulo.' · ' : '' }}{{ config('app.name', 'Juankker ERP') }}</title>
+    <title>{{ $titulo ? $titulo.' · ' : '' }}{{ config('app.name', 'Juancker ERP') }}</title>
     @include('partials.theme-script')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,7 +80,7 @@
         <div class="shell-brand">
             <a href="{{ auth()->user()->inicio() }}" class="shell-brand-link">
                 <span class="shell-logo" aria-hidden="true">J</span>
-                <span class="shell-brand-name">Juankker <span>ERP</span></span>
+                <span class="shell-brand-name">Juancker <span>ERP</span></span>
             </a>
             <button type="button" class="shell-icon-btn shell-only-mobile" data-shell-close aria-label="{{ __('Cerrar menú') }}">
                 @include('partials.nav-icon', ['icon' => 'cerrar'])
@@ -188,7 +188,7 @@
     <header class="shell-guestbar">
         <a href="{{ url('/') }}" class="shell-brand-link">
             <span class="shell-logo" aria-hidden="true">J</span>
-            <span class="shell-brand-name">Juankker <span>ERP</span></span>
+            <span class="shell-brand-name">Juancker <span>ERP</span></span>
         </a>
         <div class="shell-guestbar-end">
             <div class="shell-toggles is-guest">

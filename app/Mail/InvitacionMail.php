@@ -18,7 +18,7 @@ class InvitacionMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('Te invitamos a probar el ERP de Juankker')
+        return $this->subject('Te invitamos a probar el ERP de Juancker')
             ->view('emails.invitacion');
     }
 }

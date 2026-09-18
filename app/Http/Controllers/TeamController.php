@@ -39,7 +39,7 @@ class TeamController extends Controller
         $datos = $request->validate([
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
             'role_id' => ['required', 'integer', Rule::exists('roles', 'id')->where('organization_id', $org->id)],
-        ], ['email.unique' => __('Ese correo ya tiene una cuenta en Juankker ERP.')]);
+        ], ['email.unique' => __('Ese correo ya tiene una cuenta en Juancker ERP.')]);
 
         if (TeamInvitation::where('organization_id', $org->id)->where('email', $datos['email'])->pendientes()->exists()) {
             return back()->withErrors(['email' => __('Ya hay una invitación pendiente para ese correo. Puedes reenviarla.')])->withInput();

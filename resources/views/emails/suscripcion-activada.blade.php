@@ -3,7 +3,7 @@
 @section('content')
     <h1 style="font-size:22px;margin:0 0 12px;">Tu plan {{ $plan->name }} está activo</h1>
     <p style="margin:0 0 16px;color:#475569;">
-        Gracias por confiar en Juankker. La suscripción de <strong>{{ $organization->name }}</strong>
+        Gracias por confiar en Juancker. La suscripción de <strong>{{ $organization->name }}</strong>
         al plan <strong>{{ $plan->name }}</strong> quedó activa.
     </p>
     <ul style="color:#334155;font-size:14px;padding-left:18px;">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Superadmin · Juankker ERP</title>
+    <title>Superadmin · Juancker ERP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={theme:{extend:{colors:{brand:'#2563eb',navy:'#1e3a8a'}}}}</script>
 </head>
@@ -12,7 +12,7 @@
         <aside class="w-60 bg-navy text-slate-300 flex flex-col shrink-0">
             <div class="px-6 py-5 flex items-center gap-2 border-b border-white/10">
                 <span class="w-7 h-7 rounded-lg bg-brand inline-block"></span>
-                <span class="text-white font-bold text-lg">Juankker</span>
+                <span class="text-white font-bold text-lg">Juancker</span>
             </div>
             @php $nav = [
                 'superadmin.dashboard' => ['Dashboard','📊'],

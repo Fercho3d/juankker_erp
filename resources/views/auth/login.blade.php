@@ -5,7 +5,7 @@
 <div class="min-h-[80vh] flex items-center justify-center px-4 py-12">
     <div class="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <h1 class="text-2xl font-bold text-gray-900 mb-1">{{ __('Iniciar sesión') }}</h1>
-        <p class="text-sm text-gray-500 mb-6">{{ __('Accede a tu ERP de Juankker.') }}</p>
+        <p class="text-sm text-gray-500 mb-6">{{ __('Accede a tu ERP de Juancker.') }}</p>
 
         @if(session('status'))
             <div class="mb-4 px-4 py-3 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl">{{ session('status') }}</div>
