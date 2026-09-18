@@ -22,7 +22,7 @@ return [
 
             Desarrollo sistemas que llevan :lista en un mismo lugar, a la medida o partiendo de un ERP que ya tengo en producción. La idea es automatizar su operación para que el equipo deje de capturar lo mismo dos veces.
 
-            Si quiere verlo funcionando, puede probar mi ERP 30 días sin costo y sin tarjeta: https://erp.juancker.com/precios
+            Si quiere verlo funcionando, puede crear su cuenta y probar mi ERP 30 días sin costo y sin tarjeta: https://erp.juancker.com/register
 
             Si le interesa, puede contactarme: le dejo mis datos más abajo.
 
