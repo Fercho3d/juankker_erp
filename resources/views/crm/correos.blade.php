@@ -11,9 +11,9 @@
         <h1 class="text-2xl font-bold text-gray-900">{{ __('Correos por mandar') }} <span class="text-gray-400 font-medium">({{ $borradores->count() }})</span></h1>
         <p class="text-sm text-gray-500 mt-1">
             {{ __('Revisa cada correo antes de mandarlo. Al marcarlo como enviado queda en la bitácora del prospecto y se agenda una llamada de seguimiento.') }}
-            {{ $buzonPropio
-                ? __('Los correos salen de :correo.', ['correo' => config('services.crm_envio.remitente')])
-                : __('Los correos salen de :correo y las respuestas llegan a tu cuenta.', ['correo' => config('mail.from.address')]) }}
+            {{ $remitente === auth()->user()->email
+                ? __('Los correos salen de :correo.', ['correo' => $remitente])
+                : __('Los correos salen de :correo y las respuestas llegan a tu cuenta.', ['correo' => $remitente]) }}
         </p>
     </div>
 

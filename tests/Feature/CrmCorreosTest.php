@@ -7,6 +7,7 @@ use App\Models\Lead;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -94,5 +95,16 @@ class CrmCorreosTest extends TestCase
         $this->actingAs($this->user)->post(route('crm.correos.enviar', $borrador));
 
         $this->assertSame('no-reply@empresa.test', Mail::mailer('array')->getSymfonyTransport()->messages()->first()?->getOriginalMessage()->getFrom()[0]->getAddress());
+    }
+
+    public function test_si_el_vendedor_es_del_dominio_del_sistema_sale_de_su_correo(): void
+    {
+        $borrador = $this->borrador();
+        $dominio = Str::after($this->user->email, '@');
+        config(['services.crm_envio.organizacion' => 999, 'mail.default' => 'array', 'mail.from.address' => "no-reply@{$dominio}"]);
+
+        $this->actingAs($this->user)->post(route('crm.correos.enviar', $borrador));
+
+        $this->assertSame($this->user->email, Mail::mailer('array')->getSymfonyTransport()->messages()->first()?->getOriginalMessage()->getFrom()[0]->getAddress());
     }
 }

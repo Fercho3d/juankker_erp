@@ -7,6 +7,7 @@ use App\Models\CrmBorrador;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -18,7 +19,7 @@ class CrmCorreoController extends Controller
     {
         return view('crm.correos', [
             'borradores' => CrmBorrador::pendientesPara(Auth::user())->with('lead')->oldest()->get(),
-            'buzonPropio' => self::conBuzonPropio(),
+            'remitente' => self::remitente(),
         ]);
     }
 
@@ -61,7 +62,7 @@ class CrmCorreoController extends Controller
     {
         $propio = self::conBuzonPropio();
         $usuario = Auth::user();
-        $remitente = $propio ? config('services.crm_envio.remitente') : config('mail.from.address');
+        $remitente = self::remitente();
         $nombre = $propio ? config('services.crm_envio.nombre') : $usuario->name;
         $copia = $propio ? $remitente : $usuario->email;
 
@@ -114,6 +115,22 @@ class CrmCorreoController extends Controller
         $this->autorizar($borrador)->delete();
 
         return back()->with('status', __('Borrador descartado.'));
+    }
+
+    /**
+     * Sin buzón propio sale del correo del vendedor si es del dominio que el
+     * mailer del sistema tiene verificado; si no, del remitente del sistema.
+     */
+    private static function remitente(): string
+    {
+        $correo = Auth::user()->email;
+        $sistema = config('mail.from.address');
+
+        return match (true) {
+            self::conBuzonPropio() => config('services.crm_envio.remitente'),
+            Str::after($correo, '@') === Str::after($sistema, '@') => $correo,
+            default => $sistema,
+        };
     }
 
     /**
