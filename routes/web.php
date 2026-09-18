@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CrmCorreoController;
+use App\Http\Controllers\CrmRespuestaController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
@@ -118,6 +119,8 @@ Route::middleware('auth')->group(function () {
         Route::post('leads/{lead}/convertir', [LeadController::class, 'convertir'])->whereNumber('lead')->name('leads.convertir');
         Route::post('leads/{lead}/descartar', [LeadController::class, 'descartar'])->whereNumber('lead')->name('leads.descartar');
         Route::get('correos', [CrmCorreoController::class, 'index'])->name('correos');
+        Route::get('respuestas', [CrmRespuestaController::class, 'index'])->name('respuestas');
+        Route::get('respuestas/nuevas', [CrmRespuestaController::class, 'nuevas'])->name('respuestas.nuevas');
         Route::post('correos/{borrador}/prueba', [CrmCorreoController::class, 'prueba'])->whereNumber('borrador')->name('correos.prueba');
         Route::post('correos/{borrador}/enviar', [CrmCorreoController::class, 'enviar'])->whereNumber('borrador')->name('correos.enviar');
         Route::post('correos/{borrador}/enviado', [CrmCorreoController::class, 'enviado'])->whereNumber('borrador')->name('correos.enviado');

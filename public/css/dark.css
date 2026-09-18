@@ -107,6 +107,7 @@ html.dark .text-amber-700, html.dark .text-amber-800, html.dark .hover\:text-amb
 
 html.dark .border-gray-100, html.dark .border-slate-100 { border-color: var(--d-b1); }
 html.dark .border-gray-200, html.dark .border-slate-200 { border-color: var(--d-b2); }
+html.dark .border-indigo-300 { border-color: rgba(129, 140, 248, .55); }
 html.dark .border-gray-300, html.dark .border-slate-300 { border-color: var(--d-b3); }
 html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--d-b1); }
 html.dark .hover\:border-gray-300:hover, html.dark .hover\:border-gray-400:hover,

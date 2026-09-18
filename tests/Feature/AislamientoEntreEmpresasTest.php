@@ -103,7 +103,7 @@ class AislamientoEntreEmpresasTest extends TestCase
         $this->blancos['id'] = $borrado;
         $this->blancos['actividad'] = CrmActivity::create([
             'organization_id' => $org, 'lead_id' => $this->blancos['lead']->id, 'tipo' => 'llamada',
-            'descripcion' => $this->secreto('actividad'), 'programada_at' => now(),
+            'descripcion' => $this->secreto('actividad'), 'programada_at' => now(), 'mensaje_id' => 'ajeno@prueba',
         ]);
         $this->blancos['borrador'] = CrmBorrador::create([
             'organization_id' => $org, 'lead_id' => $this->blancos['lead']->id,
@@ -219,7 +219,7 @@ class AislamientoEntreEmpresasTest extends TestCase
     public function test_los_listados_y_busquedas_no_muestran_nada_ajeno(): void
     {
         $pantallas = ['/clientes', '/proveedores', '/productos', '/categorias', '/marcas', '/atributos-producto',
-            '/inventario', '/ventas', '/pos', '/crm', '/crm/tablero', '/crm/papelera', '/crm/leads/nuevo', '/crm/importar', '/crm/correos',
+            '/inventario', '/ventas', '/pos', '/crm', '/crm/tablero', '/crm/papelera', '/crm/leads/nuevo', '/crm/importar', '/crm/correos', '/crm/respuestas',
             '/equipo', '/productos/create', '/clientes?search=SECRETO', '/productos?search=SECRETO', '/inventario?search=SECRETO',
             '/crm/tablero?search=SECRETO', '/crm/papelera?search=SECRETO', '/pos/search?q=SECRETO'];
         $api = ['/api/crm/leads', '/api/crm/leads?search=SECRETO', '/api/crm/pendientes', '/api/crm/etapas', '/api/crm/resumen'];

@@ -47,6 +47,8 @@
         }
     }
 
+    $conCrm = auth()->check() && collect($nav)->flatten(1)->contains(fn ($item) => $item[1] === route('crm.pendientes'))
+        && (auth()->user()->isSuperadmin() || (auth()->user()->organization?->esPremium() && auth()->user()->organization->allowsModule('crm')));
     $activo = collect($nav)->flatten(1)->first(fn ($item) => $item[2]);
     $titulo = $activo[0] ?? null;
     $version = fn (string $archivo) => asset($archivo).'?v='.@filemtime(public_path($archivo));
@@ -120,6 +122,14 @@
             </button>
 
             <h1 class="shell-title">{{ $titulo ?? config('app.name') }}</h1>
+
+            @if ($conCrm)
+                <a href="{{ route('crm.respuestas') }}" class="shell-icon-btn shell-bell" aria-label="{{ __('Respuestas de prospectos') }}"
+                   data-respuestas="{{ route('crm.respuestas.nuevas') }}" data-respuestas-titulo="{{ __('Te contestaron un correo') }}">
+                    @include('partials.nav-icon', ['icon' => 'campana'])
+                    <span class="shell-bell-count" hidden></span>
+                </a>
+            @endif
 
             <div class="shell-toggles">
                 @include('partials.locale-toggle')

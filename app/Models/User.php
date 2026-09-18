@@ -68,6 +68,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'last_login_at' => 'datetime',
+        'respuestas_vistas_at' => 'datetime',
         'is_superadmin' => 'boolean',
         'password' => 'hashed',
         'theme' => \App\Support\Theme::class,

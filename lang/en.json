@@ -791,5 +791,11 @@
     "Prueba enviada a :correo.": "Test sent to :correo.",
     "[Prueba] :asunto": "[Test] :asunto",
     "Los correos salen de :correo.": "Emails are sent from :correo.",
-    "Los correos salen de :correo y las respuestas llegan a tu cuenta.": "Emails are sent from :correo and replies reach your account."
+    "Los correos salen de :correo y las respuestas llegan a tu cuenta.": "Emails are sent from :correo and replies reach your account.",
+    "Los correos que te contestaron. Se revisa el buzón cada 10 minutos y la campana suena cuando llega uno nuevo.": "Emails leads replied to. The inbox is checked every 10 minutes and the bell rings when a new one arrives.",
+    "Nueva": "New",
+    "Respuestas de prospectos": "Lead replies",
+    "Te contestaron un correo": "A lead replied to your email",
+    "Todavía no contesta nadie. Aquí aparecerán las respuestas en cuanto lleguen.": "No replies yet. They will show up here as soon as they arrive.",
+    "Ver ficha y contestar": "Open lead and reply"
 }

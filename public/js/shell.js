@@ -127,4 +127,65 @@
                 });
         });
     });
+
+    // Campana de respuestas de prospectos: revisa cada minuto y suena cuando
+    // llega una nueva. El navegador sólo deja sonar después de que la persona
+    // hizo clic en la página al menos una vez.
+    var campana = document.querySelector('[data-respuestas]');
+    if (campana) {
+        var contador = campana.querySelector('.shell-bell-count');
+        var tituloBase = document.title;
+        var clave = 'crm-respuesta-ultima';
+        var audio = null;
+
+        var sonar = function () {
+            try {
+                audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+                [880, 1320].forEach(function (frecuencia, i) {
+                    var osc = audio.createOscillator();
+                    var vol = audio.createGain();
+                    var inicio = audio.currentTime + i * 0.18;
+                    osc.frequency.value = frecuencia;
+                    vol.gain.setValueAtTime(0.0001, inicio);
+                    vol.gain.exponentialRampToValueAtTime(0.25, inicio + 0.02);
+                    vol.gain.exponentialRampToValueAtTime(0.0001, inicio + 0.35);
+                    osc.connect(vol).connect(audio.destination);
+                    osc.start(inicio);
+                    osc.stop(inicio + 0.4);
+                });
+            } catch (e) { /* sin audio, queda el contador */ }
+        };
+
+        var revisar = function () {
+            fetch(campana.dataset.respuestas, { headers: { 'Accept': 'application/json' } })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (datos) {
+                    if (!datos) return;
+                    contador.hidden = datos.nuevas < 1;
+                    contador.textContent = datos.nuevas > 9 ? '9+' : datos.nuevas;
+                    document.title = (datos.nuevas ? '(' + datos.nuevas + ') ' : '') + tituloBase;
+
+                    var anterior = null;
+                    try { anterior = localStorage.getItem(clave); } catch (e) {}
+                    if (anterior !== null && datos.ultima > Number(anterior) && datos.nuevas > 0) {
+                        sonar();
+                        if (window.Notification && Notification.permission === 'granted') {
+                            new Notification(campana.dataset.respuestasTitulo);
+                        }
+                    }
+                    try { localStorage.setItem(clave, String(datos.ultima)); } catch (e) {}
+                })
+                .catch(function () {});
+        };
+
+        // El primer clic en la página habilita el sonido y, si se puede, los avisos del sistema.
+        document.addEventListener('click', function habilitar() {
+            try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+            if (window.Notification && Notification.permission === 'default') Notification.requestPermission();
+            document.removeEventListener('click', habilitar);
+        });
+
+        revisar();
+        setInterval(revisar, 60000);
+    }
 })();

@@ -279,6 +279,23 @@ html.dark .pro-badge { background: rgba(245, 158, 11, .16); color: #fcd34d; }
 .shell-icon-btn:hover { background: var(--sh-raised); color: var(--sh-ink); }
 .shell-icon-btn .shell-icon { width: 1.25rem; height: 1.25rem; }
 
+.shell-bell { position: relative; }
+.shell-bell-count {
+    position: absolute;
+    top: .1rem;
+    right: .05rem;
+    min-width: 1.05rem;
+    height: 1.05rem;
+    padding: 0 .25rem;
+    border-radius: 999px;
+    background: #e11d48;
+    color: #fff;
+    font-size: .65rem;
+    font-weight: 700;
+    line-height: 1.05rem;
+    text-align: center;
+}
+
 .shell-toggles { display: none; align-items: center; gap: .5rem; }
 
 .shell-pill {
