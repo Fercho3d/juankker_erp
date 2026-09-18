@@ -2,8 +2,10 @@
 
 namespace App\Support;
 
+use App\Http\Controllers\CrmController;
 use App\Models\CrmActivity;
 use App\Models\CrmBorrador;
+use App\Models\CrmStage;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -85,5 +87,11 @@ class EnvioDeCorreos
             'proxima_accion_at' => now()->addWeekdays(3)->setTime(10, 0),
         ]));
         $borrador->update(['enviado_at' => now()]);
+
+        // Del primer paso del embudo ("Nuevo") pasa al siguiente ("Contactado").
+        [$primera, $siguiente] = CrmStage::paraOrganizacion($lead->organization_id)->take(2)->pad(2, null)->all();
+        if ($siguiente && $lead->stage_id === $primera?->id) {
+            CrmController::aplicarEtapa($lead, $siguiente, $primera->nombre);
+        }
     }
 }

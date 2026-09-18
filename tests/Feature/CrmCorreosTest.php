@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\CrmBorrador;
+use App\Models\CrmStage;
 use App\Models\Lead;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -58,6 +59,17 @@ class CrmCorreosTest extends TestCase
         $this->putJson("/api/crm/borradores/{$borrador->id}", ['cuerpo' => 'Con teléfono'])->assertOk();
 
         $this->assertSame('Con teléfono', $borrador->fresh()->cuerpo);
+    }
+
+    public function test_al_mandarlo_pasa_de_nuevo_a_contactado(): void
+    {
+        $borrador = $this->borrador();
+        [$nuevo, $contactado] = CrmStage::paraOrganizacion($this->user->organization_id)->take(2)->all();
+        $borrador->lead->update(['stage_id' => $nuevo->id]);
+
+        $this->actingAs($this->user)->post(route('crm.correos.enviado', $borrador));
+
+        $this->assertSame($contactado->id, $borrador->lead->fresh()->stage_id);
     }
 
     public function test_ya_lo_mande_lo_registra_en_la_bitacora(): void
