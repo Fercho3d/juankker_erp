@@ -31,6 +31,9 @@ return [
             https://juancker.com
             TXT,
 
+        // Buzones que no llegan a quien decide una compra.
+        'omitir_correos' => ['reclutamiento', 'rrhh', 'rh@', 'empleo', 'vacante', 'curriculum', 'bolsadetrabajo'],
+
         // Sólo a estos sectores: los demás (restaurantes, iglesias, talleres) no son perfil.
         'listas' => [
             'Construcción' => 'compras, inventario, nómina y costos por obra',

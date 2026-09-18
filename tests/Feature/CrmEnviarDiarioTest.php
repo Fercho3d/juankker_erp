@@ -53,6 +53,15 @@ class CrmEnviarDiarioTest extends TestCase
         $this->assertStringContainsString('compras, producción, inventario', CrmBorrador::where('lead_id', $lead->id)->whereNotNull('enviado_at')->value('cuerpo'));
     }
 
+    public function test_salta_los_correos_de_reclutamiento(): void
+    {
+        $lead = $this->prospecto('Reclutamiento');
+
+        $this->artisan('crm:enviar-diario');
+
+        $this->assertFalse(CrmBorrador::where('lead_id', $lead->id)->exists());
+    }
+
     public function test_no_vuelve_a_escribir_a_quien_ya_se_contacto(): void
     {
         $lead = $this->prospecto('Contactada');
