@@ -7,7 +7,6 @@ use App\Models\Lead;
 use App\Models\User;
 use App\Support\EnvioDeCorreos;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Throwable;
 
@@ -92,7 +91,7 @@ class CrmEnviarDiario extends Command
             ."\n\nEmbudo: ".route('crm.tablero');
 
         try {
-            Mail::mailer(EnvioDeCorreos::conBuzonPropio($dueno) ? 'prospeccion' : config('mail.default'))
+            EnvioDeCorreos::mailer($dueno)
                 ->raw($texto, fn ($m) => $m->from($buzon, 'ERP Juancker')->to($buzon)
                     ->subject('Envío diario: '.(count($resumen) - $fallidos).' correos a prospectos'));
         } catch (Throwable $e) {

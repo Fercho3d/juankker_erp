@@ -7,8 +7,10 @@ use App\Models\CrmActivity;
 use App\Models\CrmBorrador;
 use App\Models\CrmStage;
 use App\Models\User;
+use Illuminate\Mail\Mailer;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Throwable;
 
 /**
@@ -41,6 +43,21 @@ class EnvioDeCorreos
         };
     }
 
+    /**
+     * Cada correo abre su propia conexión: el SMTP cierra las que se quedan
+     * quietas entre un envío y otro ("421 Idle timeout").
+     */
+    public static function mailer(User $usuario): Mailer
+    {
+        $mailer = Mail::mailer(self::conBuzonPropio($usuario) ? 'prospeccion' : config('mail.default'));
+        $transporte = $mailer->getSymfonyTransport();
+        if ($transporte instanceof SmtpTransport) {
+            $transporte->stop();
+        }
+
+        return $mailer;
+    }
+
     public static function mandar(CrmBorrador $borrador, string $para, bool $conCopia, User $usuario): bool
     {
         $propio = self::conBuzonPropio($usuario);
@@ -48,7 +65,7 @@ class EnvioDeCorreos
         $nombre = $propio ? config('services.crm_envio.nombre') : $usuario->name;
 
         try {
-            Mail::mailer($propio ? 'prospeccion' : config('mail.default'))->raw($borrador->cuerpo, function ($m) use ($borrador, $para, $conCopia, $remitente, $nombre, $usuario, $propio) {
+            self::mailer($usuario)->raw($borrador->cuerpo, function ($m) use ($borrador, $para, $conCopia, $remitente, $nombre, $usuario, $propio) {
                 $m->from($remitente, $nombre)
                     ->replyTo($propio ? $remitente : $usuario->email, $nombre)
                     ->to($para)
