@@ -75,6 +75,10 @@ class CrmApiController extends Controller
             $query->pendientes();
         }
 
+        if ($request->boolean('con_web')) {
+            $query->conPresenciaWeb();
+        }
+
         if ($request->boolean('con_email')) {
             $query->whereNotNull('email');
         }
@@ -335,6 +339,7 @@ class CrmApiController extends Controller
             'nombre' => $lead->nombre,
             'empresa' => $lead->empresa,
             'email' => $lead->email,
+            'sitio_web' => $lead->sitio_web,
             'telefono' => $lead->telefono,
             'giro' => $lead->giro,
             'sector' => $lead->sector,

@@ -79,6 +79,7 @@
             <option value="">{{ __('Con o sin contacto') }}</option>
             <option value="telefono" @selected(($filtros['contacto'] ?? '') === 'telefono')>{{ __('Con teléfono') }}</option>
             <option value="email" @selected(($filtros['contacto'] ?? '') === 'email')>{{ __('Con correo') }}</option>
+            <option value="web" @selected(($filtros['contacto'] ?? '') === 'web')>{{ __('Con página web o dominio propio') }}</option>
         </select>
         @if ($veTodo && $responsables->count())
             <select name="responsable" onchange="this.form.submit()" class="px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15" aria-label="{{ __('Responsable') }}">

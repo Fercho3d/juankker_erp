@@ -53,6 +53,18 @@ class CrmEnviarDiarioTest extends TestCase
         $this->assertStringContainsString('compras, producción, inventario', CrmBorrador::where('lead_id', $lead->id)->whereNotNull('enviado_at')->value('cuerpo'));
     }
 
+    public function test_solo_escribe_a_empresas_con_pagina_o_dominio_propio(): void
+    {
+        $sinWeb = $this->prospecto('Changarro');
+        $sinWeb->update(['email' => 'changarro@gmail.com']);
+        $conWeb = $this->prospecto('Taller');
+        $conWeb->update(['email' => 'taller@hotmail.com', 'sitio_web' => 'www.taller.mx']);
+
+        $this->artisan('crm:enviar-diario');
+
+        $this->assertSame([$conWeb->id], CrmBorrador::whereIn('lead_id', [$sinWeb->id, $conWeb->id])->pluck('lead_id')->all());
+    }
+
     public function test_salta_los_correos_de_reclutamiento(): void
     {
         $lead = $this->prospecto('Reclutamiento');

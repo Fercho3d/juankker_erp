@@ -155,6 +155,10 @@
                 @if ($lead->email)
                     <a href="mailto:{{ $lead->email }}" class="text-sm text-gray-900 no-underline hover:text-indigo-600 break-all">{{ $lead->email }}</a>
                 @endif
+                @if ($lead->sitio_web)
+                    <a href="{{ \Illuminate\Support\Str::startsWith($lead->sitio_web, 'http') ? $lead->sitio_web : 'https://'.$lead->sitio_web }}" target="_blank" rel="noopener"
+                       class="text-sm text-indigo-600 no-underline hover:underline break-all">{{ $lead->sitio_web }}</a>
+                @endif
                 @if (!$lead->telefono && !$lead->email)
                     <span class="text-sm text-gray-400">{{ __('Sin datos de contacto.') }}</span>
                 @endif

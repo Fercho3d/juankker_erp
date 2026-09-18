@@ -265,6 +265,7 @@ class DenueProspectar extends Command
                 'empresa' => $n['empresa'],
                 'telefono' => $n['telefono'],
                 'email' => $n['email'],
+                'sitio_web' => $n['web'] ? mb_strtolower(mb_substr($n['web'], 0, 255)) : null,
                 'origen' => 'prospeccion',
                 'giro' => $n['giro'] ? mb_substr($n['giro'], 0, 255) : null,
                 'sector' => Lead::sectorDe($n['scian'], $n['giro']),

@@ -12,7 +12,7 @@ class Lead extends Model
 
     protected $fillable = [
         'organization_id', 'stage_id', 'owner_id', 'client_id',
-        'nombre', 'empresa', 'email', 'telefono',
+        'nombre', 'empresa', 'email', 'sitio_web', 'telefono',
         'origen', 'giro', 'sector', 'personal_min', 'municipio',
         'valor_estimado', 'valor_mensual', 'probabilidad',
         'proxima_accion', 'proxima_accion_at', 'ultimo_contacto_at',
@@ -45,6 +45,9 @@ class Lead extends Model
         'no_contactar' => 'Pidió no ser contactado',
         'otro' => 'Otro',
     ];
+
+    /** Dominios de correo gratuito: quien escribe desde uno de estos no tiene dominio propio. */
+    public const CORREOS_GRATUITOS = ['gmail', 'hotmail', 'yahoo', 'outlook', 'live', 'icloud', 'prodigy', 'msn', 'aol'];
 
     /**
      * Estratos de personal del DENUE, por su piso: el estrato "11 a 30 personas"
@@ -155,6 +158,7 @@ class Lead extends Model
             ->when($f['municipio'] ?? null, fn ($q, $v) => $q->where('municipio', $v))
             ->when(($f['contacto'] ?? null) === 'telefono', fn ($q) => $q->whereNotNull('telefono'))
             ->when(($f['contacto'] ?? null) === 'email', fn ($q) => $q->whereNotNull('email'))
+            ->when(($f['contacto'] ?? null) === 'web', fn ($q) => $q->conPresenciaWeb())
             ->when($f['responsable'] ?? null, fn ($q, $v) => $v === 'sin'
                 ? $q->whereNull('owner_id')
                 : $q->where('owner_id', (int) $v));
@@ -162,7 +166,8 @@ class Lead extends Model
 
     /**
      * Los que más conviene trabajar primero, sin gastar IA: se parecen a los que
-     * ya se ganaron, se les puede escribir o llamar y tienen tamaño y probabilidad.
+     * ya se ganaron, se les puede escribir o llamar, tienen página web o dominio
+     * propio, y tienen tamaño y probabilidad.
      */
     public function scopeMejoresPrimero($query, int $organizationId)
     {
@@ -173,11 +178,25 @@ class Lead extends Model
             ? 'CASE WHEN leads.sector IN ('.implode(',', array_fill(0, count($sectoresGanados), '?')).') THEN 3 ELSE 0 END'
             : '0';
 
+        $gratuito = implode(' OR ', array_fill(0, count(self::CORREOS_GRATUITOS), 'LOWER(leads.email) LIKE ?'));
+
         return $query->orderByRaw(
             "{$parecido} + (leads.email IS NOT NULL) * 2 + (leads.telefono IS NOT NULL)"
+            ." + (leads.sitio_web IS NOT NULL OR (leads.email IS NOT NULL AND NOT ({$gratuito}))) * 2"
             .' + (COALESCE(leads.personal_min, 0) >= 11) * 2 + COALESCE(leads.probabilidad, 0) / 25 DESC',
-            $sectoresGanados
+            [...$sectoresGanados, ...array_map(fn ($d) => "%@{$d}.%", self::CORREOS_GRATUITOS)]
         );
+    }
+
+    /**
+     * Empresas formales: tienen página web o correo con dominio propio. Suelen
+     * tener más volumen y presupuesto para un sistema.
+     */
+    public function scopeConPresenciaWeb($query)
+    {
+        return $query->where(fn ($q) => $q->whereNotNull('leads.sitio_web')
+            ->orWhere(fn ($q) => $q->whereNotNull('leads.email')
+                ->where(fn ($q) => collect(self::CORREOS_GRATUITOS)->each(fn ($d) => $q->whereRaw('LOWER(leads.email) NOT LIKE ?', ["%@{$d}.%"])))));
     }
 
     public function scopePendientes($query)

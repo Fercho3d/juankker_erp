@@ -32,6 +32,7 @@ class CrmEnviarDiario extends Command
 
         $leads = Lead::deOrganizacion($dueno->organization_id)->abiertos()
             ->whereNotNull('email')
+            ->conPresenciaWeb()
             ->whereIn('sector', array_keys($config['listas']))
             ->where(fn ($q) => collect($config['omitir_correos'])->each(fn ($p) => $q->whereRaw('LOWER(email) NOT LIKE ?', ["%{$p}%"])))
             ->whereNull('ultimo_contacto_at')
