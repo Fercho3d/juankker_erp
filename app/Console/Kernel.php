@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('crm:leer-respuestas')->everyTenMinutes()->withoutOverlapping();
+        $schedule->command('crm:enviar-diario')->weekdays()->at('09:30')->timezone('America/Mexico_City')->withoutOverlapping();
     }
 
     /**

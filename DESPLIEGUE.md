@@ -159,3 +159,17 @@ vienen de la dirección de un prospecto. Necesita:
 - El programador de Laravel en el crontab de `www-data`, como los otros sitios:
 
       * * * * * cd /var/www/erp && /usr/bin/php artisan schedule:run >> /dev/null 2>&1
+
+## Envío diario a prospectos
+
+`crm:enviar-diario` corre de lunes a viernes a las 9:30 (hora de México): toma
+los mejores prospectos nuevos con correo de los sectores de `config/crm.php`,
+les escribe con la plantilla aprobada desde el buzón propio, con 20 segundos
+entre uno y otro, y los deja en la bitácora igual que "Enviar al cliente".
+Sólo corre con el buzón propio configurado y respeta `CRM_ENVIOS_POR_DIA`.
+
+    CRM_AUTOENVIO_POR_DIA=10   # 0 lo apaga
+    CRM_AUTOENVIO_PAUSA=20     # segundos entre correos
+
+Para ver a quién le escribiría sin mandar nada:
+`sudo -u www-data php artisan crm:enviar-diario --simular`.
