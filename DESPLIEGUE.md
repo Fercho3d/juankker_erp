@@ -139,7 +139,23 @@ Para probar un envío sin abrir el sitio:
     CRM_MAIL_NOMBRE="Juan Fernando Salas · Juancker"
     CRM_ENVIOS_POR_DIA=20
 
+    CRM_IMAP_HOST=imap.migadu.com   # Buzón que revisa crm:leer-respuestas
+
 Sin `CRM_MAIL_PASSWORD` el botón "Enviar" no aparece y quedan "Abrir en mi
 correo" y "Ya lo mandé". El SDK de Anthropic (`anthropic-ai/sdk`) vive en
 `vendor/`, que el script no sube: antes de poner la llave corre
 `composer install --no-dev` en el servidor.
+
+## Respuestas de prospectos
+
+`crm:leer-respuestas` revisa cada 10 minutos el buzón de `CRM_MAIL_USERNAME`
+por IMAP (sin marcar nada como leído) y pasa a la bitácora los correos que
+vienen de la dirección de un prospecto. Necesita:
+
+- `CRM_ENVIO_ORGANIZACION`, `CRM_MAIL_USERNAME` y `CRM_MAIL_PASSWORD` en `.env`.
+  Con la contraseña puesta, el envío también pasa del mailer del sistema al
+  buzón propio.
+- `webklex/php-imap` en `vendor/`: `composer install --no-dev` en el servidor.
+- El programador de Laravel en el crontab de `www-data`, como los otros sitios:
+
+      * * * * * cd /var/www/erp && /usr/bin/php artisan schedule:run >> /dev/null 2>&1

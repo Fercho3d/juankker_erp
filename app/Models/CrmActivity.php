@@ -11,7 +11,7 @@ class CrmActivity extends Model
 
     protected $fillable = [
         'organization_id', 'lead_id', 'user_id',
-        'tipo', 'descripcion', 'programada_at', 'completada_at',
+        'tipo', 'descripcion', 'mensaje_id', 'programada_at', 'completada_at',
     ];
 
     protected $casts = [
