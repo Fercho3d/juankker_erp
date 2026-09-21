@@ -39,7 +39,7 @@ class DenueProspectar extends Command
 
     public function handle(): int
     {
-        $token = $this->option('token') ?: env('DENUE_TOKEN');
+        $token = $this->option('token') ?: config('services.denue.token');
 
         if (! $token) {
             $this->error('Falta el token del DENUE.');

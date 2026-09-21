@@ -47,6 +47,16 @@ return [
         'imap_host' => env('CRM_IMAP_HOST', 'imap.migadu.com'),
     ],
 
+    // Aviso interno cuando una empresa se registra en el ERP.
+    'avisos' => [
+        'registro' => env('ADMIN_NOTIFY_EMAIL'),
+    ],
+
+    // API del DENUE (INEGI) para los comandos de prospección.
+    'denue' => [
+        'token' => env('DENUE_TOKEN'),
+    ],
+
     'turnstile' => [
         'site' => env('TURNSTILE_SITE_KEY'),
         'secret' => env('TURNSTILE_SECRET'),

@@ -19,17 +19,23 @@ class NuevoRegistroMail extends Mailable implements ShouldQueue
     }
 
     /**
-     * Notifica al admin interno silenciando errores de envío.
+     * Notifica al admin interno. Un fallo de envío no debe tumbar el registro,
+     * pero sí queda en el log para enterarse.
+     *
+     * Se lee de config y no de env(): con la configuración cacheada, env()
+     * devuelve null fuera de config/ y el aviso se iba al remitente no-reply.
      */
     public static function notificar(User $user, Organization $organization): void
     {
-        $to = env('ADMIN_NOTIFY_EMAIL', config('mail.from.address'));
+        $to = config('services.avisos.registro');
 
         if (empty($to)) {
+            logger()->warning('Registro sin aviso: falta ADMIN_NOTIFY_EMAIL.', ['organization_id' => $organization->id]);
+
             return;
         }
 
-        rescue(fn () => Mail::to($to)->send(new self($user, $organization)), null, false);
+        rescue(fn () => Mail::to($to)->send(new self($user, $organization)), null, true);
     }
 
     public function build()
