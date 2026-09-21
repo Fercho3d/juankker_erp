@@ -49,6 +49,41 @@ class CrmRespuestasTest extends TestCase
         $this->assertFalse($this->registrar($this->lead(), 'alguien@desconocido.test'));
     }
 
+    private function contactado(string $email): Lead
+    {
+        $org = User::find(1)->organization_id;
+
+        return Lead::create([
+            'organization_id' => $org, 'stage_id' => CrmStage::paraOrganizacion($org)->first()->id,
+            'nombre' => 'Prueba', 'empresa' => 'Prueba', 'email' => $email, 'origen' => 'otro',
+            'probabilidad' => 10, 'ultimo_contacto_at' => now()->subDay(),
+        ]);
+    }
+
+    public function test_si_contesta_otra_persona_de_la_misma_empresa_se_reconoce_por_dominio(): void
+    {
+        $lead = $this->contactado('ventas@empresa-prueba.test');
+
+        $this->assertTrue($this->registrar($lead, 'gerente@empresa-prueba.test', 'msg-dominio@prueba'));
+        $this->assertDatabaseHas('crm_activities', ['lead_id' => $lead->id, 'mensaje_id' => 'msg-dominio@prueba']);
+        $this->assertStringContainsString('(desde gerente@empresa-prueba.test)', CrmActivity::where('mensaje_id', 'msg-dominio@prueba')->value('descripcion'));
+    }
+
+    public function test_un_dominio_de_correo_personal_no_identifica_a_la_empresa(): void
+    {
+        $lead = $this->contactado('taller@gmail.com');
+
+        $this->assertFalse($this->registrar($lead, 'otra-persona@gmail.com', 'msg-gmail@prueba'));
+    }
+
+    public function test_el_dominio_solo_cuenta_si_el_prospecto_ya_fue_contactado(): void
+    {
+        $lead = $this->contactado('ventas@nunca-contactado.test');
+        $lead->update(['ultimo_contacto_at' => null]);
+
+        $this->assertFalse($this->registrar($lead, 'gerente@nunca-contactado.test', 'msg-nunca@prueba'));
+    }
+
     public function test_un_prospecto_de_otra_empresa_no_se_toca(): void
     {
         $otra = 4;
