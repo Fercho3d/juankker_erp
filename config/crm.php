@@ -45,4 +45,45 @@ return [
             'Transporte' => 'gastos por unidad, cuentas por cobrar y facturación CFDI 4.0',
         ],
     ],
+
+    /*
+    | Seguimiento automático (`crm:seguimiento`) a quien recibió el primer correo
+    | y no contestó: sale en el mismo hilo, corto y con una sola pregunta. Se
+    | detiene si el prospecto responde, cambia de etapa o alguien lo atiende.
+    */
+    'seguimiento' => [
+        'por_dia' => (int) env('CRM_SEGUIMIENTO_POR_DIA', 10),
+
+        // Días desde el primer correo para cada toque.
+        'dias' => [2 => 3, 3 => 7],
+
+        'cuerpos' => [
+            2 => <<<'TXT'
+                Buen día:
+
+                Le escribí hace unos días sobre cómo llevan :lista en su empresa. Sé que el correo se pierde entre lo urgente, así que lo subo de nuevo.
+
+                Una sola pregunta: ¿hoy eso lo llevan en Excel o ya con algún sistema?
+
+                Con esa respuesta le digo en dos líneas si le conviene o no lo que hago, sin compromiso.
+
+                Saludos,
+                Juan Fernando Salas
+                Juancker · Software a la medida
+                Tel. 449 932 6936
+                TXT,
+            3 => <<<'TXT'
+                Buen día:
+
+                Último correo de mi parte, no quiero ser insistente.
+
+                Si en algún momento el control de :lista se vuelve un dolor de cabeza, aquí estoy: un mensaje a este correo o al 449 932 6936 y lo platicamos.
+
+                Que tenga buena semana.
+
+                Juan Fernando Salas
+                Juancker · Software a la medida
+                TXT,
+        ],
+    ],
 ];

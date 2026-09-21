@@ -17,6 +17,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('crm:enviar-diario')
             ->days([Schedule::MONDAY, Schedule::TUESDAY, Schedule::WEDNESDAY, Schedule::THURSDAY, Schedule::FRIDAY, Schedule::SATURDAY])
             ->at('09:30')->timezone('America/Mexico_City')->withoutOverlapping();
+        // Después del envío del día: segundo y tercer correo a quien no contestó.
+        $schedule->command('crm:seguimiento')
+            ->days([Schedule::MONDAY, Schedule::TUESDAY, Schedule::WEDNESDAY, Schedule::THURSDAY, Schedule::FRIDAY, Schedule::SATURDAY])
+            ->at('09:45')->timezone('America/Mexico_City')->withoutOverlapping();
     }
 
     /**

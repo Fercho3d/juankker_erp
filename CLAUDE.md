@@ -48,6 +48,11 @@ organización, y las rutas se protegen con `premium:<modulo>`.
 - **Prospección:** `denue:prospectar` (API del INEGI, requiere `DENUE_TOKEN`) y
   `denue:csv` (archivos descargados, sin token).
 - `Lead.client_id` enlaza al `Client` del ERP cuando el prospecto se gana.
+- **Secuencia de correo:** `crm:enviar-diario` (09:30) manda el primer correo;
+  `crm:seguimiento` (09:45) el segundo a los 3 días y el tercero a los 7, en el
+  mismo hilo (`crm_borradores.toque`, `message_id`, `responde_a`). Se detiene si
+  el prospecto contesta, cambia de etapa o alguien registra una actividad.
+  Ambos comparten el tope `CRM_ENVIOS_POR_DIA`; `--simular` no manda nada.
 
 Al agregar un módulo nuevo: dale su clave en `plans.modules` y en
 `Role::MODULOS`, protege sus rutas con `premium:<clave>` **y** `acceso:<clave>`, y

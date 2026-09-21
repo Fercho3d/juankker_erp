@@ -12,7 +12,7 @@ class CrmBorrador extends Model
 {
     protected $table = 'crm_borradores';
 
-    protected $fillable = ['organization_id', 'lead_id', 'user_id', 'asunto', 'cuerpo', 'enviado_at'];
+    protected $fillable = ['organization_id', 'lead_id', 'user_id', 'asunto', 'cuerpo', 'toque', 'message_id', 'responde_a', 'enviado_at'];
 
     protected $casts = ['enviado_at' => 'datetime'];
 

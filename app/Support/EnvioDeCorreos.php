@@ -66,6 +66,7 @@ class EnvioDeCorreos
 
         try {
             self::mailer($usuario)->raw($borrador->cuerpo, function ($m) use ($borrador, $para, $conCopia, $remitente, $nombre, $usuario, $propio) {
+                $borrador->message_id = SeguimientoDeProspectos::encabezadosDeHilo($m, $borrador, $remitente);
                 $m->from($remitente, $nombre)
                     ->replyTo($propio ? $remitente : $usuario->email, $nombre)
                     ->to($para)
@@ -78,6 +79,10 @@ class EnvioDeCorreos
             report($e);
 
             return false;
+        }
+
+        if ($borrador->exists && $borrador->isDirty('message_id')) {
+            $borrador->save();
         }
 
         return true;
