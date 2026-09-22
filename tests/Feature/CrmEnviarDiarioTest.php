@@ -87,6 +87,16 @@ class CrmEnviarDiarioTest extends TestCase
         $this->assertStringContainsString('Resumida', $resumen?->getTextBody() ?? '');
     }
 
+    public function test_saluda_al_equipo_por_el_nombre_de_su_empresa(): void
+    {
+        $lead = $this->prospecto('Fabrica');
+        $lead->update(['empresa' => 'ACEROS DEL NORTE S.A. DE C.V.']);
+
+        $this->artisan('crm:enviar-diario');
+
+        $this->assertStringStartsWith('Buen día, equipo Aceros del Norte:', CrmBorrador::where('lead_id', $lead->id)->value('cuerpo'));
+    }
+
     public function test_no_vuelve_a_escribir_a_quien_ya_se_contacto(): void
     {
         $lead = $this->prospecto('Contactada');

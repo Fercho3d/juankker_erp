@@ -227,6 +227,22 @@ class Lead extends Model
             && ! $this->proxima_accion_at->isToday();
     }
 
+    /**
+     * Nombre de la empresa como se escribe en un saludo: el DENUE lo trae en
+     * mayúsculas y con razón social ("REAL DE ACEROS SUR S.A. DE C.V.").
+     */
+    public function nombreParaSaludo(): string
+    {
+        $menores = ['de', 'del', 'y', 'e', 'en', 'para', 'por', 'con'];
+        $nombre = preg_replace('/[,\s]+S\.?\s?A\.?(\s+DE\s+C\.?\s?V\.?)?\s*$/iu', '', trim($this->empresa ?: $this->nombre));
+
+        return collect(preg_split('/\s+/u', $nombre))->map(fn ($palabra, $i) => match (true) {
+            $i > 0 && in_array(mb_strtolower($palabra), $menores) => mb_strtolower($palabra),
+            ! preg_match('/[aeiouáéíóú]/iu', $palabra) => mb_strtoupper($palabra),
+            default => mb_convert_case(mb_strtolower($palabra), MB_CASE_TITLE),
+        })->implode(' ');
+    }
+
     /** "11 a 30", o null si el lead no viene del DENUE. */
     public function rangoPersonal(): ?string
     {

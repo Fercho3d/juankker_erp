@@ -3,7 +3,8 @@
 /*
 | Envío diario automático a prospectos (`crm:enviar-diario`). Sólo corre para
 | la organización dueña del buzón (`CRM_ENVIO_ORGANIZACION`) y con la plantilla
-| aprobada; `:lista` se reemplaza según el sector del prospecto.
+| aprobada; `:lista` se reemplaza según el sector del prospecto y `:empresa`
+| con su nombre como va en un saludo.
 */
 
 return [
@@ -14,20 +15,20 @@ return [
         'asunto' => 'Juancker · Desarrollo de software a la medida',
 
         'cuerpo' => <<<'TXT'
-            Buen día:
+            Buen día, equipo :empresa:
 
-            Le escribo de Juancker, soluciones de software para empresas, aquí en Aguascalientes.
+            Soy Fernando Salas, ingeniero en programación; actualmente estoy liderando mi empresa Juancker.
 
-            ¿La administración y el papeleo los llevan con hojas de Excel, o ya trabajan con algún sistema?
+            Desarrollamos sistemas que concentran :lista en un solo lugar, ya sea partiendo de un ERP que tenemos en producción o construyéndolos a la medida de su forma de trabajar. La idea es automatizar su operación para que el equipo deje de capturar lo mismo dos veces.
 
-            Desarrollo sistemas que llevan :lista en un mismo lugar, a la medida o partiendo de un ERP que ya tengo en producción. La idea es automatizar su operación para que el equipo deje de capturar lo mismo dos veces.
+            Al estar aquí mismo en Aguascalientes, la atención es directa y en persona.
 
-            Si quiere verlo funcionando, puede crear su cuenta y probar mi ERP 30 días sin costo y sin tarjeta: https://erp.juancker.com/register
+            Me gustaría agendar una reunión breve, en sus oficinas o en línea, para conocer cómo trabajan hoy y ver en qué les podemos ayudar.
 
-            Si le interesa, puede contactarme: le dejo mis datos más abajo.
+            Quedo atento a sus comentarios.
 
             Saludos,
-            Juan Fernando Salas
+            Fernando Salas
             Juancker · Software a la medida
             Tel. 449 932 6936 · contacto@juancker.com
             https://juancker.com
@@ -59,29 +60,29 @@ return [
 
         'cuerpos' => [
             2 => <<<'TXT'
-                Buen día:
+                Buen día, equipo :empresa:
 
-                Le escribí hace unos días sobre cómo llevan :lista en su empresa. Sé que el correo se pierde entre lo urgente, así que lo subo de nuevo.
+                Les escribí hace unos días para presentarme: soy Fernando Salas, de Juancker, y desarrollamos sistemas que concentran :lista en un solo lugar.
 
-                Una sola pregunta: ¿hoy eso lo llevan en Excel o ya con algún sistema?
+                Sé que el correo se pierde entre lo urgente, por eso lo retomo. ¿Tendrían un espacio para una reunión breve, en persona o en línea, en los próximos días?
 
-                Con esa respuesta le digo en dos líneas si le conviene o no lo que hago, sin compromiso.
+                Quedo atento a sus comentarios.
 
                 Saludos,
-                Juan Fernando Salas
+                Fernando Salas
                 Juancker · Software a la medida
                 Tel. 449 932 6936
                 TXT,
             3 => <<<'TXT'
-                Buen día:
+                Buen día, equipo :empresa:
 
-                Último correo de mi parte, no quiero ser insistente.
+                Este es mi último correo, no quiero ser insistente.
 
-                Si en algún momento el control de :lista se vuelve un dolor de cabeza, aquí estoy: un mensaje a este correo o al 449 932 6936 y lo platicamos.
+                Si más adelante necesitan ordenar :lista, con gusto los visito: basta con responder este correo o llamar al 449 932 6936.
 
-                Que tenga buena semana.
+                Que tengan buena semana.
 
-                Juan Fernando Salas
+                Fernando Salas
                 Juancker · Software a la medida
                 TXT,
         ],

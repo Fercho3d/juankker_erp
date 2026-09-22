@@ -5,7 +5,6 @@ namespace App\Support;
 use App\Models\CrmActivity;
 use App\Models\CrmBorrador;
 use App\Models\CrmStage;
-use App\Models\Lead;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -70,7 +69,7 @@ class SeguimientoDeProspectos
             'lead_id' => $lead->id,
             'user_id' => $userId,
             'asunto' => Str::startsWith($primero->asunto, 'Re: ') ? $primero->asunto : 'Re: '.$primero->asunto,
-            'cuerpo' => str_replace(':lista', $lista, config("crm.seguimiento.cuerpos.$toque")),
+            'cuerpo' => strtr(config("crm.seguimiento.cuerpos.$toque"), [':lista' => $lista, ':empresa' => $lead->nombreParaSaludo()]),
             'toque' => $toque,
             'responde_a' => $ultimo?->message_id,
         ]);

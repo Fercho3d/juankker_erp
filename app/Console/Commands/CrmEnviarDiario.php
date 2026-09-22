@@ -59,7 +59,7 @@ class CrmEnviarDiario extends Command
                 'lead_id' => $lead->id,
                 'user_id' => $dueno->id,
                 'asunto' => $config['asunto'],
-                'cuerpo' => str_replace(':lista', $config['listas'][$lead->sector], $config['cuerpo']),
+                'cuerpo' => strtr($config['cuerpo'], [':lista' => $config['listas'][$lead->sector], ':empresa' => $lead->nombreParaSaludo()]),
             ]);
             // Si falla se queda en la bandeja para mandarlo a mano.
             $enviado = EnvioDeCorreos::mandar($borrador, strtolower($lead->email), true, $dueno);
