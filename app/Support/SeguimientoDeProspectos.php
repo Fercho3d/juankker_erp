@@ -40,7 +40,7 @@ class SeguimientoDeProspectos
             // Un toque que se quedó sin enviar (SMTP caído, plan vencido) se reintenta.
             ->whereNotExists(fn ($q) => $q->from('crm_borradores as s')
                 ->whereColumn('s.lead_id', 'crm_borradores.lead_id')->where('s.toque', $toque)->whereNotNull('s.enviado_at'))
-            ->whereHas('lead', fn ($q) => $q->where('stage_id', $contactado->id)->whereNotNull('email'))
+            ->whereHas('lead', fn ($q) => $q->where('stage_id', $contactado->id)->conCorreoValido())
             ->with('lead')
             ->orderBy('enviado_at')
             ->get()

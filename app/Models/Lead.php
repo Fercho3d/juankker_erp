@@ -119,6 +119,16 @@ class Lead extends Model
             && (! $user->veSoloSusProspectos() || $this->owner_id === $user->id);
     }
 
+    /**
+     * Correos con forma válida (usuario@dominio.tld). Los importados con la
+     * dirección rota rebotan en el SMTP y gastan un lugar del cupo diario.
+     */
+    public function scopeConCorreoValido($query)
+    {
+        return $query->whereNotNull('email')
+            ->where('email', 'regexp', '^[^@[:space:]]+@[^@.[:space:]]+(\\.[^@.[:space:]]+)+$');
+    }
+
     public function scopeAbiertos($query)
     {
         return $query->whereHas('stage', function ($q) {

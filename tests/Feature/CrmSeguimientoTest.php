@@ -100,6 +100,15 @@ class CrmSeguimientoTest extends TestCase
         $this->travelBack();
     }
 
+    public function test_un_correo_sin_dominio_no_entra_a_la_secuencia(): void
+    {
+        $roto = $this->contactadoHace(3, 'alguien@.com.mx');
+        $bueno = $this->contactadoHace(3, 'alguien@empresa.com.mx');
+
+        $this->assertNotContains($roto->lead_id, $this->candidatos(2));
+        $this->assertContains($bueno->lead_id, $this->candidatos(2));
+    }
+
     public function test_si_el_prospecto_contesto_se_detiene(): void
     {
         $primero = $this->contactadoHace(3);
