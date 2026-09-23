@@ -17,7 +17,7 @@ return [
         'cuerpo' => <<<'TXT'
             Buen día, equipo :empresa:
 
-            Soy Fernando Salas, ingeniero en programación; actualmente estoy liderando mi empresa Juancker.
+            Soy Fernando Salas, desarrollador de software; actualmente estoy liderando mi empresa Juancker.
 
             Desarrollamos sistemas que concentran :lista en un solo lugar, ya sea partiendo de un ERP que tenemos en producción o construyéndolos a la medida de su forma de trabajar. La idea es automatizar su operación para que el equipo deje de capturar lo mismo dos veces.
 
