@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Support\EnvioDeCorreos;
 use App\Support\SeguimientoDeProspectos;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\RateLimiter;
 
 class CrmSeguimiento extends Command
 {
@@ -52,7 +51,7 @@ class CrmSeguimiento extends Command
     /** false sólo cuando se llegó al tope diario compartido con el envío inicial. */
     private function mandar($primero, int $toque, User $dueno): bool
     {
-        if (! RateLimiter::attempt('crm-envio:'.$dueno->organization_id, (int) config('services.crm_envio.por_dia'), fn () => true, 86400)) {
+        if (! EnvioDeCorreos::cupoDelDia($dueno->organization_id)) {
             $this->warn('Se llegó al tope diario de envíos.');
 
             return false;

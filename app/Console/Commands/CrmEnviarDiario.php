@@ -7,7 +7,6 @@ use App\Models\Lead;
 use App\Models\User;
 use App\Support\EnvioDeCorreos;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\RateLimiter;
 use Throwable;
 
 class CrmEnviarDiario extends Command
@@ -49,7 +48,7 @@ class CrmEnviarDiario extends Command
             if ($this->option('simular')) {
                 continue;
             }
-            if (! RateLimiter::attempt('crm-envio:'.$lead->organization_id, (int) config('services.crm_envio.por_dia'), fn () => true, 86400)) {
+            if (! EnvioDeCorreos::cupoDelDia($lead->organization_id)) {
                 $this->warn('Se llegó al tope diario de envíos.');
                 break;
             }

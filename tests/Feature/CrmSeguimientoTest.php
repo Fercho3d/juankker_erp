@@ -75,6 +75,31 @@ class CrmSeguimientoTest extends TestCase
         $this->assertNotContains($primero->lead_id, $this->candidatos(2));
     }
 
+    public function test_un_toque_que_no_salio_se_reintenta_sin_duplicarlo(): void
+    {
+        $primero = $this->contactadoHace(3);
+        $fallido = SeguimientoDeProspectos::preparar($primero, 2, 1); // quedó con enviado_at null
+
+        $this->assertContains($primero->lead_id, $this->candidatos(2));
+        $this->assertSame($fallido->id, SeguimientoDeProspectos::preparar($primero, 2, 1)->id);
+        $this->assertSame(1, CrmBorrador::where('lead_id', $primero->lead_id)->where('toque', 2)->count());
+    }
+
+    public function test_el_cupo_diario_cuenta_por_dia_calendario_y_no_por_ventana_de_24_horas(): void
+    {
+        config(['services.crm_envio.por_dia' => 1]);
+        \Illuminate\Support\Facades\RateLimiter::clear('crm-envio:'.$this->org.':'.now('America/Mexico_City')->toDateString());
+
+        $this->assertTrue(\App\Support\EnvioDeCorreos::cupoDelDia($this->org));
+        $this->assertFalse(\App\Support\EnvioDeCorreos::cupoDelDia($this->org), 'el segundo intento del día debe rebotar');
+
+        // Mañana es otra clave: el cupo lleno de hoy no bloquea el envío de mañana.
+        $this->travelTo(now()->addDay());
+        $this->assertTrue(\App\Support\EnvioDeCorreos::cupoDelDia($this->org));
+        \Illuminate\Support\Facades\RateLimiter::clear('crm-envio:'.$this->org.':'.now('America/Mexico_City')->toDateString());
+        $this->travelBack();
+    }
+
     public function test_si_el_prospecto_contesto_se_detiene(): void
     {
         $primero = $this->contactadoHace(3);

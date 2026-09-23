@@ -9,6 +9,7 @@ use App\Models\CrmStage;
 use App\Models\User;
 use Illuminate\Mail\Mailer;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Throwable;
@@ -56,6 +57,20 @@ class EnvioDeCorreos
         }
 
         return $mailer;
+    }
+
+    /**
+     * Toma un lugar del cupo diario de envíos (`CRM_ENVIOS_POR_DIA`), que
+     * comparten el envío diario, el seguimiento y la bandeja. Cuenta por día
+     * calendario en hora de México: con una ventana de 24 h, el cupo lleno de
+     * ayer a las 9:30 seguía vigente hoy a las 9:30 y bloqueaba el envío.
+     */
+    public static function cupoDelDia(int $organizationId): bool
+    {
+        $hoy = now('America/Mexico_City');
+        $clave = 'crm-envio:'.$organizationId.':'.$hoy->toDateString();
+
+        return RateLimiter::attempt($clave, (int) config('services.crm_envio.por_dia'), fn () => true, $hoy->secondsUntilEndOfDay() + 60);
     }
 
     public static function mandar(CrmBorrador $borrador, string $para, bool $conCopia, User $usuario): bool

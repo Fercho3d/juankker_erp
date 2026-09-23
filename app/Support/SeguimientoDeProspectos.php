@@ -37,8 +37,9 @@ class SeguimientoDeProspectos
         return CrmBorrador::where('organization_id', $organizationId)
             ->where('toque', 1)
             ->where('enviado_at', '<=', now()->subDays($dias))
+            // Un toque que se quedó sin enviar (SMTP caído, plan vencido) se reintenta.
             ->whereNotExists(fn ($q) => $q->from('crm_borradores as s')
-                ->whereColumn('s.lead_id', 'crm_borradores.lead_id')->where('s.toque', $toque))
+                ->whereColumn('s.lead_id', 'crm_borradores.lead_id')->where('s.toque', $toque)->whereNotNull('s.enviado_at'))
             ->whereHas('lead', fn ($q) => $q->where('stage_id', $contactado->id)->whereNotNull('email'))
             ->with('lead')
             ->orderBy('enviado_at')
@@ -64,15 +65,17 @@ class SeguimientoDeProspectos
         $lista = config('crm.envio_diario.listas')[$lead->sector] ?? 'la administración';
         $ultimo = CrmBorrador::where('lead_id', $lead->id)->whereNotNull('message_id')->latest('enviado_at')->first();
 
-        return CrmBorrador::create([
+        // Si el toque ya existe sin enviar, se reutiliza en vez de duplicarlo.
+        $borrador = CrmBorrador::firstOrNew(['lead_id' => $lead->id, 'toque' => $toque]);
+        $borrador->fill([
             'organization_id' => $lead->organization_id,
-            'lead_id' => $lead->id,
             'user_id' => $userId,
             'asunto' => Str::startsWith($primero->asunto, 'Re: ') ? $primero->asunto : 'Re: '.$primero->asunto,
             'cuerpo' => strtr(config("crm.seguimiento.cuerpos.$toque"), [':lista' => $lista, ':empresa' => $lead->nombreParaSaludo()]),
-            'toque' => $toque,
             'responde_a' => $ultimo?->message_id,
-        ]);
+        ])->save();
+
+        return $borrador;
     }
 
     /**

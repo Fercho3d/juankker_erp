@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\CrmBorrador;
 use App\Support\EnvioDeCorreos;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\RateLimiter;
 
 /**
  * Bandeja de correos preparados para prospectos.
@@ -27,12 +26,11 @@ class CrmCorreoController extends Controller
     public function enviar(CrmBorrador $borrador)
     {
         $lead = $this->autorizar($borrador)->lead;
-        $cupo = 'crm-envio:'.$borrador->organization_id;
 
         if (! $lead->email) {
             abort(403);
         }
-        if (! RateLimiter::attempt($cupo, (int) config('services.crm_envio.por_dia'), fn () => true, 86400)) {
+        if (! EnvioDeCorreos::cupoDelDia($borrador->organization_id)) {
             return back()->withErrors(['envio' => __('Ya se mandaron los correos de hoy. Mañana hay más.')]);
         }
 
