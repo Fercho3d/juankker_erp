@@ -73,22 +73,24 @@ class EnvioDeCorreos
         return RateLimiter::attempt($clave, (int) config('services.crm_envio.por_dia'), fn () => true, $hoy->secondsUntilEndOfDay() + 60);
     }
 
-    public static function mandar(CrmBorrador $borrador, string $para, bool $conCopia, User $usuario): bool
+    /**
+     * Sin copia al buzón propio: gastaba un lugar del cupo por cada correo. El
+     * correo completo queda en la bitácora del prospecto y el resumen del día
+     * llega por `avisarResumen`. Con `$definitivo` en false sale como prueba.
+     */
+    public static function mandar(CrmBorrador $borrador, string $para, bool $definitivo, User $usuario): bool
     {
         $propio = self::conBuzonPropio($usuario);
         $remitente = self::remitente($usuario);
         $nombre = $propio ? config('services.crm_envio.nombre') : $usuario->name;
 
         try {
-            self::mailer($usuario)->raw($borrador->cuerpo, function ($m) use ($borrador, $para, $conCopia, $remitente, $nombre, $usuario, $propio) {
+            self::mailer($usuario)->raw($borrador->cuerpo, function ($m) use ($borrador, $para, $definitivo, $remitente, $nombre, $usuario, $propio) {
                 $borrador->message_id = SeguimientoDeProspectos::encabezadosDeHilo($m, $borrador, $remitente);
                 $m->from($remitente, $nombre)
                     ->replyTo($propio ? $remitente : $usuario->email, $nombre)
                     ->to($para)
-                    ->subject($conCopia ? $borrador->asunto : __('[Prueba] :asunto', ['asunto' => $borrador->asunto]));
-                if ($conCopia) {
-                    $m->bcc($propio ? $remitente : $usuario->email);
-                }
+                    ->subject($definitivo ? $borrador->asunto : __('[Prueba] :asunto', ['asunto' => $borrador->asunto]));
             });
         } catch (Throwable $e) {
             report($e);
@@ -101,6 +103,26 @@ class EnvioDeCorreos
         }
 
         return true;
+    }
+
+    /**
+     * Resumen al buzón de la empresa de lo que salió en un envío automático:
+     * a quién se le escribió y qué falló.
+     */
+    public static function avisarResumen(User $dueno, string $titulo, string $intro, array $lineas): void
+    {
+        $buzon = self::remitente($dueno);
+        $fallidos = count(array_filter($lineas, fn ($l) => str_starts_with($l, '✗')));
+        $texto = $intro."\n\n".implode("\n\n", $lineas)
+            .($fallidos ? "\n\n✗ = no se pudo enviar; quedó en ".route('crm.correos').' para mandarlo a mano.' : '')
+            ."\n\nEmbudo: ".route('crm.tablero');
+
+        try {
+            self::mailer($dueno)->raw($texto, fn ($m) => $m->from($buzon, 'ERP Juancker')->to($buzon)
+                ->subject($titulo.': '.(count($lineas) - $fallidos).' correos a prospectos'));
+        } catch (Throwable $e) {
+            report($e);
+        }
     }
 
     /**

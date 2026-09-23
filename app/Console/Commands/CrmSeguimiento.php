@@ -13,6 +13,9 @@ class CrmSeguimiento extends Command
 
     protected $description = 'Manda el segundo y tercer correo, en el mismo hilo, a los prospectos que no contestaron';
 
+    /** Lo que salió hoy, para el resumen al buzón de la empresa. */
+    private array $resumen = [];
+
     public function handle(): int
     {
         $dueno = User::where('organization_id', (int) config('services.crm_envio.organizacion'))
@@ -43,6 +46,10 @@ class CrmSeguimiento extends Command
             }
         }
 
+        if ($this->resumen) {
+            EnvioDeCorreos::avisarResumen($dueno, 'Seguimiento', 'Hoy salieron estos seguimientos a prospectos que no habían contestado:', $this->resumen);
+        }
+
         $this->info($this->option('simular') ? 'Simulación terminada.' : "Seguimientos enviados: {$enviados}.");
 
         return self::SUCCESS;
@@ -59,9 +66,12 @@ class CrmSeguimiento extends Command
 
         $borrador = SeguimientoDeProspectos::preparar($primero, $toque, $dueno->id);
         // Si falla queda en la bandeja, igual que el envío diario.
-        if (EnvioDeCorreos::mandar($borrador, strtolower($primero->lead->email), true, $dueno)) {
+        $enviado = EnvioDeCorreos::mandar($borrador, strtolower($primero->lead->email), true, $dueno);
+        if ($enviado) {
             EnvioDeCorreos::registrarEnviado($borrador, $dueno);
         }
+        $this->resumen[] = ($enviado ? '✓ ' : '✗ ')."toque {$toque} · {$primero->lead->empresa}\n  "
+            .strtolower($primero->lead->email)."\n  ".route('crm.leads.show', $primero->lead);
 
         return true;
     }

@@ -52,7 +52,9 @@ organización, y las rutas se protegen con `premium:<modulo>`.
   `crm:seguimiento` (09:45) el segundo a los 3 días y el tercero a los 7, en el
   mismo hilo (`crm_borradores.toque`, `message_id`, `responde_a`). Se detiene si
   el prospecto contesta, cambia de etapa o alguien registra una actividad.
-  Ambos comparten el tope `CRM_ENVIOS_POR_DIA`; `--simular` no manda nada.
+  Ambos comparten el tope `CRM_ENVIOS_POR_DIA` y mandan un resumen al buzón
+  de la empresa; no se manda copia de cada correo (gasta cupo), el texto
+  completo queda en la bitácora del prospecto. `--simular` no manda nada.
 
 Al agregar un módulo nuevo: dale su clave en `plans.modules` y en
 `Role::MODULOS`, protege sus rutas con `premium:<clave>` **y** `acceso:<clave>`, y
