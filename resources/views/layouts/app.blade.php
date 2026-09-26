@@ -27,6 +27,7 @@
                 [__('Proveedores'), 'proveedores.index', ['proveedores.*'], 'camion', false, 'proveedores'],
             ],
             __('Contabilidad') => [
+                [__('Resumen'), 'finanzas.index', ['finanzas.*'], 'grafica', false, 'contabilidad'],
                 [__('Facturas'), 'facturas.index', ['facturas.index', 'facturas.show', 'facturas.create', 'facturas.edit'], 'factura', false, 'contabilidad'],
                 [__('Declaraciones'), 'declaraciones.index', ['declaraciones.*', 'facturas.reporte-*'], 'calculadora', false, 'contabilidad'],
                 [__('Descarga SAT'), 'sat.index', ['sat.*'], 'descarga', false, 'contabilidad'],

@@ -197,6 +197,7 @@ Route::middleware('auth')->group(function () {
         Route::get('reportes/anual', [App\Http\Controllers\FacturaController::class, 'reporteAnual'])->name('facturas.reporte-anual');
         Route::post('reportes/declaracion', [App\Http\Controllers\FacturaController::class, 'guardarDeclaracion'])->name('facturas.declaracion.guardar');
 
+        Route::get('finanzas', [App\Http\Controllers\FinanzasController::class, 'index'])->name('finanzas.index');
         Route::get('declaraciones', [App\Http\Controllers\DeclaracionController::class, 'index'])->name('declaraciones.index');
         Route::get('declaraciones/hoja', [App\Http\Controllers\DeclaracionController::class, 'hoja'])->name('declaraciones.hoja');
         Route::post('declaraciones', [App\Http\Controllers\DeclaracionController::class, 'guardar'])->name('declaraciones.guardar');

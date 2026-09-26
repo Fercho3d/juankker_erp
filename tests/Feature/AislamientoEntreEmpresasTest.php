@@ -236,7 +236,7 @@ class AislamientoEntreEmpresasTest extends TestCase
             '/inventario', '/ventas', '/pos', '/crm', '/crm/tablero', '/crm/papelera', '/crm/leads/nuevo', '/crm/importar', '/crm/correos', '/crm/respuestas',
             '/equipo', '/productos/create', '/clientes?search=SECRETO', '/productos?search=SECRETO', '/inventario?search=SECRETO',
             '/crm/tablero?search=SECRETO', '/crm/papelera?search=SECRETO', '/pos/search?q=SECRETO',
-            '/facturas', '/facturas?search=SECRETO', '/reportes/mensual', '/reportes/anual', '/sat/descarga', '/declaraciones'];
+            '/facturas', '/facturas?search=SECRETO', '/reportes/mensual', '/reportes/anual', '/sat/descarga', '/declaraciones', '/finanzas'];
         $api = ['/api/crm/leads', '/api/crm/leads?search=SECRETO', '/api/crm/pendientes', '/api/crm/etapas', '/api/crm/resumen'];
 
         $fugas = [];
