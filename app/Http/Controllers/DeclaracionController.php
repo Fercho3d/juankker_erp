@@ -24,7 +24,7 @@ class DeclaracionController extends Controller
             $periodos[] = $this->periodo($h['año'], $h['mes'], $h, $declaraciones->get($clave));
             if ($h['mes'] === 12) {
                 $delAño = array_filter($hojas, fn ($x) => $x['año'] === $h['año']);
-                $anual = array_map(fn ($k) => array_sum(array_column($delAño, $k)), array_flip(array_keys($h)));
+                $anual = array_combine(array_keys($h), array_map(fn ($k) => array_sum(array_column($delAño, $k)), array_keys($h)));
                 $periodos[] = $this->periodo($h['año'], null, $anual, $declaraciones->get($h['año'].'-0'));
             }
         }
@@ -153,7 +153,7 @@ class DeclaracionController extends Controller
 
     private function periodo(int $año, ?int $mes, array $totales, ?Declaracion $declaracion): array
     {
-        return $totales + [
+        return [
             'año' => $año,
             'mes' => $mes,
             'declaracion' => $declaracion,
@@ -162,6 +162,6 @@ class DeclaracionController extends Controller
                 (bool) $declaracion?->omitida_sat => 'omitida',
                 default => 'por_presentar',
             },
-        ];
+        ] + $totales;
     }
 }

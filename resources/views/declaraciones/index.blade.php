@@ -7,7 +7,7 @@
 @php
     $meses = [1 => 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     $nombre = fn ($p) => $p['mes'] ? $meses[$p['mes']].' '.$p['año'] : 'Anual '.$p['año'];
-    $dinero = fn ($n) => ($n < 0 ? '-$' : '$').number_format(abs($n), 2);
+    $dinero = fn ($n) => ($n < 0 ? '-$' : '$').number_format(abs($n));
     $badges = [
         'presentada' => ['Presentada', 'bg-sky-50 text-sky-700 border-sky-200'],
         'omitida' => ['Omitida SAT', 'bg-red-50 text-red-700 border-red-200'],
@@ -16,7 +16,7 @@
 @endphp
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+<div class="w-full px-4 sm:px-6 py-6">
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Declaraciones</h1>
@@ -83,15 +83,14 @@
             <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
                 <tr>
                     <th class="text-left px-4 py-3">Periodo</th>
-                    <th class="text-right px-3 py-3">Ingresos</th>
-                    <th class="text-right px-3 py-3">Gastos</th>
-                    <th class="text-right px-3 py-3">ISR a pagar</th>
-                    <th class="text-right px-3 py-3" title="Ya descuenta el saldo a favor de meses anteriores">IVA a pagar</th>
-                    <th class="text-right px-3 py-3" title="Estimada con el INPC más reciente; el SAT la calcula al día en que presentas">Actualización</th>
-                    <th class="text-right px-3 py-3">Total a pagar</th>
-                    <th class="text-left px-3 py-3">Estado</th>
-                    <th class="text-left px-3 py-3">Archivos</th>
-                    <th class="px-3 py-3"></th>
+                    <th class="text-right px-2 py-3">Ingresos</th>
+                    <th class="text-right px-2 py-3">Gastos</th>
+                    <th class="text-right px-2 py-3">ISR a pagar</th>
+                    <th class="text-right px-2 py-3" title="Ya descuenta el saldo a favor de meses anteriores">IVA a pagar</th>
+                    <th class="text-right px-2 py-3" title="Estimada con el INPC más reciente; el SAT la calcula al día en que presentas">Actualización</th>
+                    <th class="text-right px-2 py-3">Total a pagar</th>
+                    <th class="text-left px-2 py-3">Estado</th>
+                    <th class="px-2 py-3"></th>
                 </tr>
             </thead>
             <tbody>
@@ -109,16 +108,16 @@
                     @endphp
                     <tr id="p-{{ $p['año'] }}-{{ $p['mes'] ?? 0 }}"
                         class="border-t border-gray-100 {{ $p['mes'] ? '' : 'bg-indigo-50/60 font-semibold' }} {{ $esSiguiente ? 'ring-2 ring-inset ring-indigo-400' : '' }}">
-                        <td class="px-4 py-2.5 whitespace-nowrap text-gray-900">{{ $nombre($p) }}</td>
-                        <td class="px-3 py-2.5 text-right tabular-nums text-emerald-700">{{ $dinero($p['ingresos_periodo']) }}</td>
-                        <td class="px-3 py-2.5 text-right tabular-nums text-amber-700">{{ $dinero($p['gastos_periodo']) }}</td>
-                        <td class="px-3 py-2.5 text-right tabular-nums">{{ $dinero($p['isr_cargo']) }}</td>
-                        <td class="px-3 py-2.5 text-right tabular-nums" title="{{ $p['iva_neto'] < 0 ? 'Saldo a favor del mes: '.$dinero(-$p['iva_neto']) : '' }}">
+                        <td class="px-3 py-2 whitespace-nowrap text-gray-900">{{ $nombre($p) }}</td>
+                        <td class="px-2 py-2 text-right tabular-nums text-emerald-700">{{ $dinero($p['ingresos_periodo']) }}</td>
+                        <td class="px-2 py-2 text-right tabular-nums text-amber-700">{{ $dinero($p['gastos_periodo']) }}</td>
+                        <td class="px-2 py-2 text-right tabular-nums">{{ $dinero($p['isr_cargo']) }}</td>
+                        <td class="px-2 py-2 text-right tabular-nums" title="{{ $p['iva_neto'] < 0 ? 'Saldo a favor del mes: '.$dinero(-$p['iva_neto']) : '' }}">
                             {{ $dinero($p['iva_cargo']) }}@if($p['mes'] && $p['iva_neto'] < 0)<span class="text-emerald-700 text-xs"> (a favor)</span>@endif
                         </td>
-                        <td class="px-3 py-2.5 text-right tabular-nums text-gray-500">{{ $p['actualizacion'] ? $dinero($p['actualizacion']) : '—' }}</td>
-                        <td class="px-3 py-2.5 text-right tabular-nums font-semibold text-gray-900">{{ $dinero($p['isr_cargo'] + $p['iva_cargo'] + $p['actualizacion']) }}</td>
-                        <td class="px-3 py-2.5 whitespace-nowrap">
+                        <td class="px-2 py-2 text-right tabular-nums text-gray-500">{{ $p['actualizacion'] ? $dinero($p['actualizacion']) : '—' }}</td>
+                        <td class="px-2 py-2 text-right tabular-nums font-semibold text-gray-900">{{ $dinero($p['isr_cargo'] + $p['iva_cargo'] + $p['actualizacion']) }}</td>
+                        <td class="px-2 py-2"><div class="flex flex-wrap gap-1">
                             <span class="inline-block px-2 py-0.5 text-xs font-semibold border rounded-full {{ $clase }}" title="{{ $d?->notas }}">
                                 {{ $etiqueta }}{{ $d?->fecha_presentacion ? ' '.$d->fecha_presentacion->format('d/m/Y') : '' }}
                             </span>
@@ -127,16 +126,15 @@
                             @elseif($p['estado'] === 'presentada')
                                 <span class="inline-block px-2 py-0.5 text-xs font-semibold border rounded-full bg-red-50 text-red-700 border-red-200">Sin pagar</span>
                             @endif
-                        </td>
-                        <td class="px-3 py-2.5 whitespace-nowrap text-xs">
-                            @if($d?->acuse_path)
-                                <a href="{{ route('declaraciones.archivo', [$d, 'acuse']) }}" target="_blank" class="text-indigo-600 hover:underline">Acuse</a>
+                            </div>
+                            @if($d?->acuse_path || $d?->pago_path)
+                                <div class="text-xs mt-1">
+                                    @if($d->acuse_path)<a href="{{ route('declaraciones.archivo', [$d, 'acuse']) }}" target="_blank" class="text-indigo-600 hover:underline">Acuse</a>@endif
+                                    @if($d->pago_path)<a href="{{ route('declaraciones.archivo', [$d, 'pago']) }}" target="_blank" class="text-indigo-600 hover:underline ml-2">Pago</a>@endif
+                                </div>
                             @endif
-                            @if($d?->pago_path)
-                                <a href="{{ route('declaraciones.archivo', [$d, 'pago']) }}" target="_blank" class="text-indigo-600 hover:underline ml-2">Pago</a>
-                            @endif
                         </td>
-                        <td class="px-3 py-2.5 whitespace-nowrap text-right">
+                        <td class="px-2 py-2 whitespace-nowrap text-right">
                             @if($p['mes'])
                                 <a href="{{ route('declaraciones.hoja', ['año' => $p['año'], 'mes' => $p['mes']]) }}"
                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-50 mr-1">Hoja SAT</a>
@@ -151,25 +149,25 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="10" class="px-4 py-10 text-center text-gray-400">No hay periodos con este filtro.</td></tr>
+                    <tr><td colspan="9" class="px-4 py-10 text-center text-gray-400">No hay periodos con este filtro.</td></tr>
                 @endforelse
             </tbody>
             @php
                 // Sólo meses: las filas anuales ya son la suma de sus meses
                 $meses_ = collect($periodos)->whereNotNull('mes');
-                $pendientes = $meses_->where('estado', '!=', 'presentada');
+                $pendientes = $meses_->reject(fn ($p) => $p['declaracion']?->isPagada());
             @endphp
             @if($meses_->isNotEmpty())
                 <tfoot class="border-t-2 border-gray-200 bg-gray-50 font-semibold">
                     <tr>
                         <td class="px-4 py-3 text-gray-900">Total ({{ $meses_->count() }} meses)</td>
-                        <td class="px-3 py-3 text-right tabular-nums text-emerald-700">{{ $dinero($meses_->sum('ingresos_periodo')) }}</td>
-                        <td class="px-3 py-3 text-right tabular-nums text-amber-700">{{ $dinero($meses_->sum('gastos_periodo')) }}</td>
-                        <td class="px-3 py-3 text-right tabular-nums">{{ $dinero($meses_->sum('isr_cargo')) }}</td>
-                        <td class="px-3 py-3 text-right tabular-nums">{{ $dinero($meses_->sum('iva_cargo')) }}</td>
-                        <td class="px-3 py-3 text-right tabular-nums text-gray-500">{{ $dinero($meses_->sum('actualizacion')) }}</td>
-                        <td class="px-3 py-3 text-right tabular-nums text-gray-900">{{ $dinero($meses_->sum('isr_cargo') + $meses_->sum('iva_cargo') + $meses_->sum('actualizacion')) }}</td>
-                        <td colspan="3"></td>
+                        <td class="px-2 py-3 text-right tabular-nums text-emerald-700">{{ $dinero($meses_->sum('ingresos_periodo')) }}</td>
+                        <td class="px-2 py-3 text-right tabular-nums text-amber-700">{{ $dinero($meses_->sum('gastos_periodo')) }}</td>
+                        <td class="px-2 py-3 text-right tabular-nums">{{ $dinero($meses_->sum('isr_cargo')) }}</td>
+                        <td class="px-2 py-3 text-right tabular-nums">{{ $dinero($meses_->sum('iva_cargo')) }}</td>
+                        <td class="px-2 py-3 text-right tabular-nums text-gray-500">{{ $dinero($meses_->sum('actualizacion')) }}</td>
+                        <td class="px-2 py-3 text-right tabular-nums text-gray-900">{{ $dinero($meses_->sum('isr_cargo') + $meses_->sum('iva_cargo') + $meses_->sum('actualizacion')) }}</td>
+                        <td colspan="2"></td>
                     </tr>
                     @if($pendientes->count() !== $meses_->count())
                         <tr class="text-red-700">
@@ -179,10 +177,10 @@
                             <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('iva_cargo')) }}</td>
                             <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('actualizacion')) }}</td>
                             <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('isr_cargo') + $pendientes->sum('iva_cargo') + $pendientes->sum('actualizacion')) }}</td>
-                            <td colspan="3"></td>
+                            <td colspan="2"></td>
                         </tr>
                     @endif
-                    <tr><td colspan="10" class="px-4 py-2 text-xs font-normal text-gray-500">Actualización estimada con el INPC de {{ \Illuminate\Support\Str::of(array_key_last(config('inpc'))) }}; el SAT la calcula al día en que presentas. No incluye recargos: en 2024 y anteriores se perdonan con el estímulo de regularización; en 2025 y 2026 sí se pagan.</td></tr>
+                    <tr><td colspan="9" class="px-4 py-2 text-xs font-normal text-gray-500">Actualización estimada con el INPC de {{ \Illuminate\Support\Str::of(array_key_last(config('inpc'))) }}; el SAT la calcula al día en que presentas. No incluye recargos: en 2024 y anteriores se perdonan con el estímulo de regularización; en 2025 y 2026 sí se pagan.</td></tr>
                 </tfoot>
             @endif
         </table>
