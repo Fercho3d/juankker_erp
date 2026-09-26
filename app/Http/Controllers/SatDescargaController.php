@@ -472,7 +472,7 @@ class SatDescargaController extends Controller
 
                 Factura::create(array_merge($datos, [
                     'tipo_factura' => $solicitud->tipo_factura,
-                    'es_deducible' => true,
+                    'es_deducible' => ! Factura::noDeducibleEnElMes($datos['uso_cfdi'] ?? null),
                     'xml_path' => $xmlPath,
                     'user_id' => $solicitud->user_id,
                 ]));

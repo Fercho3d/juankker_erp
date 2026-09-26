@@ -45,6 +45,15 @@ class Factura extends Model
         };
     }
 
+    /**
+     * Usos de CFDI que no son gasto de la actividad: S01 no tiene efectos fiscales y los D
+     * (médicos, colegiaturas, etc.) son deducciones personales que van sólo en la anual.
+     */
+    public static function noDeducibleEnElMes(?string $usoCfdi): bool
+    {
+        return $usoCfdi === 'S01' || str_starts_with((string) $usoCfdi, 'D');
+    }
+
     // Nombres de meses en español
     public static function nombreMes(int $mes): string
     {

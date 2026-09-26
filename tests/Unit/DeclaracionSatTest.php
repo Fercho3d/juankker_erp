@@ -25,4 +25,9 @@ class DeclaracionSatTest extends TestCase
 
         $this->assertSame(300.0, (float) $hojas['2022-2']['iva_cargo']);
     }
+
+    public function test_s01_y_deducciones_personales_no_son_gasto_del_mes(): void
+    {
+        $this->assertSame([true, true, false], array_map([\App\Models\Factura::class, 'noDeducibleEnElMes'], ['S01', 'D01', 'G03']));
+    }
 }
