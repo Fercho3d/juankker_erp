@@ -21,6 +21,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('crm:seguimiento')
             ->days([Schedule::MONDAY, Schedule::TUESDAY, Schedule::WEDNESDAY, Schedule::THURSDAY, Schedule::FRIDAY, Schedule::SATURDAY])
             ->at('09:45')->timezone('America/Mexico_City')->withoutOverlapping();
+        // Aviso de líneas de captura por vencer de declaraciones presentadas sin pagar
+        $schedule->command('declaraciones:avisar-vencimientos')->dailyAt('08:00')->timezone('America/Mexico_City');
     }
 
     /**
