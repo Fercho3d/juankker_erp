@@ -12,7 +12,7 @@ class Declaracion extends Model
         'user_id', 'año', 'mes',
         'iva_pagado', 'isr_pagado',
         'fecha_presentacion', 'fecha_pago',
-        'notas',
+        'notas', 'omitida_sat',
     ];
 
     protected $casts = [
@@ -20,6 +20,7 @@ class Declaracion extends Model
         'fecha_pago' => 'date',
         'iva_pagado' => 'decimal:2',
         'isr_pagado' => 'decimal:2',
+        'omitida_sat' => 'boolean',
     ];
 
     public function isPresentada(): bool

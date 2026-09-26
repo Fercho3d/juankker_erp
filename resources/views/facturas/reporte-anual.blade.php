@@ -131,13 +131,17 @@
                         @endif
                     </td>
                     <td style="padding:.55rem .6rem;text-align:center;">
-                        @if($hayDatos)
                         @php $decl = $declaraciones[$m] ?? null; @endphp
+                        @if($hayDatos || $decl)
                         <div style="display:flex;gap:.25rem;justify-content:center;flex-wrap:wrap;">
                             @if($decl?->isPresentada())
                                 <span style="background:#dcfce7;color:#166534;padding:.15rem .4rem;border-radius:9999px;font-size:.62rem;font-weight:700;" title="Presentada {{ $decl->fecha_presentacion->format('d/m/Y') }}">✓ Pres.</span>
                             @else
+                                @if($decl?->omitida_sat)
+                                <span style="background:#fee2e2;color:#991b1b;padding:.15rem .4rem;border-radius:9999px;font-size:.62rem;font-weight:700;" title="{{ $decl->notas }}">Omitida SAT</span>
+                                @else
                                 <span style="background:#fef3c7;color:#92400e;padding:.15rem .4rem;border-radius:9999px;font-size:.62rem;">Pendiente</span>
+                                @endif
                             @endif
                             @if($decl?->isPagada())
                                 <span style="background:#dcfce7;color:#166534;padding:.15rem .4rem;border-radius:9999px;font-size:.62rem;font-weight:700;" title="Pagada {{ $decl->fecha_pago->format('d/m/Y') }}">✓ Pagada</span>
@@ -186,6 +190,9 @@
                 @if($declAnual?->isPresentada())
                     <span style="background:#dcfce7;color:#166534;padding:.2rem .6rem;border-radius:9999px;font-size:.7rem;font-weight:700;">✓ Presentada {{ $declAnual->fecha_presentacion->format('d/m/Y') }}</span>
                 @else
+                    @if($declAnual?->omitida_sat)
+                    <span style="background:#fee2e2;color:#991b1b;padding:.2rem .6rem;border-radius:9999px;font-size:.7rem;font-weight:700;" title="{{ $declAnual->notas }}">⚠ Omitida ante el SAT</span>
+                    @endif
                     <span style="background:#fef3c7;color:#92400e;padding:.2rem .6rem;border-radius:9999px;font-size:.7rem;font-weight:600;">Pendiente de presentar (abril {{ $año + 1 }})</span>
                 @endif
                 @if($declAnual?->isPagada())

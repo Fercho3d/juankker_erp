@@ -244,6 +244,9 @@
                 @if($declaracion?->isPresentada())
                     <span style="background:#dcfce7;color:#166534;padding:.2rem .6rem;border-radius:9999px;font-size:.7rem;font-weight:700;">✓ Presentada {{ $declaracion->fecha_presentacion->format('d/m/Y') }}</span>
                 @else
+                    @if($declaracion?->omitida_sat)
+                    <span style="background:#fee2e2;color:#991b1b;padding:.2rem .6rem;border-radius:9999px;font-size:.7rem;font-weight:700;" title="{{ $declaracion->notas }}">⚠ Omitida ante el SAT</span>
+                    @endif
                     <span style="background:#fef3c7;color:#92400e;padding:.2rem .6rem;border-radius:9999px;font-size:.7rem;font-weight:600;">Pendiente de presentar</span>
                 @endif
                 @if($declaracion?->isPagada())
