@@ -73,6 +73,16 @@
         </div>
     @endif
 
+    @if($h['año'] <= 2024 && ! $presentada)
+        <div class="px-4 py-3 mb-5 text-sm text-indigo-900 bg-indigo-50 border border-indigo-200 rounded-xl">
+            <strong>Regularización Fiscal 2026: no pagues recargos de este mes.</strong>
+            En «Determinación de pago», a «¿Tienes estímulos por aplicar?» responde <strong>Sí</strong>, elige
+            <strong>«Estímulo de regularización fiscal»</strong> y captura como monto los recargos (y la multa, si la hay).
+            Pagas sólo el impuesto actualizado. Aplica a 2024 y anteriores, a más tardar el 31 de diciembre de 2026
+            (art. Vigésimo Segundo Transitorio LIF 2026, regla 9.2.5 RMF).
+        </div>
+    @endif
+
     <div class="grid grid-cols-2 gap-3 mb-6">
         <div class="bg-white border border-gray-200 rounded-xl p-4">
             <div class="text-xs text-gray-500">ISR a pagar</div>
