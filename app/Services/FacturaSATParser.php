@@ -146,32 +146,23 @@ class FacturaSATParser
         $ivaRetenido = 0.0;
         $isrRetenido = 0.0;
 
-        // Atributo TotalImpuestosTrasladados en nodo Impuestos
-        $totalAttr = $xml->xpath('//*[local-name()="Impuestos"]/@TotalImpuestosTrasladados');
-        if ($totalAttr) {
-            $ivaTrasladado = (float) $totalAttr[0];
-        }
+        // Sólo el resumen de Impuestos del comprobante: los de cada concepto repiten los mismos
+        // importes y sumar ambos duplicaba el IVA y las retenciones. Sin resumen, se suman los conceptos.
+        $nodos = $xml->xpath('/*/*[local-name()="Impuestos"]') ?: $xml->xpath('//*[local-name()="Concepto"]/*[local-name()="Impuestos"]');
 
-        // Traslados detallados (IVA = impuesto 002)
-        $traslados = $xml->xpath('//*[local-name()="Traslado"]');
-        if ($traslados) {
-            $ivaTrasladado = 0.0;
-            foreach ($traslados as $t) {
+        foreach ($nodos as $impuestos) {
+            foreach ($impuestos->xpath('*[local-name()="Traslados"]/*[local-name()="Traslado"]') as $t) {
                 if ((string) ($t['Impuesto'] ?? '') === '002') {
                     $ivaTrasladado += (float) ($t['Importe'] ?? 0);
                 }
             }
-        }
-
-        // Retenciones
-        foreach ($xml->xpath('//*[local-name()="Retencion"]') as $r) {
-            $imp = (string) ($r['Impuesto'] ?? '');
-            $importe = (float) ($r['Importe'] ?? 0);
-            if ($imp === '001') {
-                $isrRetenido += $importe;
-            }
-            if ($imp === '002') {
-                $ivaRetenido += $importe;
+            foreach ($impuestos->xpath('*[local-name()="Retenciones"]/*[local-name()="Retencion"]') as $r) {
+                $importe = (float) ($r['Importe'] ?? 0);
+                match ((string) ($r['Impuesto'] ?? '')) {
+                    '001' => $isrRetenido += $importe,
+                    '002' => $ivaRetenido += $importe,
+                    default => null,
+                };
             }
         }
 

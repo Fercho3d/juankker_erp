@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Declaracion;
+use App\Services\DeclaracionSat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,27 +17,15 @@ class DeclaracionController extends Controller
 {
     public function index(Request $request)
     {
-        $totales = $this->totalesPorMes();
-        $declaraciones = Declaracion::where('user_id', Auth::id())->get()
-            ->keyBy(fn ($d) => $d->año.'-'.($d->mes ?? 0));
-
-        $primerAño = min($totales->keys()->map(fn ($k) => (int) $k)->min() ?? now()->year,
-            $declaraciones->min('año') ?? now()->year);
-        $ultimoMes = now()->subMonth();
+        [$hojas, $declaraciones] = $this->hojas();
 
         $periodos = [];
-        for ($año = $primerAño; $año <= $ultimoMes->year; $año++) {
-            $mesFinal = $año === $ultimoMes->year ? $ultimoMes->month : 12;
-            $anual = ['ingresos' => 0, 'gastos' => 0, 'iva' => 0];
-            for ($mes = 1; $mes <= $mesFinal; $mes++) {
-                $t = $totales->get("$año-$mes", ['ingresos' => 0, 'gastos' => 0, 'iva' => 0]);
-                $periodos[] = $this->periodo($año, $mes, $t, $declaraciones->get("$año-$mes"));
-                foreach ($anual as $k => $v) {
-                    $anual[$k] = $v + $t[$k];
-                }
-            }
-            if ($año < now()->year) {
-                $periodos[] = $this->periodo($año, null, $anual, $declaraciones->get("$año-0"));
+        foreach ($hojas as $clave => $h) {
+            $periodos[] = $this->periodo($h['año'], $h['mes'], $h, $declaraciones->get($clave));
+            if ($h['mes'] === 12) {
+                $delAño = array_filter($hojas, fn ($x) => $x['año'] === $h['año']);
+                $anual = array_map(fn ($k) => array_sum(array_column($delAño, $k)), array_flip(array_keys($h)));
+                $periodos[] = $this->periodo($h['año'], null, $anual, $declaraciones->get($h['año'].'-0'));
             }
         }
 
@@ -52,6 +41,24 @@ class DeclaracionController extends Controller
         }
 
         return view('declaraciones.index', compact('periodos', 'siguiente', 'conteo', 'años'));
+    }
+
+    /** Los campos del formulario del SAT de un mes, en el orden en que los pide. */
+    public function hoja(Request $request)
+    {
+        [$hojas, $declaraciones] = $this->hojas();
+        $clave = (int) $request->año.'-'.(int) $request->mes;
+        abort_unless(isset($hojas[$clave]), 404);
+
+        $claves = array_keys($hojas);
+        $i = array_search($clave, $claves, true);
+
+        return view('declaraciones.hoja', [
+            'h' => $hojas[$clave],
+            'declaracion' => $declaraciones->get($clave),
+            'anterior' => $hojas[$claves[$i - 1] ?? ''] ?? null,
+            'siguiente' => $hojas[$claves[$i + 1] ?? ''] ?? null,
+        ]);
     }
 
     public function guardar(Request $request)
@@ -104,23 +111,35 @@ class DeclaracionController extends Controller
         return Storage::disk('local')->response($path);
     }
 
-    /** Ingresos, gastos deducibles e IVA neto por "año-mes"; las notas de crédito (E) restan. */
-    private function totalesPorMes()
+    /** Hojas SAT de todos los meses hasta el mes pasado, y las declaraciones por "año-mes" (0 = anual). */
+    private function hojas(): array
     {
-        return DB::table('facturas')
+        $totales = DB::table('facturas')
             ->where('user_id', Auth::id())
             ->where('tipo_comprobante', '!=', 'P')
             ->where(fn ($q) => $q->where('tipo_factura', 'emitida')->orWhere('es_deducible', true))
             ->selectRaw("año, mes,
                 SUM(CASE WHEN tipo_factura = 'emitida' THEN s * (subtotal - descuento) ELSE 0 END) ingresos,
                 SUM(CASE WHEN tipo_factura = 'recibida' THEN s * (subtotal - descuento) ELSE 0 END) gastos,
-                SUM(CASE WHEN tipo_factura = 'emitida' THEN s * (iva_trasladado - iva_retenido) ELSE -s * iva_trasladado END) iva")
+                SUM(CASE WHEN tipo_factura = 'emitida' THEN s * iva_trasladado ELSE 0 END) iva_trasladado,
+                SUM(CASE WHEN tipo_factura = 'emitida' THEN s * iva_retenido ELSE 0 END) iva_retenido,
+                SUM(CASE WHEN tipo_factura = 'recibida' THEN s * iva_trasladado ELSE 0 END) iva_acreditable,
+                SUM(CASE WHEN tipo_factura = 'emitida' THEN s * isr_retenido ELSE 0 END) isr_retenido")
             ->fromSub(DB::table('facturas')->selectRaw("*, CASE WHEN tipo_comprobante = 'E' THEN -1 ELSE 1 END s"), 'facturas')
             ->groupBy('año', 'mes')
             ->get()
-            ->mapWithKeys(fn ($r) => ["{$r->año}-{$r->mes}" => [
-                'ingresos' => (float) $r->ingresos, 'gastos' => (float) $r->gastos, 'iva' => (float) $r->iva,
-            ]]);
+            ->mapWithKeys(fn ($r) => ["{$r->año}-{$r->mes}" => array_map('floatval', array_diff_key((array) $r, ['año' => 0, 'mes' => 0]))]);
+
+        $declaraciones = Declaracion::where('user_id', Auth::id())->get()
+            ->keyBy(fn ($d) => $d->año.'-'.($d->mes ?? 0));
+        // Lo ya presentado manda sobre lo calculado para los pagos provisionales siguientes
+        $declarado = $declaraciones->filter(fn ($d) => $d->isPresentada())
+            ->map(fn ($d) => ['isr' => (float) $d->isr_pagado, 'iva' => (float) $d->iva_pagado])->all();
+
+        $primerAño = min($totales->keys()->map(fn ($k) => (int) $k)->min() ?? now()->year, $declaraciones->min('año') ?? now()->year);
+        $hasta = now()->subMonth();
+
+        return [DeclaracionSat::hojas($totales->all(), $declarado, $primerAño, $hasta->year, $hasta->month), $declaraciones];
     }
 
     private function periodo(int $año, ?int $mes, array $totales, ?Declaracion $declaracion): array

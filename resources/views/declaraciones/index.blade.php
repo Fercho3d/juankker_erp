@@ -78,8 +78,8 @@
                     <th class="text-left px-4 py-3">Periodo</th>
                     <th class="text-right px-3 py-3">Ingresos</th>
                     <th class="text-right px-3 py-3">Gastos</th>
-                    <th class="text-right px-3 py-3">Utilidad</th>
-                    <th class="text-right px-3 py-3" title="Positivo: a pagar. Negativo: a favor.">IVA</th>
+                    <th class="text-right px-3 py-3">ISR a pagar</th>
+                    <th class="text-right px-3 py-3" title="Ya descuenta el saldo a favor de meses anteriores">IVA a pagar</th>
                     <th class="text-left px-3 py-3">Estado</th>
                     <th class="text-left px-3 py-3">Archivos</th>
                     <th class="px-3 py-3"></th>
@@ -94,16 +94,19 @@
                         $datos = [
                             'año' => $p['año'], 'mes' => $p['mes'], 'titulo' => $nombre($p),
                             'fecha_presentacion' => $d?->fecha_presentacion?->format('Y-m-d'), 'fecha_pago' => $d?->fecha_pago?->format('Y-m-d'),
-                            'iva_pagado' => $d?->iva_pagado, 'isr_pagado' => $d?->isr_pagado, 'notas' => $d?->notas,
+                            'isr_pagado' => $d?->isPresentada() ? $d->isr_pagado : $p['isr_cargo'],
+                            'iva_pagado' => $d?->isPresentada() ? $d->iva_pagado : $p['iva_cargo'], 'notas' => $d?->notas,
                         ];
                     @endphp
                     <tr id="p-{{ $p['año'] }}-{{ $p['mes'] ?? 0 }}"
                         class="border-t border-gray-100 {{ $p['mes'] ? '' : 'bg-indigo-50/60 font-semibold' }} {{ $esSiguiente ? 'ring-2 ring-inset ring-indigo-400' : '' }}">
                         <td class="px-4 py-2.5 whitespace-nowrap text-gray-900">{{ $nombre($p) }}</td>
-                        <td class="px-3 py-2.5 text-right tabular-nums text-emerald-700">{{ $dinero($p['ingresos']) }}</td>
-                        <td class="px-3 py-2.5 text-right tabular-nums text-amber-700">{{ $dinero($p['gastos']) }}</td>
-                        <td class="px-3 py-2.5 text-right tabular-nums">{{ $dinero($p['ingresos'] - $p['gastos']) }}</td>
-                        <td class="px-3 py-2.5 text-right tabular-nums {{ $p['iva'] < 0 ? 'text-emerald-700' : 'text-gray-900' }}">{{ $dinero($p['iva']) }}</td>
+                        <td class="px-3 py-2.5 text-right tabular-nums text-emerald-700">{{ $dinero($p['ingresos_periodo']) }}</td>
+                        <td class="px-3 py-2.5 text-right tabular-nums text-amber-700">{{ $dinero($p['gastos_periodo']) }}</td>
+                        <td class="px-3 py-2.5 text-right tabular-nums">{{ $dinero($p['isr_cargo']) }}</td>
+                        <td class="px-3 py-2.5 text-right tabular-nums" title="{{ $p['iva_neto'] < 0 ? 'Saldo a favor del mes: '.$dinero(-$p['iva_neto']) : '' }}">
+                            {{ $dinero($p['iva_cargo']) }}@if($p['mes'] && $p['iva_neto'] < 0)<span class="text-emerald-700 text-xs"> (a favor)</span>@endif
+                        </td>
                         <td class="px-3 py-2.5 whitespace-nowrap">
                             <span class="inline-block px-2 py-0.5 text-xs font-semibold border rounded-full {{ $clase }}" title="{{ $d?->notas }}">
                                 {{ $etiqueta }}{{ $d?->fecha_presentacion ? ' '.$d->fecha_presentacion->format('d/m/Y') : '' }}
@@ -121,8 +124,12 @@
                             @endif
                         </td>
                         <td class="px-3 py-2.5 whitespace-nowrap text-right">
-                            <a href="{{ $p['mes'] ? route('facturas.reporte-mensual', ['año' => $p['año'], 'mes' => $p['mes']]) : route('facturas.reporte-anual', ['año' => $p['año']]) }}"
-                               class="text-xs text-gray-500 hover:text-gray-900 mr-2">Detalle</a>
+                            @if($p['mes'])
+                                <a href="{{ route('declaraciones.hoja', ['año' => $p['año'], 'mes' => $p['mes']]) }}"
+                                   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-50 mr-1">Hoja SAT</a>
+                            @else
+                                <a href="{{ route('facturas.reporte-anual', ['año' => $p['año']]) }}" class="text-xs text-gray-500 hover:text-gray-900 mr-2">Detalle</a>
+                            @endif
                             <button type="button"
                                     class="px-3 py-1.5 text-xs font-semibold rounded-lg {{ $p['estado'] === 'presentada' ? 'border border-gray-200 text-gray-600' : 'bg-indigo-600 text-white hover:bg-indigo-700' }}"
                                     onclick='abrirDeclaracion(@json($datos))'>
@@ -136,7 +143,7 @@
             </tbody>
         </table>
     </div>
-    <p class="text-xs text-gray-400 mt-3">Montos calculados con tus facturas del SAT (sin complementos de pago; las notas de crédito restan). El ISR depende de tu régimen: revísalo en el detalle o con tu contador.</p>
+    <p class="text-xs text-gray-400 mt-3">Montos calculados con tus facturas del SAT (sin complementos de pago; las notas de crédito restan), régimen de Actividad Empresarial y Profesional. El ISR es el pago provisional acumulado del año; en las filas anuales es la suma de los pagos provisionales.</p>
 </div>
 
 {{-- Registrar presentación y pago --}}
