@@ -26,6 +26,11 @@
                 [__('Clientes'), 'clientes.index', ['clientes.*'], 'usuarios', false, 'clientes'],
                 [__('Proveedores'), 'proveedores.index', ['proveedores.*'], 'camion', false, 'proveedores'],
             ],
+            __('Contabilidad') => [
+                [__('Facturas'), 'facturas.index', ['facturas.index', 'facturas.show', 'facturas.create', 'facturas.edit'], 'factura', false, 'contabilidad'],
+                [__('Declaraciones'), 'facturas.reporte-mensual', ['facturas.reporte-*'], 'calculadora', false, 'contabilidad'],
+                [__('Descarga SAT'), 'sat.index', ['sat.*'], 'descarga', false, 'contabilidad'],
+            ],
             __('Cuenta') => [
                 [__('Equipo'), 'team.index', ['team.*'], 'equipo', false, 'equipo'],
                 $u->isSuperadmin()

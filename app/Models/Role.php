@@ -27,6 +27,7 @@ class Role extends Model
         'inventario' => 'Inventario',
         'clientes' => 'Clientes',
         'proveedores' => 'Proveedores',
+        'contabilidad' => 'Contabilidad: facturas SAT y declaraciones',
         'equipo' => 'Equipo y perfiles',
         'plan' => 'Plan y facturación',
     ];

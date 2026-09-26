@@ -87,6 +87,7 @@ class User extends Authenticatable
         'inventario' => 'inventario.index',
         'clientes' => 'clientes.index',
         'proveedores' => 'proveedores.index',
+        'contabilidad' => 'facturas.index',
     ];
 
     public function role()

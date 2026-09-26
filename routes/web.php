@@ -185,6 +185,27 @@ Route::middleware('auth')->group(function () {
     // Inventory
     Route::resource('inventario', App\Http\Controllers\InventoryController::class)->only(['index', 'update'])->middleware('acceso:inventario');
     }); // fin grupo premium (POS, ventas, inventario)
+
+    // Contabilidad: facturas del SAT, descarga masiva y declaraciones
+    Route::middleware('acceso:contabilidad')->group(function () {
+        Route::resource('facturas', App\Http\Controllers\FacturaController::class);
+        Route::get('facturas/{factura}/descargar/{tipo}', [App\Http\Controllers\FacturaController::class, 'descargar'])
+            ->name('facturas.descargar')->where('tipo', 'xml|pdf');
+        Route::get('facturas/{factura}/ver/{tipo}', [App\Http\Controllers\FacturaController::class, 'visualizar'])
+            ->name('facturas.visualizar')->where('tipo', 'xml|pdf');
+        Route::get('reportes/mensual', [App\Http\Controllers\FacturaController::class, 'reporteMensual'])->name('facturas.reporte-mensual');
+        Route::get('reportes/anual', [App\Http\Controllers\FacturaController::class, 'reporteAnual'])->name('facturas.reporte-anual');
+        Route::post('reportes/declaracion', [App\Http\Controllers\FacturaController::class, 'guardarDeclaracion'])->name('facturas.declaracion.guardar');
+
+        Route::get('sat/descarga', [App\Http\Controllers\SatDescargaController::class, 'index'])->name('sat.index');
+        Route::post('sat/solicitar', [App\Http\Controllers\SatDescargaController::class, 'solicitar'])->name('sat.solicitar');
+        Route::post('sat/verificar/{solicitud}', [App\Http\Controllers\SatDescargaController::class, 'verificar'])->name('sat.verificar');
+        Route::post('sat/descargar/{solicitud}', [App\Http\Controllers\SatDescargaController::class, 'descargar'])->name('sat.descargar');
+        Route::post('sat/reimportar/{solicitud}', [App\Http\Controllers\SatDescargaController::class, 'reimportar'])->name('sat.reimportar');
+        Route::delete('sat/solicitud/{solicitud}', [App\Http\Controllers\SatDescargaController::class, 'eliminarSolicitud'])->name('sat.solicitud.eliminar');
+        Route::post('sat/credencial', [App\Http\Controllers\SatDescargaController::class, 'guardarCredencial'])->name('sat.credencial.guardar');
+        Route::delete('sat/credencial', [App\Http\Controllers\SatDescargaController::class, 'eliminarCredencial'])->name('sat.credencial.eliminar');
+    });
 });
 
 /* ==================== SUPERADMIN ==================== */

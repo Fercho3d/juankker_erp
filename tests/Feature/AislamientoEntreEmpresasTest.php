@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Models\CrmActivity;
 use App\Models\CrmBorrador;
 use App\Models\CrmStage;
+use App\Models\Factura;
 use App\Models\Lead;
 use App\Models\Product;
 use App\Models\ProductAttribute;
@@ -16,6 +17,7 @@ use App\Models\ProductVariant;
 use App\Models\Role;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\SatSolicitud;
 use App\Models\Supplier;
 use App\Models\TeamInvitation;
 use App\Models\User;
@@ -113,6 +115,15 @@ class AislamientoEntreEmpresasTest extends TestCase
         $this->blancos['invitacion'] = tap((new TeamInvitation([
             'organization_id' => $org, 'role_id' => $this->blancos['perfil']->id, 'email' => strtolower($this->secreto('correo')).'@otra.test',
         ]))->renovar())->save();
+        $this->blancos['factura'] = Factura::create([
+            'uuid' => 'AJENA000-0000-0000-0000-000000000001', 'tipo_factura' => 'emitida', 'fecha_emision' => now(), 'año' => now()->year, 'mes' => now()->month,
+            'rfc_emisor' => 'XAXX010101000', 'nombre_emisor' => $this->secreto('emisor'), 'rfc_receptor' => 'XAXX010101000', 'nombre_receptor' => $this->secreto('receptor'),
+            'user_id' => $this->blancos['miembro']->id,
+        ]);
+        $this->blancos['tipo'] = (new Factura)->forceFill(['id' => 'xml']); // {tipo} no es registro: sólo aporta "xml" a la URL
+        $this->blancos['solicitud'] = SatSolicitud::create([
+            'tipo_factura' => 'emitida', 'fecha_inicio' => now()->startOfYear(), 'fecha_fin' => now(), 'estado' => 'lista', 'user_id' => $this->blancos['miembro']->id,
+        ]);
     }
 
     /** Estado completo del registro, para comparar antes y después (incluso si "se borró"). */
@@ -221,7 +232,8 @@ class AislamientoEntreEmpresasTest extends TestCase
         $pantallas = ['/clientes', '/proveedores', '/productos', '/categorias', '/marcas', '/atributos-producto',
             '/inventario', '/ventas', '/pos', '/crm', '/crm/tablero', '/crm/papelera', '/crm/leads/nuevo', '/crm/importar', '/crm/correos', '/crm/respuestas',
             '/equipo', '/productos/create', '/clientes?search=SECRETO', '/productos?search=SECRETO', '/inventario?search=SECRETO',
-            '/crm/tablero?search=SECRETO', '/crm/papelera?search=SECRETO', '/pos/search?q=SECRETO'];
+            '/crm/tablero?search=SECRETO', '/crm/papelera?search=SECRETO', '/pos/search?q=SECRETO',
+            '/facturas', '/facturas?search=SECRETO', '/reportes/mensual', '/reportes/anual', '/sat/descarga'];
         $api = ['/api/crm/leads', '/api/crm/leads?search=SECRETO', '/api/crm/pendientes', '/api/crm/etapas', '/api/crm/resumen'];
 
         $fugas = [];
