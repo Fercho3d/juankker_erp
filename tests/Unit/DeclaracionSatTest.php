@@ -30,4 +30,11 @@ class DeclaracionSatTest extends TestCase
     {
         $this->assertSame([true, true, false], array_map([\App\Models\Factura::class, 'noDeducibleEnElMes'], ['S01', 'D01', 'G03']));
     }
+
+    public function test_la_actualizacion_coincide_con_el_portal_del_sat_en_enero_2022(): void
+    {
+        $factor = DeclaracionSat::factorActualizacion(2022, 1, ['2022-01' => 118.002, '2026-08' => 145.462]);
+
+        $this->assertSame([376.0, 533.0], [floor(1618 * ($factor - 1)), floor(2292 * ($factor - 1))]);
+    }
 }

@@ -139,7 +139,15 @@ class DeclaracionController extends Controller
         $primerAño = min($totales->keys()->map(fn ($k) => (int) $k)->min() ?? now()->year, $declaraciones->min('año') ?? now()->year);
         $hasta = now()->subMonth();
 
-        return [DeclaracionSat::hojas($totales->all(), $declarado, $primerAño, $hasta->year, $hasta->month), $declaraciones];
+        $hojas = DeclaracionSat::hojas($totales->all(), $declarado, $primerAño, $hasta->year, $hasta->month);
+        // Estimado de lo que el SAT sumará por inflación a lo que falta presentar; se trunca como en el portal
+        foreach ($hojas as $clave => &$h) {
+            $factor = isset($declarado[$clave]) ? 1.0 : DeclaracionSat::factorActualizacion($h['año'], $h['mes'], config('inpc'));
+            $h['actualizacion'] = floor($h['isr_cargo'] * ($factor - 1)) + floor($h['iva_cargo'] * ($factor - 1));
+        }
+        unset($h);
+
+        return [$hojas, $declaraciones];
     }
 
     private function periodo(int $año, ?int $mes, array $totales, ?Declaracion $declaracion): array

@@ -80,6 +80,7 @@
                     <th class="text-right px-3 py-3">Gastos</th>
                     <th class="text-right px-3 py-3">ISR a pagar</th>
                     <th class="text-right px-3 py-3" title="Ya descuenta el saldo a favor de meses anteriores">IVA a pagar</th>
+                    <th class="text-right px-3 py-3" title="Estimada con el INPC más reciente; el SAT la calcula al día en que presentas">Actualización</th>
                     <th class="text-right px-3 py-3">Total a pagar</th>
                     <th class="text-left px-3 py-3">Estado</th>
                     <th class="text-left px-3 py-3">Archivos</th>
@@ -108,7 +109,8 @@
                         <td class="px-3 py-2.5 text-right tabular-nums" title="{{ $p['iva_neto'] < 0 ? 'Saldo a favor del mes: '.$dinero(-$p['iva_neto']) : '' }}">
                             {{ $dinero($p['iva_cargo']) }}@if($p['mes'] && $p['iva_neto'] < 0)<span class="text-emerald-700 text-xs"> (a favor)</span>@endif
                         </td>
-                        <td class="px-3 py-2.5 text-right tabular-nums font-semibold text-gray-900">{{ $dinero($p['isr_cargo'] + $p['iva_cargo']) }}</td>
+                        <td class="px-3 py-2.5 text-right tabular-nums text-gray-500">{{ $p['actualizacion'] ? $dinero($p['actualizacion']) : '—' }}</td>
+                        <td class="px-3 py-2.5 text-right tabular-nums font-semibold text-gray-900">{{ $dinero($p['isr_cargo'] + $p['iva_cargo'] + $p['actualizacion']) }}</td>
                         <td class="px-3 py-2.5 whitespace-nowrap">
                             <span class="inline-block px-2 py-0.5 text-xs font-semibold border rounded-full {{ $clase }}" title="{{ $d?->notas }}">
                                 {{ $etiqueta }}{{ $d?->fecha_presentacion ? ' '.$d->fecha_presentacion->format('d/m/Y') : '' }}
@@ -140,7 +142,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" class="px-4 py-10 text-center text-gray-400">No hay periodos con este filtro.</td></tr>
+                    <tr><td colspan="10" class="px-4 py-10 text-center text-gray-400">No hay periodos con este filtro.</td></tr>
                 @endforelse
             </tbody>
             @php
@@ -156,7 +158,8 @@
                         <td class="px-3 py-3 text-right tabular-nums text-amber-700">{{ $dinero($meses_->sum('gastos_periodo')) }}</td>
                         <td class="px-3 py-3 text-right tabular-nums">{{ $dinero($meses_->sum('isr_cargo')) }}</td>
                         <td class="px-3 py-3 text-right tabular-nums">{{ $dinero($meses_->sum('iva_cargo')) }}</td>
-                        <td class="px-3 py-3 text-right tabular-nums text-gray-900">{{ $dinero($meses_->sum('isr_cargo') + $meses_->sum('iva_cargo')) }}</td>
+                        <td class="px-3 py-3 text-right tabular-nums text-gray-500">{{ $dinero($meses_->sum('actualizacion')) }}</td>
+                        <td class="px-3 py-3 text-right tabular-nums text-gray-900">{{ $dinero($meses_->sum('isr_cargo') + $meses_->sum('iva_cargo') + $meses_->sum('actualizacion')) }}</td>
                         <td colspan="3"></td>
                     </tr>
                     @if($pendientes->count() !== $meses_->count())
@@ -165,11 +168,12 @@
                             <td colspan="2"></td>
                             <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('isr_cargo')) }}</td>
                             <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('iva_cargo')) }}</td>
-                            <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('isr_cargo') + $pendientes->sum('iva_cargo')) }}</td>
+                            <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('actualizacion')) }}</td>
+                            <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('isr_cargo') + $pendientes->sum('iva_cargo') + $pendientes->sum('actualizacion')) }}</td>
                             <td colspan="3"></td>
                         </tr>
                     @endif
-                    <tr><td colspan="9" class="px-4 py-2 text-xs font-normal text-gray-500">Sólo impuesto; el SAT le suma la actualización por inflación y, en 2025 y 2026, los recargos.</td></tr>
+                    <tr><td colspan="10" class="px-4 py-2 text-xs font-normal text-gray-500">Actualización estimada con el INPC de {{ \Illuminate\Support\Str::of(array_key_last(config('inpc'))) }}; el SAT la calcula al día en que presentas. No incluye recargos: en 2024 y anteriores se perdonan con el estímulo de regularización; en 2025 y 2026 sí se pagan.</td></tr>
                 </tfoot>
             @endif
         </table>

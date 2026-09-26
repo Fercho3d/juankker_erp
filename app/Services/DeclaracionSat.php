@@ -36,6 +36,23 @@ class DeclaracionSat
         return max(array_filter(array_keys(self::TARIFAS), fn ($a) => $a <= $año) ?: [2022]);
     }
 
+    /**
+     * Factor de actualización (art. 17-A CFF) de un pago mensual que vencía en el mes
+     * siguiente: INPC más reciente entre el del mes del periodo, truncado a diezmilésimos.
+     *
+     * @param  array<string, float>  $inpc  "YYYY-MM" => índice
+     */
+    public static function factorActualizacion(int $año, int $mes, array $inpc): float
+    {
+        $base = $inpc[sprintf('%d-%02d', $año, $mes)] ?? null;
+        $reciente = $inpc ? $inpc[max(array_keys($inpc))] : null;
+        if (! $base || ! $reciente) {
+            return 1.0;
+        }
+
+        return max(1.0, floor($reciente / $base * 10000) / 10000);
+    }
+
     /** ISR de la tarifa acumulada a $meses meses sobre una base gravable. */
     public static function isrTarifa(float $base, int $año, int $meses): float
     {

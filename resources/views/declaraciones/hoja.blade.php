@@ -92,6 +92,13 @@
             <div class="text-xs text-gray-500">IVA a pagar</div>
             <div class="text-2xl font-bold text-gray-900">${{ number_format($h['iva_cargo']) }}</div>
         </div>
+        @if($h['actualizacion'])
+            <div class="col-span-2 text-sm text-gray-600 -mt-1">
+                + <strong>${{ number_format($h['actualizacion']) }}</strong> de actualización estimada (ISR ${{ number_format(floor($h['isr_cargo'] * (\App\Services\DeclaracionSat::factorActualizacion($h['año'], $h['mes'], config('inpc')) - 1))) }},
+                IVA ${{ number_format(floor($h['iva_cargo'] * (\App\Services\DeclaracionSat::factorActualizacion($h['año'], $h['mes'], config('inpc')) - 1))) }})
+                = <strong>${{ number_format($h['isr_cargo'] + $h['iva_cargo'] + $h['actualizacion']) }}</strong> en el portal, sin recargos.
+            </div>
+        @endif
     </div>
 
     @foreach(['ISR personas físicas, actividad empresarial y profesional' => $isr, 'IVA simplificado' => $iva] as $seccion => $campos)
