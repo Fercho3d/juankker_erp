@@ -45,6 +45,7 @@ return [
         'nombre' => env('CRM_MAIL_NOMBRE'),
         'por_dia' => env('CRM_ENVIOS_POR_DIA', 20),
         'imap_host' => env('CRM_IMAP_HOST', 'imap.migadu.com'),
+        'imap_password' => env('CRM_MAIL_PASSWORD'),
     ],
 
     // Aviso interno cuando una empresa se registra en el ERP.

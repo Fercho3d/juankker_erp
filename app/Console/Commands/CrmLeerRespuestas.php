@@ -16,7 +16,7 @@ class CrmLeerRespuestas extends Command
     public function handle(): int
     {
         $buzon = config('services.crm_envio.remitente');
-        $password = config('mail.mailers.prospeccion.password');
+        $password = config('services.crm_envio.imap_password');
         $org = (int) config('services.crm_envio.organizacion');
 
         if (! $buzon || ! $password || ! $org) {

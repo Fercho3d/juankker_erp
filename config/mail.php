@@ -53,8 +53,9 @@ return [
             'host' => env('CRM_MAIL_HOST', 'smtp.migadu.com'),
             'port' => env('CRM_MAIL_PORT', 465),
             'encryption' => env('CRM_MAIL_ENCRYPTION', 'ssl'),
-            'username' => env('CRM_MAIL_USERNAME'),
-            'password' => env('CRM_MAIL_PASSWORD'),
+            // El SMTP puede ser otro (p. ej. Resend) sin mover el buzón IMAP.
+            'username' => env('CRM_SMTP_USERNAME', env('CRM_MAIL_USERNAME')),
+            'password' => env('CRM_SMTP_PASSWORD', env('CRM_MAIL_PASSWORD')),
             'timeout' => 20,
         ],
 
