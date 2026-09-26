@@ -61,18 +61,22 @@
     </div>
 
     {{-- Filtros --}}
-    <form method="GET" class="flex flex-wrap items-center gap-3 mb-4">
-        <select name="año" onchange="this.form.submit()" class="px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white">
-            <option value="">Todos los años</option>
-            @foreach($años as $a)
-                <option value="{{ $a }}" @selected(request('año') == $a)>{{ $a }}</option>
+    @php
+        $boton = fn ($activo) => 'px-4 py-2 rounded-xl text-sm font-semibold border transition-colors '
+            .($activo ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400');
+    @endphp
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('declaraciones.index', array_filter(['estado' => request('estado')])) }}" class="{{ $boton(! request('año')) }}">Todos</a>
+            @foreach($años->sort() as $a)
+                <a href="{{ route('declaraciones.index', array_filter(['año' => $a, 'estado' => request('estado')])) }}" class="{{ $boton(request('año') == $a) }}">{{ $a }}</a>
             @endforeach
-        </select>
-        <select name="estado" onchange="this.form.submit()" class="px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white">
-            <option value="">Todas</option>
-            <option value="pendientes" @selected(request('estado') === 'pendientes')>Sólo pendientes</option>
-        </select>
-    </form>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ route('declaraciones.index', array_filter(['año' => request('año')])) }}" class="{{ $boton(request('estado') !== 'pendientes') }}">Todas</a>
+            <a href="{{ route('declaraciones.index', array_filter(['año' => request('año'), 'estado' => 'pendientes'])) }}" class="{{ $boton(request('estado') === 'pendientes') }}">Sólo pendientes</a>
+        </div>
+    </div>
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
         <table class="w-full text-sm">
