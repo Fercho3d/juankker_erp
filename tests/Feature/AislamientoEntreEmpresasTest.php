@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Models\CrmActivity;
 use App\Models\CrmBorrador;
 use App\Models\CrmStage;
+use App\Models\Declaracion;
 use App\Models\Factura;
 use App\Models\Lead;
 use App\Models\Product;
@@ -121,6 +122,8 @@ class AislamientoEntreEmpresasTest extends TestCase
             'user_id' => $this->blancos['miembro']->id,
         ]);
         $this->blancos['tipo'] = (new Factura)->forceFill(['id' => 'xml']); // {tipo} no es registro: sólo aporta "xml" a la URL
+        $this->blancos['declaracion'] = Declaracion::create(['user_id' => $this->blancos['miembro']->id, 'año' => 2024, 'mes' => 1, 'notas' => $this->secreto('declaracion'), 'acuse_path' => 'declaraciones/ajeno.pdf']);
+        $this->blancos['archivo'] = (new Declaracion)->forceFill(['id' => 'acuse']); // {archivo} no es registro: sólo aporta "acuse" a la URL
         $this->blancos['solicitud'] = SatSolicitud::create([
             'tipo_factura' => 'emitida', 'fecha_inicio' => now()->startOfYear(), 'fecha_fin' => now(), 'estado' => 'lista', 'user_id' => $this->blancos['miembro']->id,
         ]);
@@ -233,7 +236,7 @@ class AislamientoEntreEmpresasTest extends TestCase
             '/inventario', '/ventas', '/pos', '/crm', '/crm/tablero', '/crm/papelera', '/crm/leads/nuevo', '/crm/importar', '/crm/correos', '/crm/respuestas',
             '/equipo', '/productos/create', '/clientes?search=SECRETO', '/productos?search=SECRETO', '/inventario?search=SECRETO',
             '/crm/tablero?search=SECRETO', '/crm/papelera?search=SECRETO', '/pos/search?q=SECRETO',
-            '/facturas', '/facturas?search=SECRETO', '/reportes/mensual', '/reportes/anual', '/sat/descarga'];
+            '/facturas', '/facturas?search=SECRETO', '/reportes/mensual', '/reportes/anual', '/sat/descarga', '/declaraciones'];
         $api = ['/api/crm/leads', '/api/crm/leads?search=SECRETO', '/api/crm/pendientes', '/api/crm/etapas', '/api/crm/resumen'];
 
         $fugas = [];

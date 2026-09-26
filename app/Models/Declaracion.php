@@ -12,7 +12,7 @@ class Declaracion extends Model
         'user_id', 'año', 'mes',
         'iva_pagado', 'isr_pagado',
         'fecha_presentacion', 'fecha_pago',
-        'notas', 'omitida_sat',
+        'notas', 'omitida_sat', 'acuse_path', 'pago_path',
     ];
 
     protected $casts = [

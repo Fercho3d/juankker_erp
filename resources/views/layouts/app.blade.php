@@ -28,7 +28,7 @@
             ],
             __('Contabilidad') => [
                 [__('Facturas'), 'facturas.index', ['facturas.index', 'facturas.show', 'facturas.create', 'facturas.edit'], 'factura', false, 'contabilidad'],
-                [__('Declaraciones'), 'facturas.reporte-mensual', ['facturas.reporte-*'], 'calculadora', false, 'contabilidad'],
+                [__('Declaraciones'), 'declaraciones.index', ['declaraciones.*', 'facturas.reporte-*'], 'calculadora', false, 'contabilidad'],
                 [__('Descarga SAT'), 'sat.index', ['sat.*'], 'descarga', false, 'contabilidad'],
             ],
             __('Cuenta') => [

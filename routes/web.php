@@ -197,6 +197,11 @@ Route::middleware('auth')->group(function () {
         Route::get('reportes/anual', [App\Http\Controllers\FacturaController::class, 'reporteAnual'])->name('facturas.reporte-anual');
         Route::post('reportes/declaracion', [App\Http\Controllers\FacturaController::class, 'guardarDeclaracion'])->name('facturas.declaracion.guardar');
 
+        Route::get('declaraciones', [App\Http\Controllers\DeclaracionController::class, 'index'])->name('declaraciones.index');
+        Route::post('declaraciones', [App\Http\Controllers\DeclaracionController::class, 'guardar'])->name('declaraciones.guardar');
+        Route::get('declaraciones/{declaracion}/{archivo}', [App\Http\Controllers\DeclaracionController::class, 'archivo'])
+            ->name('declaraciones.archivo')->where('archivo', 'acuse|pago');
+
         Route::get('sat/descarga', [App\Http\Controllers\SatDescargaController::class, 'index'])->name('sat.index');
         Route::post('sat/solicitar', [App\Http\Controllers\SatDescargaController::class, 'solicitar'])->name('sat.solicitar');
         Route::post('sat/verificar/{solicitud}', [App\Http\Controllers\SatDescargaController::class, 'verificar'])->name('sat.verificar');
