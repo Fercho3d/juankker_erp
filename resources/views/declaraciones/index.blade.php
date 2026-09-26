@@ -83,12 +83,14 @@
             <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
                 <tr>
                     <th class="text-left px-4 py-3">Periodo</th>
-                    <th class="text-right px-2 py-3">Ingresos</th>
-                    <th class="text-right px-2 py-3">Gastos</th>
+                    <th class="hidden 2xl:table-cell text-right px-2 py-3">Ingresos</th>
+                    <th class="hidden 2xl:table-cell text-right px-2 py-3">Gastos</th>
                     <th class="text-right px-2 py-3">ISR a pagar</th>
                     <th class="text-right px-2 py-3" title="Ya descuenta el saldo a favor de meses anteriores">IVA a pagar</th>
                     <th class="text-right px-2 py-3" title="Estimada con el INPC más reciente; el SAT la calcula al día en que presentas">Actualización</th>
                     <th class="text-right px-2 py-3">Total a pagar</th>
+                    <th class="text-right px-2 py-3">Pagado</th>
+                    <th class="text-right px-2 py-3">Por pagar</th>
                     <th class="text-left px-2 py-3">Estado</th>
                     <th class="px-2 py-3"></th>
                 </tr>
@@ -104,19 +106,22 @@
                             'fecha_presentacion' => $d?->fecha_presentacion?->format('Y-m-d'), 'fecha_pago' => $d?->fecha_pago?->format('Y-m-d'),
                             'isr_pagado' => $d?->isPresentada() ? $d->isr_pagado : $p['isr_cargo'],
                             'iva_pagado' => $d?->isPresentada() ? $d->iva_pagado : $p['iva_cargo'], 'notas' => $d?->notas,
+                            'monto_linea_captura' => round($p['total']),
                         ];
                     @endphp
                     <tr id="p-{{ $p['año'] }}-{{ $p['mes'] ?? 0 }}"
                         class="border-t border-gray-100 {{ $p['mes'] ? '' : 'bg-indigo-50/60 font-semibold' }} {{ $esSiguiente ? 'ring-2 ring-inset ring-indigo-400' : '' }}">
                         <td class="px-3 py-2 whitespace-nowrap text-gray-900">{{ $nombre($p) }}</td>
-                        <td class="px-2 py-2 text-right tabular-nums text-emerald-700">{{ $dinero($p['ingresos_periodo']) }}</td>
-                        <td class="px-2 py-2 text-right tabular-nums text-amber-700">{{ $dinero($p['gastos_periodo']) }}</td>
+                        <td class="hidden 2xl:table-cell px-2 py-2 text-right tabular-nums text-emerald-700">{{ $dinero($p['ingresos_periodo']) }}</td>
+                        <td class="hidden 2xl:table-cell px-2 py-2 text-right tabular-nums text-amber-700">{{ $dinero($p['gastos_periodo']) }}</td>
                         <td class="px-2 py-2 text-right tabular-nums">{{ $dinero($p['isr_cargo']) }}</td>
                         <td class="px-2 py-2 text-right tabular-nums" title="{{ $p['iva_neto'] < 0 ? 'Saldo a favor del mes: '.$dinero(-$p['iva_neto']) : '' }}">
                             {{ $dinero($p['iva_cargo']) }}@if($p['mes'] && $p['iva_neto'] < 0)<span class="text-emerald-700 text-xs"> (a favor)</span>@endif
                         </td>
                         <td class="px-2 py-2 text-right tabular-nums text-gray-500">{{ $p['actualizacion'] ? $dinero($p['actualizacion']) : '—' }}</td>
-                        <td class="px-2 py-2 text-right tabular-nums font-semibold text-gray-900">{{ $dinero($p['isr_cargo'] + $p['iva_cargo'] + $p['actualizacion']) }}</td>
+                        <td class="px-2 py-2 text-right tabular-nums font-semibold text-gray-900" title="{{ $d?->monto_linea_captura !== null ? 'Monto de tu línea de captura' : 'Estimado' }}">{{ $dinero($p['total']) }}</td>
+                        <td class="px-2 py-2 text-right tabular-nums text-emerald-700">{{ $p['pagado'] ? $dinero($p['pagado']) : '—' }}</td>
+                        <td class="px-2 py-2 text-right tabular-nums font-semibold {{ $p['por_pagar'] > 0 ? 'text-red-700' : 'text-gray-400' }}">{{ $p['por_pagar'] > 0 ? $dinero($p['por_pagar']) : '—' }}</td>
                         <td class="px-2 py-2"><div class="flex flex-wrap gap-1">
                             <span class="inline-block px-2 py-0.5 text-xs font-semibold border rounded-full {{ $clase }}" title="{{ $d?->notas }}">
                                 {{ $etiqueta }}{{ $d?->fecha_presentacion ? ' '.$d->fecha_presentacion->format('d/m/Y') : '' }}
@@ -149,38 +154,28 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" class="px-4 py-10 text-center text-gray-400">No hay periodos con este filtro.</td></tr>
+                    <tr><td colspan="11" class="px-4 py-10 text-center text-gray-400">No hay periodos con este filtro.</td></tr>
                 @endforelse
             </tbody>
             @php
                 // Sólo meses: las filas anuales ya son la suma de sus meses
                 $meses_ = collect($periodos)->whereNotNull('mes');
-                $pendientes = $meses_->reject(fn ($p) => $p['declaracion']?->isPagada());
             @endphp
             @if($meses_->isNotEmpty())
                 <tfoot class="border-t-2 border-gray-200 bg-gray-50 font-semibold">
                     <tr>
                         <td class="px-4 py-3 text-gray-900">Total ({{ $meses_->count() }} meses)</td>
-                        <td class="px-2 py-3 text-right tabular-nums text-emerald-700">{{ $dinero($meses_->sum('ingresos_periodo')) }}</td>
-                        <td class="px-2 py-3 text-right tabular-nums text-amber-700">{{ $dinero($meses_->sum('gastos_periodo')) }}</td>
+                        <td class="hidden 2xl:table-cell px-2 py-3 text-right tabular-nums text-emerald-700">{{ $dinero($meses_->sum('ingresos_periodo')) }}</td>
+                        <td class="hidden 2xl:table-cell px-2 py-3 text-right tabular-nums text-amber-700">{{ $dinero($meses_->sum('gastos_periodo')) }}</td>
                         <td class="px-2 py-3 text-right tabular-nums">{{ $dinero($meses_->sum('isr_cargo')) }}</td>
                         <td class="px-2 py-3 text-right tabular-nums">{{ $dinero($meses_->sum('iva_cargo')) }}</td>
                         <td class="px-2 py-3 text-right tabular-nums text-gray-500">{{ $dinero($meses_->sum('actualizacion')) }}</td>
-                        <td class="px-2 py-3 text-right tabular-nums text-gray-900">{{ $dinero($meses_->sum('isr_cargo') + $meses_->sum('iva_cargo') + $meses_->sum('actualizacion')) }}</td>
+                        <td class="px-2 py-3 text-right tabular-nums text-gray-900">{{ $dinero($meses_->sum('total')) }}</td>
+                        <td class="px-2 py-3 text-right tabular-nums text-emerald-700">{{ $dinero($meses_->sum('pagado')) }}</td>
+                        <td class="px-2 py-3 text-right tabular-nums text-red-700">{{ $dinero($meses_->sum('por_pagar')) }}</td>
                         <td colspan="2"></td>
                     </tr>
-                    @if($pendientes->count() !== $meses_->count())
-                        <tr class="text-red-700">
-                            <td class="px-4 py-2">Falta por pagar ({{ $pendientes->count() }} meses)</td>
-                            <td colspan="2"></td>
-                            <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('isr_cargo')) }}</td>
-                            <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('iva_cargo')) }}</td>
-                            <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('actualizacion')) }}</td>
-                            <td class="px-3 py-2 text-right tabular-nums">{{ $dinero($pendientes->sum('isr_cargo') + $pendientes->sum('iva_cargo') + $pendientes->sum('actualizacion')) }}</td>
-                            <td colspan="2"></td>
-                        </tr>
-                    @endif
-                    <tr><td colspan="9" class="px-4 py-2 text-xs font-normal text-gray-500">Actualización estimada con el INPC de {{ \Illuminate\Support\Str::of(array_key_last(config('inpc'))) }}; el SAT la calcula al día en que presentas. No incluye recargos: en 2024 y anteriores se perdonan con el estímulo de regularización; en 2025 y 2026 sí se pagan.</td></tr>
+                    <tr><td colspan="11" class="px-4 py-2 text-xs font-normal text-gray-500">Actualización estimada con el INPC de {{ \Illuminate\Support\Str::of(array_key_last(config('inpc'))) }}; el SAT la calcula al día en que presentas. No incluye recargos: en 2024 y anteriores se perdonan con el estímulo de regularización; en 2025 y 2026 sí se pagan.</td></tr>
                 </tfoot>
             @endif
         </table>
@@ -212,9 +207,12 @@
                 <input type="date" name="fecha_presentacion" class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"></label>
             <label class="block"><span class="text-sm text-gray-700">Fecha pago</span>
                 <input type="date" name="fecha_pago" class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"></label>
-            <label class="block"><span class="text-sm text-gray-700">ISR pagado</span>
+            <label class="block col-span-2"><span class="text-sm font-medium text-gray-700">Total de la línea de captura</span>
+                <input type="number" step="1" min="0" name="monto_linea_captura" class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                <span class="text-xs text-gray-400">Lo que pagas en el banco (con actualización). Viene estimado; ajústalo al de tu acuse.</span></label>
+            <label class="block"><span class="text-sm text-gray-700">ISR a cargo (sin actualización)</span>
                 <input type="number" step="0.01" min="0" name="isr_pagado" class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"></label>
-            <label class="block"><span class="text-sm text-gray-700">IVA pagado</span>
+            <label class="block"><span class="text-sm text-gray-700">IVA a cargo (sin actualización)</span>
                 <input type="number" step="0.01" min="0" name="iva_pagado" class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"></label>
         </div>
         <label class="block"><span class="text-sm text-gray-700">Notas</span>
@@ -234,7 +232,7 @@
         const f = dlg.querySelector('form');
         f.reset();
         dlg.querySelector('[data-titulo]').textContent = d.titulo;
-        for (const k of ['año', 'mes', 'fecha_presentacion', 'fecha_pago', 'iva_pagado', 'isr_pagado', 'notas']) {
+        for (const k of ['año', 'mes', 'fecha_presentacion', 'fecha_pago', 'iva_pagado', 'isr_pagado', 'monto_linea_captura', 'notas']) {
             f.elements[k].value = d[k] ?? '';
         }
         dlg.showModal();

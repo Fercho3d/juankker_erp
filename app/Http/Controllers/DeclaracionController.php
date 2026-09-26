@@ -25,7 +25,13 @@ class DeclaracionController extends Controller
             if ($h['mes'] === 12) {
                 $delAño = array_filter($hojas, fn ($x) => $x['año'] === $h['año']);
                 $anual = array_combine(array_keys($h), array_map(fn ($k) => array_sum(array_column($delAño, $k)), array_keys($h)));
-                $periodos[] = $this->periodo($h['año'], null, $anual, $declaraciones->get($h['año'].'-0'));
+                $anual = $this->periodo($h['año'], null, $anual, $declaraciones->get($h['año'].'-0'));
+                // La fila anual es el subtotal del año: lo que se paga es lo de sus meses
+                $mesesDelAño = array_filter($periodos, fn ($p) => $p['año'] === $h['año']);
+                foreach (['total', 'pagado', 'por_pagar'] as $k) {
+                    $anual[$k] = array_sum(array_column($mesesDelAño, $k));
+                }
+                $periodos[] = $anual;
             }
         }
 
@@ -71,6 +77,7 @@ class DeclaracionController extends Controller
             'fecha_pago' => 'nullable|date',
             'iva_pagado' => 'nullable|numeric|min:0',
             'isr_pagado' => 'nullable|numeric|min:0',
+            'monto_linea_captura' => 'nullable|numeric|min:0',
             'notas' => 'nullable|string|max:300',
             'acuse' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
             'pago' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
@@ -82,6 +89,7 @@ class DeclaracionController extends Controller
         $declaracion->fill($request->only('fecha_presentacion', 'fecha_pago', 'notas'));
         $declaracion->iva_pagado = $request->iva_pagado ?? $declaracion->iva_pagado ?? 0;
         $declaracion->isr_pagado = $request->isr_pagado ?? $declaracion->isr_pagado ?? 0;
+        $declaracion->monto_linea_captura = $request->monto_linea_captura ?? $declaracion->monto_linea_captura;
 
         foreach (['acuse', 'pago'] as $archivo) {
             if ($request->hasFile($archivo)) {
@@ -153,7 +161,16 @@ class DeclaracionController extends Controller
 
     private function periodo(int $año, ?int $mes, array $totales, ?Declaracion $declaracion): array
     {
+        // Lo de la línea de captura manda; sin ella, el impuesto más la actualización estimada
+        $total = $declaracion?->monto_linea_captura !== null
+            ? (float) $declaracion->monto_linea_captura
+            : $totales['isr_cargo'] + $totales['iva_cargo'] + $totales['actualizacion'];
+        $pagado = $declaracion?->isPagada() ? $total : 0.0;
+
         return [
+            'total' => $total,
+            'pagado' => $pagado,
+            'por_pagar' => $total - $pagado,
             'año' => $año,
             'mes' => $mes,
             'declaracion' => $declaracion,

@@ -10,7 +10,7 @@ class Declaracion extends Model
 
     protected $fillable = [
         'user_id', 'año', 'mes',
-        'iva_pagado', 'isr_pagado',
+        'iva_pagado', 'isr_pagado', 'monto_linea_captura',
         'fecha_presentacion', 'fecha_pago',
         'notas', 'omitida_sat', 'acuse_path', 'pago_path',
     ];
