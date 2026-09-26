@@ -9,7 +9,7 @@
     $nombre = fn ($p) => $p['mes'] ? $meses[$p['mes']].' '.$p['año'] : 'Anual '.$p['año'];
     $dinero = fn ($n) => ($n < 0 ? '-$' : '$').number_format(abs($n), 2);
     $badges = [
-        'presentada' => ['Presentada', 'bg-emerald-50 text-emerald-700 border-emerald-200'],
+        'presentada' => ['Presentada', 'bg-sky-50 text-sky-700 border-sky-200'],
         'omitida' => ['Omitida SAT', 'bg-red-50 text-red-700 border-red-200'],
         'por_presentar' => ['Por presentar', 'bg-amber-50 text-amber-700 border-amber-200'],
     ];
@@ -44,7 +44,10 @@
         </div>
         <div class="bg-white border border-gray-200 rounded-xl p-4">
             <div class="text-xs text-gray-500">Presentadas</div>
-            <div class="text-2xl font-bold text-emerald-600">{{ $conteo['presentada'] ?? 0 }}</div>
+            <div class="text-2xl font-bold text-sky-600">{{ $conteo['presentada'] ?? 0 }}</div>
+            @if($conteo['presentada'] ?? 0)
+                <div class="text-xs {{ $sinPagar ? 'text-red-600' : 'text-emerald-600' }}">{{ $sinPagar ? $sinPagar.' sin pagar' : 'todas pagadas' }}</div>
+            @endif
         </div>
         <div class="bg-indigo-600 text-white rounded-xl p-4">
             <div class="text-xs text-indigo-100">Sigue</div>
@@ -116,7 +119,9 @@
                                 {{ $etiqueta }}{{ $d?->fecha_presentacion ? ' '.$d->fecha_presentacion->format('d/m/Y') : '' }}
                             </span>
                             @if($d?->isPagada())
-                                <span class="inline-block px-2 py-0.5 text-xs font-semibold border rounded-full bg-emerald-50 text-emerald-700 border-emerald-200">Pagada</span>
+                                <span class="inline-block px-2 py-0.5 text-xs font-semibold border rounded-full bg-emerald-50 text-emerald-700 border-emerald-200">Pagada {{ $d->fecha_pago->format('d/m/Y') }}</span>
+                            @elseif($p['estado'] === 'presentada')
+                                <span class="inline-block px-2 py-0.5 text-xs font-semibold border rounded-full bg-red-50 text-red-700 border-red-200">Sin pagar</span>
                             @endif
                         </td>
                         <td class="px-3 py-2.5 whitespace-nowrap text-xs">
@@ -135,9 +140,9 @@
                                 <a href="{{ route('facturas.reporte-anual', ['año' => $p['año']]) }}" class="text-xs text-gray-500 hover:text-gray-900 mr-2">Detalle</a>
                             @endif
                             <button type="button"
-                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg {{ $p['estado'] === 'presentada' ? 'border border-gray-200 text-gray-600' : 'bg-indigo-600 text-white hover:bg-indigo-700' }}"
+                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg {{ $p['estado'] === 'presentada' && $d->isPagada() ? 'border border-gray-200 text-gray-600' : 'bg-indigo-600 text-white hover:bg-indigo-700' }}"
                                     onclick='abrirDeclaracion(@json($datos))'>
-                                {{ $p['estado'] === 'presentada' ? 'Editar' : 'Registrar' }}
+                                {{ $p['estado'] !== 'presentada' ? 'Registrar' : ($d->isPagada() ? 'Editar' : 'Registrar pago') }}
                             </button>
                         </td>
                     </tr>

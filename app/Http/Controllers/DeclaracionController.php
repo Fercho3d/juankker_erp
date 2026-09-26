@@ -31,6 +31,7 @@ class DeclaracionController extends Controller
 
         $siguiente = collect($periodos)->first(fn ($p) => $p['estado'] !== 'presentada');
         $conteo = collect($periodos)->countBy('estado');
+        $sinPagar = collect($periodos)->filter(fn ($p) => $p['estado'] === 'presentada' && ! $p['declaracion']->isPagada())->count();
         $años = collect($periodos)->pluck('año')->unique()->sortDesc()->values();
 
         if ($request->filled('año')) {
@@ -40,7 +41,7 @@ class DeclaracionController extends Controller
             $periodos = array_filter($periodos, fn ($p) => $p['estado'] !== 'presentada');
         }
 
-        return view('declaraciones.index', compact('periodos', 'siguiente', 'conteo', 'años'));
+        return view('declaraciones.index', compact('periodos', 'siguiente', 'conteo', 'sinPagar', 'años'));
     }
 
     /** Los campos del formulario del SAT de un mes, en el orden en que los pide. */
