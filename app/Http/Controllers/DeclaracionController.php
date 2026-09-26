@@ -75,6 +75,7 @@ class DeclaracionController extends Controller
             'mes' => 'nullable|integer|min:1|max:12',
             'fecha_presentacion' => 'nullable|date',
             'fecha_pago' => 'nullable|date',
+            'vence_pago' => 'nullable|date',
             'iva_pagado' => 'nullable|numeric|min:0',
             'isr_pagado' => 'nullable|numeric|min:0',
             'monto_linea_captura' => 'nullable|numeric|min:0',
@@ -86,7 +87,7 @@ class DeclaracionController extends Controller
         $declaracion = Declaracion::firstOrNew([
             'user_id' => Auth::id(), 'año' => $request->año, 'mes' => $request->mes ?: null,
         ]);
-        $declaracion->fill($request->only('fecha_presentacion', 'fecha_pago', 'notas'));
+        $declaracion->fill($request->only('fecha_presentacion', 'fecha_pago', 'vence_pago', 'notas'));
         $declaracion->iva_pagado = $request->iva_pagado ?? $declaracion->iva_pagado ?? 0;
         $declaracion->isr_pagado = $request->isr_pagado ?? $declaracion->isr_pagado ?? 0;
         $declaracion->monto_linea_captura = $request->monto_linea_captura ?? $declaracion->monto_linea_captura;

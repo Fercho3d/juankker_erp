@@ -11,13 +11,14 @@ class Declaracion extends Model
     protected $fillable = [
         'user_id', 'año', 'mes',
         'iva_pagado', 'isr_pagado', 'monto_linea_captura',
-        'fecha_presentacion', 'fecha_pago',
+        'fecha_presentacion', 'fecha_pago', 'vence_pago',
         'notas', 'omitida_sat', 'acuse_path', 'pago_path',
     ];
 
     protected $casts = [
         'fecha_presentacion' => 'date',
         'fecha_pago' => 'date',
+        'vence_pago' => 'date',
         'iva_pagado' => 'decimal:2',
         'isr_pagado' => 'decimal:2',
         'omitida_sat' => 'boolean',

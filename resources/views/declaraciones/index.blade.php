@@ -107,6 +107,10 @@
                             'isr_pagado' => $d?->isPresentada() ? $d->isr_pagado : $p['isr_cargo'],
                             'iva_pagado' => $d?->isPresentada() ? $d->iva_pagado : $p['iva_cargo'], 'notas' => $d?->notas,
                             'monto_linea_captura' => round($p['total']),
+                            'presentada' => $d?->fecha_presentacion?->format('d/m/Y'), 'pagada' => $d?->fecha_pago?->format('d/m/Y'),
+                            'vence_pago' => $d?->vence_pago?->format('Y-m-d'), 'vence' => $d?->vence_pago?->format('d/m/Y'),
+                            'url_acuse' => $d?->acuse_path ? route('declaraciones.archivo', [$d, 'acuse']) : null,
+                            'url_pago' => $d?->pago_path ? route('declaraciones.archivo', [$d, 'pago']) : null,
                         ];
                     @endphp
                     <tr id="p-{{ $p['año'] }}-{{ $p['mes'] ?? 0 }}"
@@ -130,6 +134,11 @@
                                 <span class="inline-block px-2 py-0.5 text-xs font-semibold border rounded-full bg-emerald-50 text-emerald-700 border-emerald-200">Pagada {{ $d->fecha_pago->format('d/m/Y') }}</span>
                             @elseif($p['estado'] === 'presentada')
                                 <span class="inline-block px-2 py-0.5 text-xs font-semibold border rounded-full bg-red-50 text-red-700 border-red-200">Sin pagar</span>
+                                @if($d->vence_pago)
+                                    <span class="inline-block px-2 py-0.5 text-xs border rounded-full {{ $d->vence_pago->isPast() ? 'bg-red-600 text-white border-red-600' : ($d->vence_pago->diffInDays(now(), true) <= 5 ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white text-gray-600 border-gray-200') }}">
+                                        {{ $d->vence_pago->isPast() ? 'Venció' : 'Pagar antes del' }} {{ $d->vence_pago->format('d/m/Y') }}
+                                    </span>
+                                @endif
                             @endif
                             </div>
                             @if($d?->acuse_path || $d?->pago_path)
@@ -193,13 +202,27 @@
             <h2 class="text-lg font-bold text-gray-900" data-titulo></h2>
             <button type="button" onclick="this.closest('dialog').close()" class="text-gray-400 hover:text-gray-700 text-xl leading-none">&times;</button>
         </div>
+        {{-- Estado actual y archivos ya subidos --}}
+        <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-xl border p-3" data-caja="presentada">
+                <div class="text-xs text-gray-500">Presentación</div>
+                <div class="font-semibold" data-estado="presentada"></div>
+                <a target="_blank" class="text-sm text-indigo-600 hover:underline" data-archivo="acuse">Ver acuse</a>
+            </div>
+            <div class="rounded-xl border p-3" data-caja="pagada">
+                <div class="text-xs text-gray-500">Pago</div>
+                <div class="font-semibold" data-estado="pagada"></div>
+                <div class="text-xs" data-vence></div>
+                <a target="_blank" class="text-sm text-indigo-600 hover:underline" data-archivo="pago">Ver comprobante</a>
+            </div>
+        </div>
         <label class="block">
-            <span class="text-sm font-medium text-gray-700">Acuse de la declaración (PDF o imagen)</span>
+            <span class="text-sm font-medium text-gray-700" data-subir="acuse">Acuse de la declaración (PDF o imagen)</span>
             <input type="file" name="acuse" accept=".pdf,image/*" class="mt-1 block w-full text-sm">
             <span class="text-xs text-gray-400">Al subirlo se marca como presentada.</span>
         </label>
         <label class="block">
-            <span class="text-sm font-medium text-gray-700">Comprobante de pago (opcional)</span>
+            <span class="text-sm font-medium text-gray-700" data-subir="pago">Comprobante de pago</span>
             <input type="file" name="pago" accept=".pdf,image/*" class="mt-1 block w-full text-sm">
         </label>
         <div class="grid grid-cols-2 gap-3">
@@ -207,6 +230,9 @@
                 <input type="date" name="fecha_presentacion" class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"></label>
             <label class="block"><span class="text-sm text-gray-700">Fecha pago</span>
                 <input type="date" name="fecha_pago" class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"></label>
+            <label class="block col-span-2"><span class="text-sm font-medium text-gray-700">Fecha límite de pago</span>
+                <input type="date" name="vence_pago" class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                <span class="text-xs text-gray-400">La vigencia de la línea de captura; viene en tu acuse.</span></label>
             <label class="block col-span-2"><span class="text-sm font-medium text-gray-700">Total de la línea de captura</span>
                 <input type="number" step="1" min="0" name="monto_linea_captura" class="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
                 <span class="text-xs text-gray-400">Lo que pagas en el banco (con actualización). Viene estimado; ajústalo al de tu acuse.</span></label>
@@ -232,7 +258,18 @@
         const f = dlg.querySelector('form');
         f.reset();
         dlg.querySelector('[data-titulo]').textContent = d.titulo;
-        for (const k of ['año', 'mes', 'fecha_presentacion', 'fecha_pago', 'iva_pagado', 'isr_pagado', 'monto_linea_captura', 'notas']) {
+        for (const [k, url, si, no] of [['presentada', d.url_acuse, 'Presentada', 'Sin presentar'], ['pagada', d.url_pago, 'Pagada', 'Sin pagar']]) {
+            const hecho = Boolean(d[k]);
+            dlg.querySelector(`[data-estado="${k}"]`).textContent = hecho ? `${si} el ${d[k]}` : no;
+            dlg.querySelector(`[data-caja="${k}"]`).className = 'rounded-xl border p-3 ' + (hecho ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800');
+            const a = dlg.querySelector(`[data-archivo="${k === 'presentada' ? 'acuse' : 'pago'}"]`);
+            a.hidden = ! url;
+            a.href = url || '#';
+        }
+        dlg.querySelector('[data-vence]').textContent = ! d.pagada && d.vence ? `Fecha límite: ${d.vence}` : '';
+        dlg.querySelector('[data-subir="acuse"]').textContent = d.url_acuse ? 'Reemplazar acuse (PDF o imagen)' : 'Acuse de la declaración (PDF o imagen)';
+        dlg.querySelector('[data-subir="pago"]').textContent = d.url_pago ? 'Reemplazar comprobante de pago' : 'Comprobante de pago';
+        for (const k of ['año', 'mes', 'fecha_presentacion', 'fecha_pago', 'vence_pago', 'iva_pagado', 'isr_pagado', 'monto_linea_captura', 'notas']) {
             f.elements[k].value = d[k] ?? '';
         }
         dlg.showModal();
