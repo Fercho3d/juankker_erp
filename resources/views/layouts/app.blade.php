@@ -99,7 +99,7 @@
                     <p class="shell-nav-label">{{ $seccion }}</p>
                     @foreach ($items as [$etiqueta, $href, $esActivo, $icono, $esPro])
                         <a href="{{ $href }}" class="shell-link {{ $esActivo ? 'is-active' : '' }}"
-                           @if ($esActivo) aria-current="page" @endif title="{{ $etiqueta }}">
+                           @if ($esActivo) aria-current="page" @endif aria-label="{{ $etiqueta }}">
                             @include('partials.nav-icon', ['icon' => $icono])
                             <span class="shell-link-text">{{ $etiqueta }}</span>
                             @if ($esPro) @include('partials.pro-badge') @endif
@@ -108,16 +108,9 @@
                 </div>
             @endforeach
         </nav>
-
-        <div class="shell-sidebar-foot">
-            <button type="button" class="shell-link shell-collapse-btn shell-only-desktop" data-shell-collapse
-                    title="{{ __('Contraer menú') }}" aria-label="{{ __('Contraer menú') }}">
-                @include('partials.nav-icon', ['icon' => 'panel'])
-                <span class="shell-link-text">{{ __('Contraer menú') }}</span>
-            </button>
-        </div>
     </aside>
 
+    <div class="shell-tip" role="tooltip" hidden></div>
     <div class="shell-backdrop" data-shell-close></div>
 
     <div class="shell-main">
@@ -125,6 +118,12 @@
             <button type="button" class="shell-icon-btn shell-only-mobile" data-shell-open aria-label="{{ __('Abrir menú') }}"
                     aria-controls="shell-sidebar" aria-expanded="false">
                 @include('partials.nav-icon', ['icon' => 'menu'])
+            </button>
+            {{-- Contraer/expandir el menú a sólo íconos (escritorio); se recuerda. --}}
+            <button type="button" class="shell-icon-btn shell-collapse-btn shell-only-desktop" data-shell-collapse
+                    aria-controls="shell-sidebar" title="{{ __('Contraer menú') }}" aria-label="{{ __('Contraer menú') }}"
+                    data-titulo-contraer="{{ __('Contraer menú') }}" data-titulo-expandir="{{ __('Expandir menú') }}">
+                @include('partials.nav-icon', ['icon' => 'panel'])
             </button>
 
             <h1 class="shell-title">{{ $titulo ?? config('app.name') }}</h1>

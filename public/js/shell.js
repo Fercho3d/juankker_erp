@@ -46,12 +46,38 @@
 
     /* --- Menú contraído (escritorio) ------------------------------------- */
 
-    document.querySelectorAll('[data-shell-collapse]').forEach(function (boton) {
-        boton.addEventListener('click', function () {
+    var colapsar = document.querySelector('[data-shell-collapse]');
+    var tip = document.querySelector('.shell-tip');
+
+    function rotularColapsar() {
+        var mini = raiz.classList.contains('menu-mini');
+        var texto = colapsar.getAttribute(mini ? 'data-titulo-expandir' : 'data-titulo-contraer');
+        colapsar.title = texto;
+        colapsar.setAttribute('aria-label', texto);
+        colapsar.setAttribute('aria-pressed', mini ? 'true' : 'false');
+    }
+
+    if (colapsar) {
+        rotularColapsar();
+        colapsar.addEventListener('click', function () {
             var mini = raiz.classList.toggle('menu-mini');
             try { localStorage.setItem('menu-mini', mini ? '1' : '0'); } catch (e) {}
+            rotularColapsar();
         });
-    });
+    }
+
+    if (tip) {
+        document.querySelectorAll('.shell-sidebar .shell-link').forEach(function (enlace) {
+            enlace.addEventListener('mouseenter', function () {
+                if (!raiz.classList.contains('menu-mini') || !window.matchMedia('(min-width: 1024px)').matches) return;
+                var r = enlace.getBoundingClientRect();
+                tip.textContent = enlace.getAttribute('aria-label');
+                tip.style.top = (r.top + r.height / 2) + 'px';
+                tip.hidden = false;
+            });
+            enlace.addEventListener('mouseleave', function () { tip.hidden = true; });
+        });
+    }
 
     /* --- Menú de usuario -------------------------------------------------- */
 

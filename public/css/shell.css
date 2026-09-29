@@ -187,11 +187,21 @@ html.dark {
     white-space: nowrap;
 }
 
-.shell-sidebar-foot {
-    display: none; /* sólo trae "Contraer menú", que es de escritorio */
-    flex-shrink: 0;
-    padding: .65rem;
-    border-top: 1px solid var(--sh-line);
+/* Etiqueta flotante del menú contraído: fija para que no la corte el scroll */
+.shell-tip {
+    position: fixed;
+    z-index: 60;
+    left: calc(var(--sh-sidebar-mini) + .5rem);
+    padding: .35rem .6rem;
+    border-radius: .45rem;
+    background: var(--sh-ink);
+    color: var(--sh-panel);
+    font-size: .78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translateY(-50%);
+    box-shadow: var(--sh-shadow);
 }
 
 .pro-badge {
@@ -545,10 +555,9 @@ html.dark .pro-badge { background: rgba(245, 158, 11, .16); color: #fcd34d; }
     .shell-main { padding-left: var(--sh-sidebar); }
     .shell-backdrop, .shell-only-mobile { display: none !important; }
     .shell-only-desktop { display: flex !important; }
-    .shell-sidebar-foot { display: block; }
     .shell-body.menu-abierto { overflow: visible; }
 
-    /* Menú contraído: sólo íconos (la etiqueta queda en el title) */
+    /* Menú contraído: sólo íconos (la etiqueta sale en .shell-tip) */
     html.menu-mini .shell-sidebar { width: var(--sh-sidebar-mini); }
     html.menu-mini .shell-main { padding-left: var(--sh-sidebar-mini); }
     html.menu-mini .shell-brand { justify-content: center; padding: 0; }
