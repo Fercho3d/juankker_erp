@@ -75,6 +75,22 @@ class CrmSeguimientoTest extends TestCase
         $this->assertNotContains($primero->lead_id, $this->candidatos(2));
     }
 
+    public function test_el_tercero_no_sale_si_no_salio_el_segundo(): void
+    {
+        $primero = $this->contactadoHace(7);
+
+        $this->assertNotContains($primero->lead_id, $this->candidatos(3));
+        $this->assertContains($primero->lead_id, $this->candidatos(2));
+    }
+
+    public function test_quien_ya_recibio_el_tercero_no_recibe_el_segundo(): void
+    {
+        $primero = $this->contactadoHace(10);
+        SeguimientoDeProspectos::preparar($primero, 3, 1)->update(['enviado_at' => now()->subDays(3)]);
+
+        $this->assertNotContains($primero->lead_id, $this->candidatos(2));
+    }
+
     public function test_un_toque_que_no_salio_se_reintenta_sin_duplicarlo(): void
     {
         $primero = $this->contactadoHace(3);

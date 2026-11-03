@@ -37,9 +37,14 @@ class SeguimientoDeProspectos
         return CrmBorrador::where('organization_id', $organizationId)
             ->where('toque', 1)
             ->where('enviado_at', '<=', now()->subDays($dias))
-            // Un toque que se quedó sin enviar (SMTP caído, plan vencido) se reintenta.
+            // Un toque que se quedó sin enviar (SMTP caído, plan vencido) se reintenta;
+            // uno que ya salió, o uno posterior, cierra este.
             ->whereNotExists(fn ($q) => $q->from('crm_borradores as s')
-                ->whereColumn('s.lead_id', 'crm_borradores.lead_id')->where('s.toque', $toque)->whereNotNull('s.enviado_at'))
+                ->whereColumn('s.lead_id', 'crm_borradores.lead_id')->where('s.toque', '>=', $toque)->whereNotNull('s.enviado_at'))
+            // Cada toque espera a que haya salido el anterior, con su separación en días.
+            ->when($toque > 2, fn ($q) => $q->whereExists(fn ($q) => $q->from('crm_borradores as p')
+                ->whereColumn('p.lead_id', 'crm_borradores.lead_id')->where('p.toque', $toque - 1)
+                ->where('p.enviado_at', '<=', now()->subDays($dias - config('crm.seguimiento.dias.'.($toque - 1))))))
             ->whereHas('lead', fn ($q) => $q->where('stage_id', $contactado->id)->conCorreoValido())
             ->with('lead')
             ->orderBy('enviado_at')
